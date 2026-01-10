@@ -1,0 +1,6 @@
+// Hello World in VeZ
+// The simplest VeZ program
+
+fn main() {
+    println!("Hello, VeZ!");
+}

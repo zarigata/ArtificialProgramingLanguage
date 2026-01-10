@@ -1,0 +1,199 @@
+(* VeZ Lexical Grammar *)
+(* File Extension: .zari *)
+(* EBNF Notation: ISO/IEC 14977 *)
+
+(* ===== TOKENS ===== *)
+
+program = { token } ;
+
+token = keyword
+      | identifier
+      | literal
+      | operator
+      | delimiter
+      | comment
+      | whitespace ;
+
+(* ===== KEYWORDS ===== *)
+
+keyword = "fn" | "let" | "mut" | "const" | "type"
+        | "struct" | "enum" | "union" | "trait" | "impl"
+        | "if" | "else" | "match" | "loop" | "while" | "for"
+        | "break" | "continue" | "return"
+        | "ref" | "move" | "copy" | "drop"
+        | "unsafe" | "async" | "await" | "yield"
+        | "mod" | "use" | "pub" | "import" | "export"
+        | "as" | "in" | "where" | "self" | "Self"
+        | "static" | "extern" | "inline"
+        | "true" | "false"
+        | "kernel" | "device" | "shared" | "global" | "local"
+        | "barrier" | "sync" ;
+
+(* ===== IDENTIFIERS ===== *)
+
+identifier = identifier_start , { identifier_continue } ;
+
+identifier_start = letter | "_" ;
+
+identifier_continue = letter | digit | "_" ;
+
+letter = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+       | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t"
+       | "u" | "v" | "w" | "x" | "y" | "z"
+       | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
+       | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
+       | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+(* ===== LITERALS ===== *)
+
+literal = integer_literal
+        | float_literal
+        | boolean_literal
+        | character_literal
+        | string_literal ;
+
+(* Integer Literals *)
+
+integer_literal = decimal_literal
+                | hexadecimal_literal
+                | octal_literal
+                | binary_literal ;
+
+decimal_literal = digit , { digit | "_" } , [ integer_suffix ] ;
+
+hexadecimal_literal = "0x" , hex_digit , { hex_digit | "_" } , [ integer_suffix ] ;
+
+octal_literal = "0o" , octal_digit , { octal_digit | "_" } , [ integer_suffix ] ;
+
+binary_literal = "0b" , binary_digit , { binary_digit | "_" } , [ integer_suffix ] ;
+
+hex_digit = digit | "a" | "b" | "c" | "d" | "e" | "f"
+                  | "A" | "B" | "C" | "D" | "E" | "F" ;
+
+octal_digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" ;
+
+binary_digit = "0" | "1" ;
+
+integer_suffix = "i8" | "i16" | "i32" | "i64" | "i128" | "isize"
+               | "u8" | "u16" | "u32" | "u64" | "u128" | "usize" ;
+
+(* Float Literals *)
+
+float_literal = decimal_float | scientific_float ;
+
+decimal_float = digit , { digit | "_" } , "." , digit , { digit | "_" } , [ float_suffix ] ;
+
+scientific_float = ( decimal_float | decimal_literal ) , exponent , [ float_suffix ] ;
+
+exponent = ( "e" | "E" ) , [ "+" | "-" ] , digit , { digit } ;
+
+float_suffix = "f32" | "f64" ;
+
+(* Boolean Literals *)
+
+boolean_literal = "true" | "false" ;
+
+(* Character Literals *)
+
+character_literal = "'" , ( char_content | escape_sequence ) , "'" ;
+
+char_content = ? any Unicode scalar value except ', \, newline, or tab ? ;
+
+escape_sequence = "\\" , ( "n" | "r" | "t" | "\\" | "'" | '"' | "0" )
+                | "\\x" , hex_digit , hex_digit
+                | "\\u{" , hex_digit , { hex_digit } , "}" ;
+
+(* String Literals *)
+
+string_literal = normal_string | raw_string ;
+
+normal_string = '"' , { string_content | escape_sequence } , '"' ;
+
+string_content = ? any Unicode character except ", \, or newline ? ;
+
+raw_string = "r" , [ raw_string_delimiter ] , '"' , { raw_string_content } , '"' , [ raw_string_delimiter ] ;
+
+raw_string_delimiter = "#" , { "#" } ;
+
+raw_string_content = ? any Unicode character ? ;
+
+(* ===== OPERATORS ===== *)
+
+operator = arithmetic_op
+         | bitwise_op
+         | logical_op
+         | comparison_op
+         | assignment_op
+         | range_op
+         | other_op ;
+
+arithmetic_op = "+" | "-" | "*" | "/" | "%" | "**" ;
+
+bitwise_op = "&" | "|" | "^" | "~" | "<<" | ">>" ;
+
+logical_op = "&&" | "||" | "!" ;
+
+comparison_op = "==" | "!=" | "<" | ">" | "<=" | ">=" ;
+
+assignment_op = "=" | "+=" | "-=" | "*=" | "/=" | "%="
+              | "&=" | "|=" | "^=" | "<<=" | ">>=" ;
+
+range_op = ".." | "..=" ;
+
+other_op = "?" | "@" | "#" | "$" ;
+
+(* ===== DELIMITERS ===== *)
+
+delimiter = "(" | ")" | "{" | "}" | "[" | "]"
+          | "," | ";" | ":" | "::" | "."
+          | "->" | "=>" | "|" ;
+
+(* ===== COMMENTS ===== *)
+
+comment = line_comment | block_comment | doc_comment ;
+
+line_comment = "//" , { ? any character except newline ? } , newline ;
+
+block_comment = "/*" , { ? any character ? } , "*/" ;
+
+doc_comment = doc_line_comment | doc_block_comment ;
+
+doc_line_comment = "///" , { ? any character except newline ? } , newline ;
+
+doc_block_comment = "/**" , { ? any character ? } , "*/" ;
+
+(* ===== WHITESPACE ===== *)
+
+whitespace = space | tab | newline | carriage_return ;
+
+space = " " ;
+
+tab = ? horizontal tab character ? ;
+
+newline = ? line feed character ? ;
+
+carriage_return = ? carriage return character ? ;
+
+(* ===== SPECIAL RULES ===== *)
+
+(* Reserved identifiers starting with __ are for compiler use *)
+reserved_identifier = "__" , identifier_continue , { identifier_continue } ;
+
+(* Type keywords *)
+type_keyword = "i8" | "i16" | "i32" | "i64" | "i128" | "isize"
+             | "u8" | "u16" | "u32" | "u64" | "u128" | "usize"
+             | "f32" | "f64"
+             | "bool" | "char" | "str" | "void" | "never" ;
+
+(* ===== NOTES ===== *)
+
+(*
+  - Identifiers are case-sensitive
+  - Keywords cannot be used as identifiers
+  - Underscores in numeric literals are ignored (for readability)
+  - Raw strings can use # delimiters to allow " inside: r#"text"#
+  - Unicode is fully supported in identifiers and strings
+  - Comments can be nested (block comments)
+*)

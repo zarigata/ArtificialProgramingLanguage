@@ -1,0 +1,235 @@
+// Comprehensive VeZ Example Program
+// Demonstrates all major language features
+
+use std::prelude::*;
+
+// Generic data structure with trait bounds
+struct LinkedList<T: Clone> {
+    head: Option<Box<Node<T>>>,
+    len: usize,
+}
+
+struct Node<T> {
+    value: T,
+    next: Option<Box<Node<T>>>,
+}
+
+impl<T: Clone> LinkedList<T> {
+    fn new() -> LinkedList<T> {
+        LinkedList {
+            head: None,
+            len: 0,
+        }
+    }
+    
+    fn push(&mut self, value: T) {
+        let new_node = Box::new(Node {
+            value,
+            next: self.head.take(),
+        });
+        self.head = Some(new_node);
+        self.len += 1;
+    }
+    
+    fn pop(&mut self) -> Option<T> {
+        self.head.take().map(|node| {
+            self.head = node.next;
+            self.len -= 1;
+            node.value
+        })
+    }
+    
+    fn len(&self) -> usize {
+        self.len
+    }
+    
+    fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+}
+
+// Trait implementation
+impl<T: Clone + Display> Display for LinkedList<T> {
+    fn display(&self) -> String {
+        let mut result = String::from("[");
+        let mut current = &self.head;
+        let mut first = true;
+        
+        while let Some(node) = current {
+            if !first {
+                result.push_str(", ");
+            }
+            result.push_str(&node.value.to_string());
+            current = &node.next;
+            first = false;
+        }
+        
+        result.push(']');
+        result
+    }
+}
+
+// Error handling with Result
+fn safe_divide(a: i32, b: i32) -> Result<i32, String> {
+    if b == 0 {
+        Err("Division by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+}
+
+// Pattern matching
+fn classify_number(n: i32) -> String {
+    match n {
+        0 => String::from("zero"),
+        n if n > 0 && n < 10 => String::from("small positive"),
+        n if n >= 10 => String::from("large positive"),
+        n if n < 0 && n > -10 => String::from("small negative"),
+        _ => String::from("large negative"),
+    }
+}
+
+// Recursive function
+fn fibonacci(n: u32) -> u64 {
+    match n {
+        0 => 0,
+        1 => 1,
+        _ => fibonacci(n - 1) + fibonacci(n - 2),
+    }
+}
+
+// Higher-order function
+fn apply_twice<F>(f: F, x: i32) -> i32
+where F: Fn(i32) -> i32 {
+    f(f(x))
+}
+
+// Ownership and borrowing
+fn process_string(s: &String) -> usize {
+    s.len()
+}
+
+fn modify_string(s: &mut String) {
+    s.push_str(" - modified");
+}
+
+// Main function demonstrating all features
+fn main() {
+    println!("=== VeZ Language Feature Demonstration ===\n");
+    
+    // 1. Basic types and variables
+    println!("1. Basic Types:");
+    let x: i32 = 42;
+    let y: f64 = 3.14159;
+    let b: bool = true;
+    let c: char = 'V';
+    println!("  Integer: {}", x);
+    println!("  Float: {}", y);
+    println!("  Boolean: {}", b);
+    println!("  Character: {}\n", c);
+    
+    // 2. Collections
+    println!("2. Collections:");
+    let mut vec = Vec::new();
+    vec.push(1);
+    vec.push(2);
+    vec.push(3);
+    println!("  Vector: {:?}", vec);
+    
+    let mut s = String::from("Hello");
+    s.push_str(", VeZ!");
+    println!("  String: {}\n", s);
+    
+    // 3. Generic data structure
+    println!("3. Generic Linked List:");
+    let mut list = LinkedList::new();
+    list.push(10);
+    list.push(20);
+    list.push(30);
+    println!("  List: {}", list);
+    println!("  Length: {}", list.len());
+    
+    if let Some(value) = list.pop() {
+        println!("  Popped: {}", value);
+    }
+    println!("  After pop: {}\n", list);
+    
+    // 4. Error handling
+    println!("4. Error Handling:");
+    match safe_divide(10, 2) {
+        Ok(result) => println!("  10 / 2 = {}", result),
+        Err(e) => println!("  Error: {}", e),
+    }
+    
+    match safe_divide(10, 0) {
+        Ok(result) => println!("  10 / 0 = {}", result),
+        Err(e) => println!("  Error: {}\n", e),
+    }
+    
+    // 5. Pattern matching
+    println!("5. Pattern Matching:");
+    let numbers = vec![0, 5, 15, -5, -15];
+    for num in numbers.iter() {
+        println!("  {} is {}", num, classify_number(*num));
+    }
+    println!();
+    
+    // 6. Recursion
+    println!("6. Recursion (Fibonacci):");
+    for i in 0..10 {
+        println!("  fib({}) = {}", i, fibonacci(i));
+    }
+    println!();
+    
+    // 7. Higher-order functions
+    println!("7. Higher-Order Functions:");
+    let double = |x| x * 2;
+    let result = apply_twice(double, 5);
+    println!("  apply_twice(double, 5) = {}\n", result);
+    
+    // 8. Ownership and borrowing
+    println!("8. Ownership and Borrowing:");
+    let mut text = String::from("Original");
+    println!("  Before: {}", text);
+    
+    let len = process_string(&text);
+    println!("  Length: {}", len);
+    
+    modify_string(&mut text);
+    println!("  After modification: {}\n", text);
+    
+    // 9. Smart pointers
+    println!("9. Smart Pointers:");
+    let boxed = Box::new(42);
+    println!("  Boxed value: {}", *boxed);
+    
+    let shared = Rc::new(vec![1, 2, 3]);
+    let shared2 = shared.clone();
+    println!("  Shared reference count: {}", Rc::strong_count(&shared));
+    println!("  Shared value: {:?}\n", *shared);
+    
+    // 10. Option type
+    println!("10. Option Type:");
+    let some_value: Option<i32> = Some(42);
+    let no_value: Option<i32> = None;
+    
+    println!("  some_value.unwrap_or(0) = {}", some_value.unwrap_or(0));
+    println!("  no_value.unwrap_or(0) = {}", no_value.unwrap_or(0));
+    
+    let doubled = some_value.map(|x| x * 2);
+    println!("  some_value.map(|x| x * 2) = {:?}\n", doubled);
+    
+    // 11. Result chaining
+    println!("11. Result Chaining:");
+    let result = safe_divide(100, 5)
+        .and_then(|x| safe_divide(x, 2))
+        .and_then(|x| safe_divide(x, 2))
+        .map(|x| x * 3);
+    
+    match result {
+        Ok(val) => println!("  Final result: {}", val),
+        Err(e) => println!("  Error: {}", e),
+    }
+    
+    println!("\n=== All Features Demonstrated Successfully! ===");
+}

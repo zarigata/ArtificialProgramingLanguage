@@ -1,0 +1,306 @@
+// Standard input/output operations
+
+use core::result::Result;
+use collections::String;
+
+// Standard input handle
+pub struct Stdin {
+    // Internal state
+}
+
+impl Stdin {
+    // Get a handle to standard input
+    pub fn new() -> Stdin {
+        Stdin {}
+    }
+    
+    // Read a line from stdin
+    pub fn read_line(&mut self, buf: &mut String) -> Result<usize, IoError> {
+        let mut bytes_read = 0;
+        
+        loop {
+            let byte = unsafe { getchar() };
+            
+            if byte == -1 {
+                // EOF
+                break;
+            }
+            
+            if byte == '\n' as i32 {
+                buf.push('\n');
+                bytes_read += 1;
+                break;
+            }
+            
+            buf.push(byte as u8 as char);
+            bytes_read += 1;
+        }
+        
+        Ok(bytes_read)
+    }
+    
+    // Read all input until EOF
+    pub fn read_to_string(&mut self, buf: &mut String) -> Result<usize, IoError> {
+        let mut bytes_read = 0;
+        
+        loop {
+            let byte = unsafe { getchar() };
+            
+            if byte == -1 {
+                break;
+            }
+            
+            buf.push(byte as u8 as char);
+            bytes_read += 1;
+        }
+        
+        Ok(bytes_read)
+    }
+    
+    // Lock stdin for exclusive access
+    pub fn lock(&self) -> StdinLock {
+        StdinLock { stdin: self }
+    }
+}
+
+// Locked stdin handle
+pub struct StdinLock<'a> {
+    stdin: &'a Stdin,
+}
+
+// Standard output handle
+pub struct Stdout {
+    // Internal state
+}
+
+impl Stdout {
+    // Get a handle to standard output
+    pub fn new() -> Stdout {
+        Stdout {}
+    }
+    
+    // Write a string to stdout
+    pub fn write_str(&mut self, s: &str) -> Result<(), IoError> {
+        for byte in s.bytes() {
+            unsafe {
+                putchar(byte as i32);
+            }
+        }
+        Ok(())
+    }
+    
+    // Write formatted output
+    pub fn write_fmt(&mut self, args: Arguments) -> Result<(), IoError> {
+        self.write_str(&args.to_string())
+    }
+    
+    // Flush the output buffer
+    pub fn flush(&mut self) -> Result<(), IoError> {
+        unsafe {
+            fflush_stdout();
+        }
+        Ok(())
+    }
+    
+    // Lock stdout for exclusive access
+    pub fn lock(&self) -> StdoutLock {
+        StdoutLock { stdout: self }
+    }
+}
+
+// Locked stdout handle
+pub struct StdoutLock<'a> {
+    stdout: &'a Stdout,
+}
+
+impl<'a> StdoutLock<'a> {
+    pub fn write_str(&mut self, s: &str) -> Result<(), IoError> {
+        for byte in s.bytes() {
+            unsafe {
+                putchar(byte as i32);
+            }
+        }
+        Ok(())
+    }
+}
+
+// Standard error handle
+pub struct Stderr {
+    // Internal state
+}
+
+impl Stderr {
+    // Get a handle to standard error
+    pub fn new() -> Stderr {
+        Stderr {}
+    }
+    
+    // Write a string to stderr
+    pub fn write_str(&mut self, s: &str) -> Result<(), IoError> {
+        for byte in s.bytes() {
+            unsafe {
+                fputc(byte as i32, stderr());
+            }
+        }
+        Ok(())
+    }
+    
+    // Write formatted output
+    pub fn write_fmt(&mut self, args: Arguments) -> Result<(), IoError> {
+        self.write_str(&args.to_string())
+    }
+    
+    // Flush the error buffer
+    pub fn flush(&mut self) -> Result<(), IoError> {
+        unsafe {
+            fflush_stderr();
+        }
+        Ok(())
+    }
+    
+    // Lock stderr for exclusive access
+    pub fn lock(&self) -> StderrLock {
+        StderrLock { stderr: self }
+    }
+}
+
+// Locked stderr handle
+pub struct StderrLock<'a> {
+    stderr: &'a Stderr,
+}
+
+// I/O error type
+pub enum IoError {
+    NotFound,
+    PermissionDenied,
+    ConnectionRefused,
+    ConnectionReset,
+    ConnectionAborted,
+    NotConnected,
+    AddrInUse,
+    AddrNotAvailable,
+    BrokenPipe,
+    AlreadyExists,
+    WouldBlock,
+    InvalidInput,
+    InvalidData,
+    TimedOut,
+    WriteZero,
+    Interrupted,
+    Other(String),
+    UnexpectedEof,
+}
+
+impl IoError {
+    pub fn new(kind: IoErrorKind, msg: String) -> IoError {
+        match kind {
+            IoErrorKind::NotFound => IoError::NotFound,
+            IoErrorKind::PermissionDenied => IoError::PermissionDenied,
+            IoErrorKind::Other => IoError::Other(msg),
+            _ => IoError::Other(msg),
+        }
+    }
+}
+
+pub enum IoErrorKind {
+    NotFound,
+    PermissionDenied,
+    ConnectionRefused,
+    ConnectionReset,
+    ConnectionAborted,
+    NotConnected,
+    AddrInUse,
+    AddrNotAvailable,
+    BrokenPipe,
+    AlreadyExists,
+    WouldBlock,
+    InvalidInput,
+    InvalidData,
+    TimedOut,
+    WriteZero,
+    Interrupted,
+    Other,
+    UnexpectedEof,
+}
+
+// Global stdin/stdout/stderr functions
+pub fn stdin() -> Stdin {
+    Stdin::new()
+}
+
+pub fn stdout() -> Stdout {
+    Stdout::new()
+}
+
+pub fn stderr() -> Stderr {
+    Stderr::new()
+}
+
+// External C functions
+extern "C" {
+    fn getchar() -> i32;
+    fn putchar(c: i32) -> i32;
+    fn fputc(c: i32, stream: *mut FILE) -> i32;
+    fn fflush_stdout();
+    fn fflush_stderr();
+    fn stderr() -> *mut FILE;
+}
+
+// Opaque FILE type
+pub struct FILE;
+
+// Format arguments (for macros)
+pub struct Arguments {
+    pieces: Vec<String>,
+}
+
+impl Arguments {
+    pub fn new(pieces: Vec<String>) -> Arguments {
+        Arguments { pieces }
+    }
+    
+    pub fn to_string(&self) -> String {
+        let mut result = String::new();
+        for piece in &self.pieces {
+            result.push_str(piece.as_str());
+        }
+        result
+    }
+}
+
+// Convenience macros
+macro_rules! print {
+    ($($arg:tt)*) => {{
+        let mut stdout = stdout();
+        stdout.write_fmt(format_args!($($arg)*)).unwrap();
+    }};
+}
+
+macro_rules! println {
+    () => {
+        print!("\n")
+    };
+    ($($arg:tt)*) => {{
+        let mut stdout = stdout();
+        stdout.write_fmt(format_args!($($arg)*)).unwrap();
+        stdout.write_str("\n").unwrap();
+    }};
+}
+
+macro_rules! eprint {
+    ($($arg:tt)*) => {{
+        let mut stderr = stderr();
+        stderr.write_fmt(format_args!($($arg)*)).unwrap();
+    }};
+}
+
+macro_rules! eprintln {
+    () => {
+        eprint!("\n")
+    };
+    ($($arg:tt)*) => {{
+        let mut stderr = stderr();
+        stderr.write_fmt(format_args!($($arg)*)).unwrap();
+        stderr.write_str("\n").unwrap();
+    }};
+}

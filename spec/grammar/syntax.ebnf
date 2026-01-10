@@ -1,0 +1,372 @@
+(* VeZ Syntax Grammar *)
+(* File Extension: .zari *)
+(* EBNF Notation: ISO/IEC 14977 *)
+
+(* ===== PROGRAM STRUCTURE ===== *)
+
+program = { item } ;
+
+item = function
+     | struct_declaration
+     | enum_declaration
+     | union_declaration
+     | trait_declaration
+     | implementation
+     | type_alias
+     | constant_declaration
+     | static_declaration
+     | module_declaration
+     | use_declaration
+     | extern_block ;
+
+(* ===== FUNCTIONS ===== *)
+
+function = [ visibility ] , "fn" , identifier , [ generic_params ] ,
+           "(" , [ parameters ] , ")" , [ "->" , type ] , ( block | ";" ) ;
+
+parameters = parameter , { "," , parameter } , [ "," ] ;
+
+parameter = [ "mut" ] , identifier , ":" , type ;
+
+generic_params = "<" , generic_param , { "," , generic_param } , [ "," ] , ">" ;
+
+generic_param = identifier , [ ":" , trait_bounds ] ;
+
+trait_bounds = trait_bound , { "+" , trait_bound } ;
+
+trait_bound = identifier , [ generic_args ] ;
+
+(* ===== TYPES ===== *)
+
+type = primitive_type
+     | array_type
+     | slice_type
+     | tuple_type
+     | reference_type
+     | pointer_type
+     | function_type
+     | path_type
+     | impl_trait_type
+     | never_type ;
+
+primitive_type = "i8" | "i16" | "i32" | "i64" | "i128" | "isize"
+               | "u8" | "u16" | "u32" | "u64" | "u128" | "usize"
+               | "f32" | "f64"
+               | "bool" | "char" | "str" | "void" ;
+
+array_type = "[" , type , ";" , expression , "]" ;
+
+slice_type = "[" , type , "]" ;
+
+tuple_type = "(" , [ type , { "," , type } , [ "," ] ] , ")" ;
+
+reference_type = "&" , [ lifetime ] , [ "mut" ] , type ;
+
+pointer_type = "*" , ( "const" | "mut" ) , type ;
+
+function_type = "fn" , "(" , [ type , { "," , type } ] , ")" , [ "->" , type ] ;
+
+path_type = path , [ generic_args ] ;
+
+impl_trait_type = "impl" , trait_bounds ;
+
+never_type = "!" ;
+
+lifetime = "'" , identifier ;
+
+generic_args = "<" , generic_arg , { "," , generic_arg } , [ "," ] , ">" ;
+
+generic_arg = type | lifetime | expression ;
+
+(* ===== STRUCT DECLARATION ===== *)
+
+struct_declaration = [ visibility ] , "struct" , identifier , [ generic_params ] ,
+                     ( struct_fields | tuple_fields | ";" ) ;
+
+struct_fields = "{" , [ struct_field , { "," , struct_field } , [ "," ] ] , "}" ;
+
+struct_field = [ visibility ] , identifier , ":" , type ;
+
+tuple_fields = "(" , [ tuple_field , { "," , tuple_field } , [ "," ] ] , ")" , ";" ;
+
+tuple_field = [ visibility ] , type ;
+
+(* ===== ENUM DECLARATION ===== *)
+
+enum_declaration = [ visibility ] , "enum" , identifier , [ generic_params ] ,
+                   "{" , [ enum_variant , { "," , enum_variant } , [ "," ] ] , "}" ;
+
+enum_variant = identifier , [ enum_variant_data ] ;
+
+enum_variant_data = tuple_fields | struct_fields | "=" , expression ;
+
+(* ===== UNION DECLARATION ===== *)
+
+union_declaration = [ visibility ] , "union" , identifier , [ generic_params ] ,
+                    "{" , [ struct_field , { "," , struct_field } , [ "," ] ] , "}" ;
+
+(* ===== TRAIT DECLARATION ===== *)
+
+trait_declaration = [ visibility ] , "trait" , identifier , [ generic_params ] ,
+                    [ ":" , trait_bounds ] , [ where_clause ] ,
+                    "{" , { trait_item } , "}" ;
+
+trait_item = trait_function
+           | trait_type
+           | trait_constant ;
+
+trait_function = "fn" , identifier , [ generic_params ] ,
+                 "(" , [ parameters ] , ")" , [ "->" , type ] ,
+                 [ where_clause ] , ( block | ";" ) ;
+
+trait_type = "type" , identifier , [ ":" , trait_bounds ] , [ "=" , type ] , ";" ;
+
+trait_constant = "const" , identifier , ":" , type , [ "=" , expression ] , ";" ;
+
+(* ===== IMPLEMENTATION ===== *)
+
+implementation = "impl" , [ generic_params ] , ( trait_impl | inherent_impl ) ;
+
+trait_impl = trait_bound , "for" , type , [ where_clause ] ,
+             "{" , { impl_item } , "}" ;
+
+inherent_impl = type , [ where_clause ] , "{" , { impl_item } , "}" ;
+
+impl_item = function | type_alias | constant_declaration ;
+
+where_clause = "where" , where_predicate , { "," , where_predicate } , [ "," ] ;
+
+where_predicate = type , ":" , trait_bounds ;
+
+(* ===== OTHER DECLARATIONS ===== *)
+
+type_alias = [ visibility ] , "type" , identifier , [ generic_params ] ,
+             [ where_clause ] , "=" , type , ";" ;
+
+constant_declaration = [ visibility ] , "const" , identifier , ":" , type ,
+                       "=" , expression , ";" ;
+
+static_declaration = [ visibility ] , "static" , [ "mut" ] , identifier , ":" , type ,
+                     "=" , expression , ";" ;
+
+module_declaration = [ visibility ] , "mod" , identifier , ( "{" , { item } , "}" | ";" ) ;
+
+use_declaration = [ visibility ] , "use" , use_tree , ";" ;
+
+use_tree = path , [ "::" , use_tree_suffix ] ;
+
+use_tree_suffix = "*"
+                | identifier , [ "as" , identifier ]
+                | "{" , use_tree , { "," , use_tree } , [ "," ] , "}" ;
+
+extern_block = "extern" , [ string_literal ] , "{" , { extern_item } , "}" ;
+
+extern_item = function | static_declaration ;
+
+(* ===== STATEMENTS ===== *)
+
+statement = let_statement
+          | expression_statement
+          | item ;
+
+let_statement = "let" , [ "mut" ] , pattern , [ ":" , type ] ,
+                [ "=" , expression ] , ";" ;
+
+expression_statement = expression , ";" ;
+
+(* ===== EXPRESSIONS ===== *)
+
+expression = literal_expression
+           | path_expression
+           | operator_expression
+           | grouped_expression
+           | array_expression
+           | tuple_expression
+           | struct_expression
+           | call_expression
+           | method_call_expression
+           | field_expression
+           | index_expression
+           | range_expression
+           | closure_expression
+           | block_expression
+           | if_expression
+           | match_expression
+           | loop_expression
+           | return_expression
+           | break_expression
+           | continue_expression
+           | unsafe_expression
+           | async_expression
+           | await_expression ;
+
+literal_expression = literal ;
+
+path_expression = path ;
+
+operator_expression = prefix_expression | infix_expression | postfix_expression ;
+
+prefix_expression = ( "-" | "!" | "*" | "&" | "&mut" ) , expression ;
+
+infix_expression = expression , infix_operator , expression ;
+
+infix_operator = "+" | "-" | "*" | "/" | "%" | "**"
+               | "&" | "|" | "^" | "<<" | ">>"
+               | "&&" | "||"
+               | "==" | "!=" | "<" | ">" | "<=" | ">="
+               | "=" | "+=" | "-=" | "*=" | "/=" | "%="
+               | "&=" | "|=" | "^=" | "<<=" | ">>="
+               | "as" ;
+
+postfix_expression = expression , "?" ;
+
+grouped_expression = "(" , expression , ")" ;
+
+array_expression = "[" , ( array_elements | array_repeat ) , "]" ;
+
+array_elements = expression , { "," , expression } , [ "," ] ;
+
+array_repeat = expression , ";" , expression ;
+
+tuple_expression = "(" , [ expression , { "," , expression } , [ "," ] ] , ")" ;
+
+struct_expression = path , "{" , [ struct_expr_fields ] , "}" ;
+
+struct_expr_fields = struct_expr_field , { "," , struct_expr_field } , [ "," ] ;
+
+struct_expr_field = identifier , [ ":" , expression ] ;
+
+call_expression = expression , "(" , [ arguments ] , ")" ;
+
+arguments = expression , { "," , expression } , [ "," ] ;
+
+method_call_expression = expression , "." , identifier , [ generic_args ] ,
+                         "(" , [ arguments ] , ")" ;
+
+field_expression = expression , "." , ( identifier | integer_literal ) ;
+
+index_expression = expression , "[" , expression , "]" ;
+
+range_expression = [ expression ] , ( ".." | "..=" ) , [ expression ] ;
+
+closure_expression = [ "move" ] , "|" , [ closure_params ] , "|" ,
+                     [ "->" , type ] , ( expression | block ) ;
+
+closure_params = closure_param , { "," , closure_param } , [ "," ] ;
+
+closure_param = [ "mut" ] , identifier , [ ":" , type ] ;
+
+block_expression = "{" , { statement } , [ expression ] , "}" ;
+
+block = block_expression ;
+
+if_expression = "if" , expression , block , [ "else" , ( block | if_expression ) ] ;
+
+match_expression = "match" , expression , "{" , [ match_arms ] , "}" ;
+
+match_arms = match_arm , { "," , match_arm } , [ "," ] ;
+
+match_arm = pattern , [ "if" , expression ] , "=>" , ( expression | block ) ;
+
+loop_expression = loop_loop | while_loop | for_loop ;
+
+loop_loop = "loop" , block ;
+
+while_loop = "while" , expression , block ;
+
+for_loop = "for" , pattern , "in" , expression , block ;
+
+return_expression = "return" , [ expression ] ;
+
+break_expression = "break" , [ expression ] ;
+
+continue_expression = "continue" ;
+
+unsafe_expression = "unsafe" , block ;
+
+async_expression = "async" , block ;
+
+await_expression = expression , "." , "await" ;
+
+(* ===== PATTERNS ===== *)
+
+pattern = literal_pattern
+        | identifier_pattern
+        | wildcard_pattern
+        | range_pattern
+        | reference_pattern
+        | struct_pattern
+        | tuple_pattern
+        | tuple_struct_pattern
+        | slice_pattern
+        | path_pattern
+        | or_pattern ;
+
+literal_pattern = literal ;
+
+identifier_pattern = [ "ref" ] , [ "mut" ] , identifier , [ "@" , pattern ] ;
+
+wildcard_pattern = "_" ;
+
+range_pattern = expression , ( ".." | "..=" ) , expression ;
+
+reference_pattern = "&" , [ "mut" ] , pattern ;
+
+struct_pattern = path , "{" , [ struct_pattern_fields ] , "}" ;
+
+struct_pattern_fields = struct_pattern_field , { "," , struct_pattern_field } , [ "," ] ;
+
+struct_pattern_field = identifier , [ ":" , pattern ] ;
+
+tuple_pattern = "(" , [ pattern , { "," , pattern } , [ "," ] ] , ")" ;
+
+tuple_struct_pattern = path , "(" , [ pattern , { "," , pattern } , [ "," ] ] , ")" ;
+
+slice_pattern = "[" , [ pattern , { "," , pattern } , [ "," ] ] , "]" ;
+
+path_pattern = path ;
+
+or_pattern = pattern , { "|" , pattern } ;
+
+(* ===== PATHS ===== *)
+
+path = [ "::" ] , path_segment , { "::" , path_segment } ;
+
+path_segment = identifier | "self" | "Self" | "super" ;
+
+(* ===== VISIBILITY ===== *)
+
+visibility = "pub" , [ "(" , visibility_restriction , ")" ] ;
+
+visibility_restriction = "self" | "super" | "in" , path ;
+
+(* ===== ATTRIBUTES ===== *)
+
+attribute = "#" , "[" , attribute_content , "]" ;
+
+attribute_content = identifier , [ "(" , { ? any token ? } , ")" ] ;
+
+(* ===== NOTES ===== *)
+
+(*
+  - Operator precedence (highest to lowest):
+    1. Field access (.), method calls, array indexing
+    2. Unary operators (-, !, *, &)
+    3. as (type cast)
+    4. *, /, %
+    5. +, -
+    6. <<, >>
+    7. &
+    8. ^
+    9. |
+    10. ==, !=, <, >, <=, >=
+    11. &&
+    12. ||
+    13. .. (range)
+    14. = and compound assignment
+    
+  - Semicolons are required after statements
+  - Last expression in block is return value (no semicolon)
+  - Trailing commas are allowed in lists
+  - Generic arguments can be types, lifetimes, or const expressions
+*)

@@ -1,0 +1,193 @@
+// Result type for error handling
+
+pub enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+impl<T, E> Result<T, E> {
+    // Returns true if the result is Ok
+    pub fn is_ok(&self) -> bool {
+        match self {
+            Ok(_) => true,
+            Err(_) => false,
+        }
+    }
+    
+    // Returns true if the result is Err
+    pub fn is_err(&self) -> bool {
+        match self {
+            Ok(_) => false,
+            Err(_) => true,
+        }
+    }
+    
+    // Converts from Result<T, E> to Option<T>
+    pub fn ok(self) -> Option<T> {
+        match self {
+            Ok(val) => Some(val),
+            Err(_) => None,
+        }
+    }
+    
+    // Converts from Result<T, E> to Option<E>
+    pub fn err(self) -> Option<E> {
+        match self {
+            Ok(_) => None,
+            Err(e) => Some(e),
+        }
+    }
+    
+    // Unwraps the result, panicking if it's an Err
+    pub fn unwrap(self) -> T {
+        match self {
+            Ok(val) => val,
+            Err(_) => panic!("called `Result::unwrap()` on an `Err` value"),
+        }
+    }
+    
+    // Unwraps the result or returns a default value
+    pub fn unwrap_or(self, default: T) -> T {
+        match self {
+            Ok(val) => val,
+            Err(_) => default,
+        }
+    }
+    
+    // Unwraps the result or computes a default value
+    pub fn unwrap_or_else<F>(self, f: F) -> T
+    where F: FnOnce(E) -> T {
+        match self {
+            Ok(val) => val,
+            Err(e) => f(e),
+        }
+    }
+    
+    // Unwraps the error, panicking if it's Ok
+    pub fn unwrap_err(self) -> E {
+        match self {
+            Ok(_) => panic!("called `Result::unwrap_err()` on an `Ok` value"),
+            Err(e) => e,
+        }
+    }
+    
+    // Maps a Result<T, E> to Result<U, E> by applying a function
+    pub fn map<U, F>(self, f: F) -> Result<U, E>
+    where F: FnOnce(T) -> U {
+        match self {
+            Ok(val) => Ok(f(val)),
+            Err(e) => Err(e),
+        }
+    }
+    
+    // Maps a Result<T, E> to Result<T, F> by applying a function to the error
+    pub fn map_err<F, O>(self, f: O) -> Result<T, F>
+    where O: FnOnce(E) -> F {
+        match self {
+            Ok(val) => Ok(val),
+            Err(e) => Err(f(e)),
+        }
+    }
+    
+    // Calls f if the result is Ok, otherwise returns the Err value
+    pub fn and_then<U, F>(self, f: F) -> Result<U, E>
+    where F: FnOnce(T) -> Result<U, E> {
+        match self {
+            Ok(val) => f(val),
+            Err(e) => Err(e),
+        }
+    }
+    
+    // Calls f if the result is Err, otherwise returns the Ok value
+    pub fn or_else<F, O>(self, f: O) -> Result<T, F>
+    where O: FnOnce(E) -> Result<T, F> {
+        match self {
+            Ok(val) => Ok(val),
+            Err(e) => f(e),
+        }
+    }
+    
+    // Converts from &Result<T, E> to Result<&T, &E>
+    pub fn as_ref(&self) -> Result<&T, &E> {
+        match self {
+            Ok(ref val) => Ok(val),
+            Err(ref e) => Err(e),
+        }
+    }
+    
+    // Converts from &mut Result<T, E> to Result<&mut T, &mut E>
+    pub fn as_mut(&mut self) -> Result<&mut T, &mut E> {
+        match self {
+            Ok(ref mut val) => Ok(val),
+            Err(ref mut e) => Err(e),
+        }
+    }
+    
+    // Returns true if the result contains the given value
+    pub fn contains(&self, x: &T) -> bool
+    where T: PartialEq {
+        match self {
+            Ok(ref val) => val == x,
+            Err(_) => false,
+        }
+    }
+    
+    // Returns true if the result contains the given error
+    pub fn contains_err(&self, x: &E) -> bool
+    where E: PartialEq {
+        match self {
+            Ok(_) => false,
+            Err(ref e) => e == x,
+        }
+    }
+}
+
+impl<T: Clone, E: Clone> Clone for Result<T, E> {
+    fn clone(&self) -> Result<T, E> {
+        match self {
+            Ok(ref val) => Ok(val.clone()),
+            Err(ref e) => Err(e.clone()),
+        }
+    }
+}
+
+impl<T: Copy, E: Copy> Copy for Result<T, E> {}
+
+impl<T: PartialEq, E: PartialEq> PartialEq for Result<T, E> {
+    fn eq(&self, other: &Result<T, E>) -> bool {
+        match (self, other) {
+            (Ok(a), Ok(b)) => a == b,
+            (Err(a), Err(b)) => a == b,
+            _ => false,
+        }
+    }
+}
+
+impl<T: Display, E: Display> Display for Result<T, E> {
+    fn display(&self) -> String {
+        match self {
+            Ok(val) => format!("Ok({})", val),
+            Err(e) => format!("Err({})", e),
+        }
+    }
+}
+
+impl<T: Debug, E: Debug> Debug for Result<T, E> {
+    fn debug(&self) -> String {
+        match self {
+            Ok(val) => format!("Ok({:?})", val),
+            Err(e) => format!("Err({:?})", e),
+        }
+    }
+}
+
+// Convenience macro for early returns
+// Usage: let value = try!(some_result);
+macro_rules! try {
+    ($expr:expr) => {
+        match $expr {
+            Ok(val) => val,
+            Err(e) => return Err(e),
+        }
+    };
+}

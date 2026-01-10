@@ -1,0 +1,76 @@
+// VeZ Standard Library Prelude
+// Automatically imported into every VeZ module
+
+// Core types
+pub use core::option::{Option, Option::Some, Option::None};
+pub use core::result::{Result, Result::Ok, Result::Err};
+
+// Collections
+pub use collections::vec::Vec;
+pub use collections::string::String;
+
+// Smart pointers
+pub use mem::allocator::{Box, Rc};
+
+// Traits
+pub use core::clone::Clone;
+pub use core::copy::Copy;
+pub use core::drop::Drop;
+pub use fmt::display::{Display, Debug};
+pub use core::cmp::{PartialEq, PartialOrd, Eq, Ord};
+pub use core::ops::{Add, Sub, Mul, Div, Rem};
+pub use core::ops::{AddAssign, SubAssign, MulAssign, DivAssign};
+pub use core::ops::{Index, IndexMut};
+pub use core::ops::{Deref, DerefMut};
+pub use core::iter::{Iterator, IntoIterator};
+
+// Conversion traits
+pub use core::convert::{From, Into, TryFrom, TryInto};
+pub use core::convert::{AsRef, AsMut};
+
+// I/O
+pub use io::stdio::{stdin, stdout, stderr};
+pub use io::stdio::{Stdin, Stdout, Stderr};
+pub use io::file::File;
+
+// Macros (automatically available)
+// - print!
+// - println!
+// - eprint!
+// - eprintln!
+// - format!
+// - format_args!
+// - vec!
+// - panic!
+// - assert!
+// - assert_eq!
+// - assert_ne!
+// - debug_assert!
+// - try!
+
+// Commonly used functions
+pub use mem::allocator::{size_of, align_of, swap, replace};
+pub use core::ptr::{null, null_mut};
+
+// Marker traits
+pub use core::marker::{Send, Sync, Sized, Unpin};
+pub use core::marker::{Copy as MarkerCopy};
+
+// Default trait
+pub use core::default::Default;
+
+// Primitive types (always available)
+// - i8, i16, i32, i64, i128, isize
+// - u8, u16, u32, u64, u128, usize
+// - f32, f64
+// - bool
+// - char
+// - str
+// - ()
+
+// Slice and array types
+pub use core::slice;
+pub use core::array;
+
+// String slice operations
+pub use core::str;

@@ -1,0 +1,41 @@
+// Async/await example
+// Demonstrates asynchronous programming in VeZ
+
+use async::*;
+
+async fn fetch_data(url: &str) -> Result<String, Error> {
+    let response = http::get(url).await?;
+    let text = response.text().await?;
+    Ok(text)
+}
+
+async fn process_multiple() -> Result<(), Error> {
+    let urls = vec![
+        "https://api.example.com/data1",
+        "https://api.example.com/data2",
+        "https://api.example.com/data3",
+    ];
+    
+    // Fetch all URLs concurrently
+    let futures: Vec<_> = urls.iter()
+        .map(|url| fetch_data(url))
+        .collect();
+    
+    let results = join_all(futures).await;
+    
+    for (i, result) in results.iter().enumerate() {
+        match result {
+            Ok(data) => println!("URL {}: {} bytes", i, data.len()),
+            Err(e) => println!("URL {}: Error - {}", i, e),
+        }
+    }
+    
+    Ok(())
+}
+
+async fn main() {
+    match process_multiple().await {
+        Ok(_) => println!("All requests completed"),
+        Err(e) => println!("Error: {}", e),
+    }
+}

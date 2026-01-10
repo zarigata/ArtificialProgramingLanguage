@@ -1,0 +1,388 @@
+// Formatting traits and utilities
+
+use collections::String;
+
+// Display trait for user-facing output
+pub trait Display {
+    fn display(&self) -> String;
+}
+
+// Debug trait for debugging output
+pub trait Debug {
+    fn debug(&self) -> String;
+}
+
+// Formatter for building formatted strings
+pub struct Formatter {
+    buf: String,
+}
+
+impl Formatter {
+    pub fn new() -> Formatter {
+        Formatter {
+            buf: String::new(),
+        }
+    }
+    
+    pub fn write_str(&mut self, s: &str) {
+        self.buf.push_str(s);
+    }
+    
+    pub fn write_fmt(&mut self, args: Arguments) {
+        self.buf.push_str(&args.to_string());
+    }
+    
+    pub fn finish(self) -> String {
+        self.buf
+    }
+}
+
+// Format arguments
+pub struct Arguments {
+    pieces: Vec<String>,
+}
+
+impl Arguments {
+    pub fn new(pieces: Vec<String>) -> Arguments {
+        Arguments { pieces }
+    }
+    
+    pub fn to_string(&self) -> String {
+        let mut result = String::new();
+        for piece in &self.pieces {
+            result.push_str(piece.as_str());
+        }
+        result
+    }
+}
+
+// Implement Display for primitive types
+impl Display for i8 {
+    fn display(&self) -> String {
+        format_int(*self as i64)
+    }
+}
+
+impl Display for i16 {
+    fn display(&self) -> String {
+        format_int(*self as i64)
+    }
+}
+
+impl Display for i32 {
+    fn display(&self) -> String {
+        format_int(*self as i64)
+    }
+}
+
+impl Display for i64 {
+    fn display(&self) -> String {
+        format_int(*self)
+    }
+}
+
+impl Display for u8 {
+    fn display(&self) -> String {
+        format_uint(*self as u64)
+    }
+}
+
+impl Display for u16 {
+    fn display(&self) -> String {
+        format_uint(*self as u64)
+    }
+}
+
+impl Display for u32 {
+    fn display(&self) -> String {
+        format_uint(*self as u64)
+    }
+}
+
+impl Display for u64 {
+    fn display(&self) -> String {
+        format_uint(*self)
+    }
+}
+
+impl Display for f32 {
+    fn display(&self) -> String {
+        format_float(*self as f64)
+    }
+}
+
+impl Display for f64 {
+    fn display(&self) -> String {
+        format_float(*self)
+    }
+}
+
+impl Display for bool {
+    fn display(&self) -> String {
+        if *self {
+            String::from("true")
+        } else {
+            String::from("false")
+        }
+    }
+}
+
+impl Display for char {
+    fn display(&self) -> String {
+        let mut s = String::new();
+        s.push(*self);
+        s
+    }
+}
+
+impl Display for String {
+    fn display(&self) -> String {
+        self.clone()
+    }
+}
+
+impl<T: Display> Display for &T {
+    fn display(&self) -> String {
+        (*self).display()
+    }
+}
+
+// Implement Debug for primitive types
+impl Debug for i8 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for i16 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for i32 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for i64 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for u8 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for u16 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for u32 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for u64 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for f32 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for f64 {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for bool {
+    fn debug(&self) -> String {
+        self.display()
+    }
+}
+
+impl Debug for char {
+    fn debug(&self) -> String {
+        format!("'{}'", self)
+    }
+}
+
+impl Debug for String {
+    fn debug(&self) -> String {
+        format!("\"{}\"", self.as_str())
+    }
+}
+
+impl<T: Debug> Debug for &T {
+    fn debug(&self) -> String {
+        (*self).debug()
+    }
+}
+
+// Helper functions for formatting
+fn format_int(n: i64) -> String {
+    if n == 0 {
+        return String::from("0");
+    }
+    
+    let mut result = String::new();
+    let mut num = n;
+    let negative = num < 0;
+    
+    if negative {
+        num = -num;
+    }
+    
+    while num > 0 {
+        let digit = (num % 10) as u8;
+        result.push((b'0' + digit) as char);
+        num /= 10;
+    }
+    
+    if negative {
+        result.push('-');
+    }
+    
+    // Reverse the string
+    let bytes: Vec<u8> = result.as_bytes().iter().rev().copied().collect();
+    String::from(unsafe { str::from_utf8_unchecked(&bytes) })
+}
+
+fn format_uint(n: u64) -> String {
+    if n == 0 {
+        return String::from("0");
+    }
+    
+    let mut result = String::new();
+    let mut num = n;
+    
+    while num > 0 {
+        let digit = (num % 10) as u8;
+        result.push((b'0' + digit) as char);
+        num /= 10;
+    }
+    
+    // Reverse the string
+    let bytes: Vec<u8> = result.as_bytes().iter().rev().copied().collect();
+    String::from(unsafe { str::from_utf8_unchecked(&bytes) })
+}
+
+fn format_float(f: f64) -> String {
+    // Simplified float formatting
+    if f.is_nan() {
+        return String::from("NaN");
+    }
+    
+    if f.is_infinite() {
+        if f > 0.0 {
+            return String::from("inf");
+        } else {
+            return String::from("-inf");
+        }
+    }
+    
+    let mut result = String::new();
+    let mut num = f;
+    
+    if num < 0.0 {
+        result.push('-');
+        num = -num;
+    }
+    
+    // Integer part
+    let int_part = num as i64;
+    result.push_str(&format_int(int_part));
+    
+    // Decimal part
+    result.push('.');
+    let mut frac = num - int_part as f64;
+    
+    for _ in 0..6 {  // 6 decimal places
+        frac *= 10.0;
+        let digit = frac as i64;
+        result.push((b'0' + digit as u8) as char);
+        frac -= digit as f64;
+    }
+    
+    result
+}
+
+// Format macro implementation
+macro_rules! format {
+    ($fmt:expr) => {
+        String::from($fmt)
+    };
+    ($fmt:expr, $($arg:expr),*) => {{
+        let mut s = String::new();
+        let fmt_str = $fmt;
+        let mut chars = fmt_str.chars();
+        
+        $(
+            // Find next {} in format string
+            while let Some(ch) = chars.next() {
+                if ch == '{' {
+                    if let Some(next) = chars.next() {
+                        if next == '}' {
+                            s.push_str(&$arg.to_string());
+                            break;
+                        } else {
+                            s.push(ch);
+                            s.push(next);
+                        }
+                    }
+                } else {
+                    s.push(ch);
+                }
+            }
+        )*
+        
+        // Add remaining format string
+        for ch in chars {
+            s.push(ch);
+        }
+        
+        s
+    }};
+}
+
+macro_rules! format_args {
+    ($fmt:expr) => {
+        Arguments::new(vec![String::from($fmt)])
+    };
+    ($fmt:expr, $($arg:expr),*) => {{
+        let mut pieces = Vec::new();
+        pieces.push(format!($fmt, $($arg),*));
+        Arguments::new(pieces)
+    }};
+}
+
+// Write macro for implementing Display
+macro_rules! write {
+    ($dst:expr, $($arg:tt)*) => {
+        $dst.write_fmt(format_args!($($arg)*))
+    };
+}
+
+// Writeln macro
+macro_rules! writeln {
+    ($dst:expr) => {
+        $dst.write_str("\n")
+    };
+    ($dst:expr, $($arg:tt)*) => {{
+        $dst.write_fmt(format_args!($($arg)*));
+        $dst.write_str("\n")
+    }};
+}

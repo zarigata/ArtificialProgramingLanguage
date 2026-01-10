@@ -1,0 +1,32 @@
+[package]
+name = "vez_compiler"
+version = "0.1.0"
+edition = "2021"
+authors = ["VeZ Contributors"]
+description = "The VeZ programming language compiler"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+
+[dev-dependencies]
+
+[lib]
+name = "vez_compiler"
+path = "src/lib.rs"
+
+[[bin]]
+name = "vezc"
+path = "src/main.rs"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.bench]
+inherits = "release"

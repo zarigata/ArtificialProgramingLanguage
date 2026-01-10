@@ -1,0 +1,180 @@
+// Option type for optional values
+
+pub enum Option<T> {
+    Some(T),
+    None,
+}
+
+impl<T> Option<T> {
+    // Returns true if the option is a Some value
+    pub fn is_some(&self) -> bool {
+        match self {
+            Some(_) => true,
+            None => false,
+        }
+    }
+    
+    // Returns true if the option is a None value
+    pub fn is_none(&self) -> bool {
+        match self {
+            Some(_) => false,
+            None => true,
+        }
+    }
+    
+    // Unwraps the option, panicking if it's None
+    pub fn unwrap(self) -> T {
+        match self {
+            Some(val) => val,
+            None => panic!("called `Option::unwrap()` on a `None` value"),
+        }
+    }
+    
+    // Unwraps the option or returns a default value
+    pub fn unwrap_or(self, default: T) -> T {
+        match self {
+            Some(val) => val,
+            None => default,
+        }
+    }
+    
+    // Unwraps the option or computes a default value
+    pub fn unwrap_or_else<F>(self, f: F) -> T 
+    where F: FnOnce() -> T {
+        match self {
+            Some(val) => val,
+            None => f(),
+        }
+    }
+    
+    // Maps an Option<T> to Option<U> by applying a function
+    pub fn map<U, F>(self, f: F) -> Option<U>
+    where F: FnOnce(T) -> U {
+        match self {
+            Some(val) => Some(f(val)),
+            None => None,
+        }
+    }
+    
+    // Maps an Option<T> to Option<U> or returns a default
+    pub fn map_or<U, F>(self, default: U, f: F) -> U
+    where F: FnOnce(T) -> U {
+        match self {
+            Some(val) => f(val),
+            None => default,
+        }
+    }
+    
+    // Returns None if the option is None, otherwise calls f
+    pub fn and_then<U, F>(self, f: F) -> Option<U>
+    where F: FnOnce(T) -> Option<U> {
+        match self {
+            Some(val) => f(val),
+            None => None,
+        }
+    }
+    
+    // Returns the option if it contains a value, otherwise returns optb
+    pub fn or(self, optb: Option<T>) -> Option<T> {
+        match self {
+            Some(_) => self,
+            None => optb,
+        }
+    }
+    
+    // Returns the option if it contains a value, otherwise calls f
+    pub fn or_else<F>(self, f: F) -> Option<T>
+    where F: FnOnce() -> Option<T> {
+        match self {
+            Some(_) => self,
+            None => f(),
+        }
+    }
+    
+    // Converts from &Option<T> to Option<&T>
+    pub fn as_ref(&self) -> Option<&T> {
+        match self {
+            Some(ref val) => Some(val),
+            None => None,
+        }
+    }
+    
+    // Converts from &mut Option<T> to Option<&mut T>
+    pub fn as_mut(&mut self) -> Option<&mut T> {
+        match self {
+            Some(ref mut val) => Some(val),
+            None => None,
+        }
+    }
+    
+    // Takes the value out of the option, leaving None in its place
+    pub fn take(&mut self) -> Option<T> {
+        let mut tmp = None;
+        swap(self, &mut tmp);
+        tmp
+    }
+    
+    // Replaces the actual value in the option with the given value
+    pub fn replace(&mut self, value: T) -> Option<T> {
+        let mut tmp = Some(value);
+        swap(self, &mut tmp);
+        tmp
+    }
+    
+    // Returns true if the option contains the given value
+    pub fn contains(&self, x: &T) -> bool 
+    where T: PartialEq {
+        match self {
+            Some(ref val) => val == x,
+            None => false,
+        }
+    }
+    
+    // Filters the option based on a predicate
+    pub fn filter<F>(self, predicate: F) -> Option<T>
+    where F: FnOnce(&T) -> bool {
+        match self {
+            Some(val) if predicate(&val) => Some(val),
+            _ => None,
+        }
+    }
+}
+
+impl<T: Clone> Clone for Option<T> {
+    fn clone(&self) -> Option<T> {
+        match self {
+            Some(ref val) => Some(val.clone()),
+            None => None,
+        }
+    }
+}
+
+impl<T: Copy> Copy for Option<T> {}
+
+impl<T: PartialEq> PartialEq for Option<T> {
+    fn eq(&self, other: &Option<T>) -> bool {
+        match (self, other) {
+            (Some(a), Some(b)) => a == b,
+            (None, None) => true,
+            _ => false,
+        }
+    }
+}
+
+impl<T: Display> Display for Option<T> {
+    fn display(&self) -> String {
+        match self {
+            Some(val) => format!("Some({})", val),
+            None => "None".to_string(),
+        }
+    }
+}
+
+impl<T: Debug> Debug for Option<T> {
+    fn debug(&self) -> String {
+        match self {
+            Some(val) => format!("Some({:?})", val),
+            None => "None".to_string(),
+        }
+    }
+}

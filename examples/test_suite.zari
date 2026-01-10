@@ -1,0 +1,89 @@
+// VeZ Test Suite - Comprehensive Examples
+
+// Test 1: Simple arithmetic
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+// Test 2: Factorial (recursion)
+fn factorial(n: i32) -> i32 {
+    if n <= 1 {
+        1
+    } else {
+        n * factorial(n - 1)
+    }
+}
+
+// Test 3: Fibonacci (recursion)
+fn fibonacci(n: i32) -> i32 {
+    if n <= 1 {
+        n
+    } else {
+        fibonacci(n - 1) + fibonacci(n - 2)
+    }
+}
+
+// Test 4: Maximum of two numbers
+fn max(a: i32, b: i32) -> i32 {
+    if a > b {
+        a
+    } else {
+        b
+    }
+}
+
+// Test 5: Sum with loop
+fn sum_to_n(n: i32) -> i32 {
+    let mut total = 0;
+    let mut i = 0;
+    while i < n {
+        total = total + i;
+        i = i + 1;
+    }
+    total
+}
+
+// Test 6: Pattern matching
+fn classify(x: i32) -> i32 {
+    match x {
+        0 => 0,
+        1 => 1,
+        _ => 2
+    }
+}
+
+// Test 7: Generic function
+fn identity<T>(x: T) -> T {
+    x
+}
+
+// Test 8: Struct definition
+struct Point {
+    x: f64,
+    y: f64
+}
+
+// Test 9: Enum definition
+enum Option<T> {
+    Some(T),
+    None
+}
+
+// Test 10: Trait definition
+trait Display {
+    fn display(self) -> String;
+}
+
+// Test 11: Implementation
+impl Point {
+    fn new(x: f64, y: f64) -> Point {
+        Point { x, y }
+    }
+}
+
+// Main entry point
+fn main() {
+    let result = add(5, 3);
+    let fact = factorial(5);
+    let fib = fibonacci(7);
+}

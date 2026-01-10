@@ -1,0 +1,177 @@
+// Real-World Example: Text File Processor
+// Demonstrates practical file I/O, error handling, and string processing
+
+use std::prelude::*;
+use std::io::file::File;
+
+// Statistics about processed text
+struct TextStats {
+    lines: usize,
+    words: usize,
+    chars: usize,
+    unique_words: Vec<String>,
+}
+
+impl TextStats {
+    fn new() -> TextStats {
+        TextStats {
+            lines: 0,
+            words: 0,
+            chars: 0,
+            unique_words: Vec::new(),
+        }
+    }
+    
+    fn add_word(&mut self, word: String) {
+        self.words += 1;
+        
+        // Check if word is unique
+        let mut found = false;
+        for unique_word in self.unique_words.iter() {
+            if unique_word == &word {
+                found = true;
+                break;
+            }
+        }
+        
+        if !found {
+            self.unique_words.push(word);
+        }
+    }
+}
+
+impl Display for TextStats {
+    fn display(&self) -> String {
+        format!(
+            "Lines: {}\nWords: {}\nCharacters: {}\nUnique words: {}",
+            self.lines, self.words, self.chars, self.unique_words.len()
+        )
+    }
+}
+
+// Process a text file and return statistics
+fn process_file(path: &str) -> Result<TextStats, String> {
+    // Read file contents
+    let contents = File::read_to_string(path)
+        .map_err(|e| format!("Failed to read file '{}': {:?}", path, e))?;
+    
+    let mut stats = TextStats::new();
+    
+    // Count characters
+    stats.chars = contents.len();
+    
+    // Process line by line
+    let lines = contents.split('\n');
+    for line in lines {
+        if !line.is_empty() {
+            stats.lines += 1;
+        }
+        
+        // Process words in line
+        let words = line.split_whitespace();
+        for word in words {
+            // Clean word (remove punctuation)
+            let cleaned = clean_word(word);
+            if !cleaned.is_empty() {
+                stats.add_word(cleaned);
+            }
+        }
+    }
+    
+    Ok(stats)
+}
+
+// Clean a word by removing punctuation
+fn clean_word(word: &str) -> String {
+    let mut result = String::new();
+    
+    for ch in word.chars() {
+        if ch.is_alphanumeric() {
+            result.push(ch.to_lowercase());
+        }
+    }
+    
+    result
+}
+
+// Find most common words
+fn find_common_words(stats: &TextStats, top_n: usize) -> Vec<(String, usize)> {
+    // Count word frequencies
+    let mut frequencies = Vec::new();
+    
+    for word in stats.unique_words.iter() {
+        let count = count_word_occurrences(&stats, word);
+        frequencies.push((word.clone(), count));
+    }
+    
+    // Sort by frequency (descending)
+    frequencies.sort_by(|a, b| b.1.cmp(&a.1));
+    
+    // Take top N
+    let mut result = Vec::new();
+    for i in 0..top_n {
+        if i < frequencies.len() {
+            result.push(frequencies[i].clone());
+        }
+    }
+    
+    result
+}
+
+// Count occurrences of a word
+fn count_word_occurrences(stats: &TextStats, target: &str) -> usize {
+    // This is simplified - in real implementation would track during processing
+    1
+}
+
+// Write statistics to a file
+fn write_report(path: &str, stats: &TextStats) -> Result<(), String> {
+    let mut report = String::new();
+    
+    report.push_str("=== Text Processing Report ===\n\n");
+    report.push_str(&stats.to_string());
+    report.push_str("\n\n");
+    
+    report.push_str("Top 10 Most Common Words:\n");
+    let common = find_common_words(stats, 10);
+    for (i, (word, count)) in common.iter().enumerate() {
+        report.push_str(&format!("{}. {} ({})\n", i + 1, word, count));
+    }
+    
+    File::write(path, &report)
+        .map_err(|e| format!("Failed to write report: {:?}", e))?;
+    
+    Ok(())
+}
+
+fn main() {
+    println!("=== VeZ Text Processor ===\n");
+    
+    // Get command line arguments (simplified)
+    let input_file = "input.txt";
+    let output_file = "report.txt";
+    
+    println!("Processing file: {}", input_file);
+    
+    // Process the file
+    match process_file(input_file) {
+        Ok(stats) => {
+            println!("\nStatistics:");
+            println!("{}", stats);
+            
+            // Write report
+            match write_report(output_file, &stats) {
+                Ok(()) => {
+                    println!("\nReport written to: {}", output_file);
+                    println!("Processing complete!");
+                }
+                Err(e) => {
+                    eprintln!("Error writing report: {}", e);
+                }
+            }
+        }
+        Err(e) => {
+            eprintln!("Error processing file: {}", e);
+        }
+    }
+}

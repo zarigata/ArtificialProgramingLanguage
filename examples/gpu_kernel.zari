@@ -1,0 +1,47 @@
+// GPU kernel example
+// Demonstrates VeZ's first-class GPU support
+
+use gpu::*;
+
+#[kernel]
+fn vector_add(a: &[f32], b: &[f32], c: &mut [f32]) {
+    let idx = thread_idx();
+    
+    if idx < a.len() {
+        c[idx] = a[idx] + b[idx];
+    }
+}
+
+fn main() {
+    let size = 1024;
+    
+    // Host data
+    let a: Vec<f32> = (0..size).map(|i| i as f32).collect();
+    let b: Vec<f32> = (0..size).map(|i| (i * 2) as f32).collect();
+    let mut c = vec![0.0f32; size];
+    
+    // Transfer to device
+    let device_a = DeviceBuffer::from_slice(&a);
+    let device_b = DeviceBuffer::from_slice(&b);
+    let mut device_c = DeviceBuffer::new(size);
+    
+    // Launch kernel
+    let grid_size = (size + 255) / 256;
+    let block_size = 256;
+    
+    launch_kernel(
+        vector_add,
+        grid_size,
+        block_size,
+        (&device_a, &device_b, &mut device_c)
+    );
+    
+    // Transfer back to host
+    device_c.copy_to_host(&mut c);
+    
+    // Verify results
+    println!("First 10 results:");
+    for i in 0..10 {
+        println!("c[{}] = {}", i, c[i]);
+    }
+}

@@ -1,0 +1,32 @@
+// Ownership and borrowing example
+// Demonstrates VeZ's memory safety features
+
+fn take_ownership(s: String) {
+    println!("Took ownership: {}", s);
+}
+
+fn borrow_immutable(s: &String) {
+    println!("Borrowed immutably: {}", s);
+}
+
+fn borrow_mutable(s: &mut String) {
+    s.push_str(" - modified");
+    println!("Borrowed mutably: {}", s);
+}
+
+fn main() {
+    let s1 = String::from("Hello");
+    
+    // Immutable borrow
+    borrow_immutable(&s1);
+    
+    // Mutable borrow
+    let mut s2 = String::from("World");
+    borrow_mutable(&mut s2);
+    
+    // Move ownership
+    take_ownership(s1);
+    // s1 is no longer valid here
+    
+    println!("s2 after modification: {}", s2);
+}
