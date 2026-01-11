@@ -1,5 +1,12 @@
 # VeZ Programming Language
 
+## Getting Started
+
+- **Install**: See [docs/INSTALL.md](docs/INSTALL.md) for prebuilt binaries (Linux, macOS Intel/Apple Silicon, Windows) and source builds.
+- **AI Tooling**: See [docs/AI_TOOLING.md](docs/AI_TOOLING.md) for LLM-ready context packs and prompts.
+- **Quick Start**: `cargo build --workspace --release` then add `target/release` to PATH; run `vezc --version`.
+- **Releases**: Tagged builds (`vX.Y.Z`) produce artifacts via GitHub Actions (`.github/workflows/release.yml`).
+
 ## Vision
 
 **VeZ** is a revolutionary programming language designed specifically for AI agents to write efficient, low-level code that directly interfaces with CPU, memory, and GPU resources. VeZ eliminates the overhead and complexity of human-centric programming paradigms, enabling AI to generate optimized code with minimal resource usage and maximum performance.
