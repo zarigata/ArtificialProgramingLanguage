@@ -1,0 +1,120 @@
+name: "Build and Release VeZ"
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: "Build (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            archive: zip
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            archive: zip
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build release binaries
+        run: cargo build --workspace --release --target ${{ matrix.target }}
+
+      - name: Prepare artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTDIR="artifacts/${{ matrix.target }}"
+          mkdir -p "$OUTDIR"
+          case "${{ matrix.target }}" in
+            *windows*)
+              cp "target/${{ matrix.target }}/release/vezc.exe" "$OUTDIR"/
+              cp "target/${{ matrix.target }}/release/vpm.exe" "$OUTDIR"/ || true
+              cp "target/${{ matrix.target }}/release/vez-lsp.exe" "$OUTDIR"/ || true
+              ;;
+            *)
+              cp "target/${{ matrix.target }}/release/vezc" "$OUTDIR"/
+              cp "target/${{ matrix.target }}/release/vpm" "$OUTDIR"/ || true
+              cp "target/${{ matrix.target }}/release/vez-lsp" "$OUTDIR"/ || true
+              ;;
+          esac
+          cp README.md "$OUTDIR"/README.md
+          cp LICENSE "$OUTDIR"/LICENSE
+          cp QUICK_START.md "$OUTDIR"/QUICK_START.md
+          cp docs/INSTALL.md "$OUTDIR"/INSTALL.md
+          cp docs/AI_TOOLING.md "$OUTDIR"/AI_TOOLING.md
+
+      - name: Archive artifacts
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUTDIR="artifacts/${{ matrix.target }}"
+          VERSION="${GITHUB_REF_NAME:-dev}"
+          ARCHIVE_NAME="vez-${VERSION}-${{ matrix.target }}"
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            (cd artifacts && zip -r "../${ARCHIVE_NAME}.zip" "${{ matrix.target }}")
+            echo "file=${ARCHIVE_NAME}.zip" >> "$GITHUB_OUTPUT"
+          else
+            (cd artifacts && tar -czf "../${ARCHIVE_NAME}.tar.gz" "${{ matrix.target }}")
+            echo "file=${ARCHIVE_NAME}.tar.gz" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.file }}
+          path: ${{ steps.package.outputs.file }}
+
+  release:
+    name: "Publish Release"
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "VeZ ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
