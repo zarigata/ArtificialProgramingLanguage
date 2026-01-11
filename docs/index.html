@@ -18,6 +18,7 @@
   <meta name="twitter:title" content="VeZ – AI-First Programming Language for LLMs" />
   <meta name="twitter:description" content="The language built for AI agents: deterministic, parallel, and hardware-native." />
   <style>
+    html { scroll-behavior: smooth; }
     :root {
       --blue: #0080ff;
       --cyan: #00d9ff;
@@ -90,6 +91,21 @@
       grid-template-columns: 1.1fr 0.9fr;
       gap: 36px;
       background: var(--grid);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      top: -120px;
+      right: -80px;
+      background: var(--accent);
+      filter: blur(140px);
+      opacity: 0.35;
+      animation: float 12s ease-in-out infinite alternate;
+      pointer-events: none;
     }
     .eyebrow {
       display: inline-flex;
@@ -184,7 +200,10 @@
       box-shadow: 0 12px 30px rgba(0,0,0,0.25);
       position: relative;
       overflow: hidden;
+      transform: translateY(0);
+      transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
     }
+    .card:hover { transform: translateY(-6px); border-color: rgba(0,217,255,0.3); box-shadow: 0 16px 38px rgba(0,0,0,0.35); }
     .card h3 { margin: 6px 0 10px; font-family: 'Space Grotesk', sans-serif; color: var(--white); }
     .card p { margin: 0; color: #c3cbde; }
     section { padding: 60px 6vw; border-top: 1px solid rgba(255,255,255,0.04); }
@@ -229,6 +248,9 @@
       font-size: 13px;
       color: #9fb4dd;
     }
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity 400ms ease, transform 400ms ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    @keyframes float { from { transform: translateY(0); } to { transform: translateY(18px); } }
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; padding-top: 70px; }
       header { position: sticky; }
@@ -257,7 +279,7 @@
   </header>
 
   <main>
-    <section class="hero">
+    <section class="hero reveal">
       <div>
         <span class="eyebrow">AI-native • Deterministic • GPU-first</span>
         <h1>The programming language built for large language models</h1>
@@ -301,7 +323,7 @@ fn softmax(logits: &Vec<f32>) -> Vec<f32> {
       </div>
     </section>
 
-    <section id="why">
+    <section id="why" class="reveal">
       <div class="tag">Why VeZ wins for AI</div>
       <h2>Purpose-built for agents that must touch hardware and stay safe</h2>
       <p>VeZ merges deterministic compilation, memory safety, and zero-cost abstractions so AI-generated code is both verifiable and fast. Explicit semantics help models reason about control flow, resource lifetimes, and concurrency.</p>
@@ -325,7 +347,7 @@ fn softmax(logits: &Vec<f32>) -> Vec<f32> {
       </div>
     </section>
 
-    <section id="llm">
+    <section id="llm" class="reveal">
       <div class="tag">LLM Integration</div>
       <h2>How LLMs excel with VeZ</h2>
       <div class="split">
@@ -358,7 +380,7 @@ Return code only, no prose.</div>
       </div>
     </section>
 
-    <section id="architecture">
+    <section id="architecture" class="reveal">
       <div class="tag">Architecture</div>
       <h2>Predictable stack for enterprise AI systems</h2>
       <div class="split">
@@ -383,7 +405,7 @@ Return code only, no prose.</div>
       </div>
     </section>
 
-    <section id="examples">
+    <section id="examples" class="reveal">
       <div class="tag">LLM-friendly examples</div>
       <h2>Sample programs the model can learn from</h2>
       <div class="split">
@@ -423,7 +445,7 @@ fn handler(req: Request) -> Response {
       </div>
     </section>
 
-    <section id="docs">
+    <section id="docs" class="reveal">
       <div class="tag">Documentation for humans & AIs</div>
       <h2>What to read first</h2>
       <div class="split">
@@ -449,7 +471,7 @@ fn handler(req: Request) -> Response {
       </div>
     </section>
 
-    <section id="quickstart">
+    <section id="quickstart" class="reveal">
       <div class="tag">Quick start</div>
       <h2>Get VeZ running in minutes</h2>
       <div class="split">
@@ -475,7 +497,7 @@ if result.errors:
       </div>
     </section>
 
-    <section id="ecosystem">
+    <section id="ecosystem" class="reveal">
       <div class="tag">Ecosystem & roadmap</div>
       <h2>Everything needed for production AI pipelines</h2>
       <div class="grid">
@@ -486,7 +508,7 @@ if result.errors:
       </div>
     </section>
 
-    <section id="contact">
+    <section id="contact" class="reveal">
       <div class="tag">Partnerships</div>
       <h2>Building with teams that need AI-grade performance</h2>
       <p>We collaborate with organizations pushing the limits of AI inference, agentic automation, and accelerated compute. If you're exploring GPU-first AI infrastructure or deterministic code generation, let's talk.</p>
@@ -531,6 +553,15 @@ if result.errors:
       "url": "https://vez-lang.org"
     }
   }
+  </script>
+  <script>
+    // Simple intersection reveal
+    const observer = new IntersectionObserver((entries)=> {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 </body>
 </html>

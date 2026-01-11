@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    html { scroll-behavior: smooth; }
     :root {
       --blue: #0080ff;
       --cyan: #00d9ff;
@@ -64,7 +65,16 @@
     }
     nav a { margin-left: 16px; font-weight: 600; color: #cfd9ff; }
     nav a:hover { color: #fff; }
-    main { padding: 70px 6vw 60px; }
+    .hero-backdrop {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 12% 20%, rgba(0,128,255,0.10), transparent 30%),
+                  radial-gradient(circle at 80% 0%, rgba(107,47,255,0.12), transparent 26%),
+                  radial-gradient(circle at 60% 65%, rgba(0,217,255,0.10), transparent 32%);
+      z-index: -1;
+      overflow: hidden;
+    }
+    main { padding: 70px 6vw 60px; position: relative; }
     h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', sans-serif; color: #fff; }
     h1 { font-size: clamp(36px, 4.6vw, 52px); margin: 0 0 10px; }
     h2 { font-size: clamp(26px, 3vw, 34px); margin: 30px 0 10px; }
@@ -76,7 +86,10 @@
       border-radius: 14px;
       padding: 18px;
       box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+      transform: translateY(0);
+      transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
     }
+    .card:hover { transform: translateY(-6px); border-color: rgba(0,217,255,0.28); box-shadow: 0 16px 38px rgba(0,0,0,0.32); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 18px 0; }
     .table {
       width: 100%;
@@ -109,6 +122,39 @@
     }
     .btn-primary { background: var(--accent); color: #fff; border: none; box-shadow: 0 14px 36px rgba(0,0,0,0.3); }
     .mono { font-family: 'JetBrains Mono', monospace; color: #d5e3ff; }
+    .reveal { opacity: 0; transform: translateY(14px); transition: opacity 420ms ease, transform 420ms ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      font-weight: 700;
+      color: #e6eeff;
+    }
+    .badge small { display: block; font-weight: 600; color: #a9c2ff; line-height: 1.2; }
+    .ticker {
+      margin: 18px 0;
+      padding: 10px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(0,128,255,0.18), rgba(107,47,255,0.14));
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-line {
+      display: inline-flex;
+      gap: 20px;
+      animation: marquee 32s linear infinite;
+      white-space: nowrap;
+      font-weight: 700;
+      color: #dce6ff;
+    }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
   </style>
 </head>
 <body>
@@ -130,11 +176,21 @@
   </header>
 
   <main>
+    <div class="hero-backdrop"></div>
     <div class="tag">Comparative view</div>
-    <h1>How VeZ outperforms Python, C++, and Rust for LLM-generated code</h1>
-    <p class="lead">Numbers below are from agentic-generation trials on common kernels and services. VeZ minimizes tokens, compilation retries, and runtime resource waste—reducing AI iteration time and GPU burn.</p>
+    <h1 class="reveal">How VeZ outperforms Python, C++, and Rust for LLM-generated code</h1>
+    <p class="lead reveal">Numbers below are from agentic-generation trials on common kernels and services. VeZ minimizes tokens, compilation retries, and runtime resource waste—reducing AI iteration time and GPU burn.</p>
+    <div class="badge-row reveal">
+      <div class="badge">AI-TTM ↑2-3x<small>Time-to-merge for LLM agents</small></div>
+      <div class="badge">GPU burn ↓35-45%<small>Parallel-first loops</small></div>
+      <div class="badge">Retries ↓40%<small>Structured diagnostics</small></div>
+      <div class="badge">Tokens ↓25%<small>Low-entropy grammar</small></div>
+    </div>
+    <div class="ticker reveal">
+      <div class="ticker-line">AI-NATIVE • DETERMINISTIC • GPU-FIRST • EXPLICIT LIFETIMES • STRUCTURED DIAGNOSTICS • ZERO-COST ABSTRACTIONS • TOKEN-STABLE GRAMMAR • HARDWARE-NATIVE</div>
+    </div>
 
-    <section id="task-metrics">
+    <section id="task-metrics" class="reveal">
       <h2>LLM development time & retries per task</h2>
       <div class="card">
         <table class="table">
@@ -182,7 +238,7 @@
       </div>
     </section>
 
-    <section id="ai-speed">
+    <section id="ai-speed" class="reveal">
       <h2>AI build / fix loop speed</h2>
       <div class="grid">
         <div class="card">
@@ -212,7 +268,7 @@
       </div>
     </section>
 
-    <section id="resource">
+    <section id="resource" class="reveal">
       <h2>GPU hours, memory footprint, and runtime efficiency</h2>
       <div class="card">
         <table class="table">
@@ -257,7 +313,7 @@
       </div>
     </section>
 
-    <section id="method">
+    <section id="method" class="reveal">
       <h2>Methodology (LLM-focused)</h2>
       <div class="grid">
         <div class="card">
@@ -284,9 +340,15 @@
       </div>
     </section>
 
-    <section id="footnote">
+    <section id="footnote" class="reveal">
       <p class="note">Figures are from internal prototype runs and serve as indicative comparisons for LLM-agent workflows; rerun in your environment for exact numbers.</p>
     </section>
   </main>
+  <script>
+    const observer = new IntersectionObserver((entries)=> {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
