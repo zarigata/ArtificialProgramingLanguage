@@ -41,9 +41,9 @@ impl InlineExpansion {
     fn is_recursive(&self, function: &IrFunction, module: &Module) -> bool {
         for block in &function.blocks {
             for (_vid, inst) in &block.instructions {
-                if let Instruction::Call { func, .. } = inst {
+                if let Instruction::Call { func: _, .. } = inst {
                     // Check if calling itself
-                    if let Some(callee) = module.get_function(&function.name) {
+                    if let Some(_callee) = module.get_function(&function.name) {
                         // Simplified check - would need proper function resolution
                         return true;
                     }

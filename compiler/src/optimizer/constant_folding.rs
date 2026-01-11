@@ -170,12 +170,13 @@ impl OptimizationPass for ConstantFolding {
     fn run_on_function(&mut self, function: &mut IrFunction) -> Result<bool> {
         self.changed = false;
         
-        for block in &mut function.blocks {
-            let mut new_instructions = Vec::new();
-            
+        // Collect replacements to avoid borrow conflicts
+        let mut replacements = Vec::new();
+        
+        for block in &function.blocks {
             for (value_id, inst) in &block.instructions {
                 match inst {
-                    Instruction::Binary { op, lhs, rhs, ty } => {
+                    Instruction::Binary { op, lhs, rhs, ty: _ } => {
                         // Try to get constant values
                         let lhs_val = function.get_value(*lhs);
                         let rhs_val = function.get_value(*rhs);
@@ -183,43 +184,35 @@ impl OptimizationPass for ConstantFolding {
                         if let (Some(Value::Constant(l)), Some(Value::Constant(r))) = (lhs_val, rhs_val) {
                             // Both operands are constants - fold them
                             if let Some(result) = self.fold_binary(*op, l, r) {
-                                // Replace with constant
-                                function.values[value_id.0] = Value::Constant(result);
-                                self.changed = true;
-                                continue;
+                                replacements.push((*value_id, Value::Constant(result)));
                             }
                         } else if let (Some(l), Some(r)) = (lhs_val, rhs_val) {
                             // Try algebraic simplification
                             if let Some(simplified) = self.simplify_binary(*op, l, r) {
-                                function.values[value_id.0] = simplified;
-                                self.changed = true;
-                                continue;
+                                replacements.push((*value_id, simplified));
                             }
                         }
-                        
-                        new_instructions.push((*value_id, inst.clone()));
                     }
-                    Instruction::Unary { op, operand, ty } => {
+                    Instruction::Unary { op, operand, ty: _ } => {
                         // Try to get constant value
                         if let Some(Value::Constant(c)) = function.get_value(*operand) {
                             // Operand is constant - fold it
                             if let Some(result) = self.fold_unary(*op, c) {
-                                // Replace with constant
-                                function.values[value_id.0] = Value::Constant(result);
-                                self.changed = true;
-                                continue;
+                                replacements.push((*value_id, Value::Constant(result)));
                             }
                         }
-                        
-                        new_instructions.push((*value_id, inst.clone()));
                     }
-                    _ => {
-                        new_instructions.push((*value_id, inst.clone()));
-                    }
+                    _ => {}
                 }
             }
-            
-            block.instructions = new_instructions;
+        }
+        
+        // Apply replacements
+        if !replacements.is_empty() {
+            self.changed = true;
+            for (value_id, new_value) in replacements {
+                function.values[value_id.0] = new_value;
+            }
         }
         
         Ok(self.changed)

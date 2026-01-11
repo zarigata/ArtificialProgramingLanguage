@@ -66,7 +66,7 @@ impl SymbolTable {
         }
     }
     
-    pub fn insert(&mut self, name: String, kind: SymbolKind) -> SymbolId {
+    pub fn insert(&mut self, name: String, _kind: SymbolKind) -> SymbolId {
         let symbol_id = self.scopes.len(); // Simple ID generation
         self.scopes[self.current_scope].symbols.insert(name, symbol_id);
         symbol_id

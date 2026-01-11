@@ -1,0 +1,4684 @@
+==========================================
+VeZ Simple Build Test
+==========================================
+
+Building compiler...
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/compiler/Cargo.toml
+workspace: /run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/Cargo.toml
+   Compiling vez_compiler v0.1.0 (/run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/compiler)
+error[E0583]: file not found for module `hygiene`
+ --> compiler/src/macro_system/mod.rs:5:1
+  |
+5 | pub mod hygiene;
+  | ^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `hygiene`, create file "compiler/src/macro_system/hygiene.rs" or "compiler/src/macro_system/hygiene/mod.rs"
+  = note: if there is a `mod hygiene` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `parser`
+ --> compiler/src/macro_system/mod.rs:6:1
+  |
+6 | pub mod parser;
+  | ^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `parser`, create file "compiler/src/macro_system/parser.rs" or "compiler/src/macro_system/parser/mod.rs"
+  = note: if there is a `mod parser` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `builtin`
+ --> compiler/src/macro_system/mod.rs:7:1
+  |
+7 | pub mod builtin;
+  | ^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `builtin`, create file "compiler/src/macro_system/builtin.rs" or "compiler/src/macro_system/builtin/mod.rs"
+  = note: if there is a `mod builtin` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `future`
+ --> compiler/src/async_runtime/mod.rs:4:1
+  |
+4 | pub mod future;
+  | ^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `future`, create file "compiler/src/async_runtime/future.rs" or "compiler/src/async_runtime/future/mod.rs"
+  = note: if there is a `mod future` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `task`
+ --> compiler/src/async_runtime/mod.rs:6:1
+  |
+6 | pub mod task;
+  | ^^^^^^^^^^^^^
+  |
+  = help: to create the module `task`, create file "compiler/src/async_runtime/task.rs" or "compiler/src/async_runtime/task/mod.rs"
+  = note: if there is a `mod task` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `waker`
+ --> compiler/src/async_runtime/mod.rs:7:1
+  |
+7 | pub mod waker;
+  | ^^^^^^^^^^^^^^
+  |
+  = help: to create the module `waker`, create file "compiler/src/async_runtime/waker.rs" or "compiler/src/async_runtime/waker/mod.rs"
+  = note: if there is a `mod waker` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `proof_engine`
+ --> compiler/src/verification/mod.rs:5:1
+  |
+5 | pub mod proof_engine;
+  | ^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `proof_engine`, create file "compiler/src/verification/proof_engine.rs" or "compiler/src/verification/proof_engine/mod.rs"
+  = note: if there is a `mod proof_engine` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `safety_checker`
+ --> compiler/src/verification/mod.rs:6:1
+  |
+6 | pub mod safety_checker;
+  | ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `safety_checker`, create file "compiler/src/verification/safety_checker.rs" or "compiler/src/verification/safety_checker/mod.rs"
+  = note: if there is a `mod safety_checker` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `contracts`
+ --> compiler/src/verification/mod.rs:7:1
+  |
+7 | pub mod contracts;
+  | ^^^^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `contracts`, create file "compiler/src/verification/contracts.rs" or "compiler/src/verification/contracts/mod.rs"
+  = note: if there is a `mod contracts` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `cuda`
+ --> compiler/src/gpu/mod.rs:4:1
+  |
+4 | pub mod cuda;
+  | ^^^^^^^^^^^^^
+  |
+  = help: to create the module `cuda`, create file "compiler/src/gpu/cuda.rs" or "compiler/src/gpu/cuda/mod.rs"
+  = note: if there is a `mod cuda` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `metal`
+ --> compiler/src/gpu/mod.rs:5:1
+  |
+5 | pub mod metal;
+  | ^^^^^^^^^^^^^^
+  |
+  = help: to create the module `metal`, create file "compiler/src/gpu/metal.rs" or "compiler/src/gpu/metal/mod.rs"
+  = note: if there is a `mod metal` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `vulkan`
+ --> compiler/src/gpu/mod.rs:6:1
+  |
+6 | pub mod vulkan;
+  | ^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `vulkan`, create file "compiler/src/gpu/vulkan.rs" or "compiler/src/gpu/vulkan/mod.rs"
+  = note: if there is a `mod vulkan` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `kernel`
+ --> compiler/src/gpu/mod.rs:7:1
+  |
+7 | pub mod kernel;
+  | ^^^^^^^^^^^^^^^
+  |
+  = help: to create the module `kernel`, create file "compiler/src/gpu/kernel.rs" or "compiler/src/gpu/kernel/mod.rs"
+  = note: if there is a `mod kernel` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0432]: unresolved import `crate::semantic::types`
+  --> compiler/src/verification/mod.rs:10:22
+   |
+10 | use crate::semantic::types::Type;
+   |                      ^^^^^ could not find `types` in `semantic`
+
+error[E0432]: unresolved import `crate::semantic::types`
+ --> compiler/src/consteval/mod.rs:5:22
+  |
+5 | use crate::semantic::types::Type;
+  |                      ^^^^^ could not find `types` in `semantic`
+
+error[E0432]: unresolved import `crate::semantic::types`
+  --> compiler/src/plugin/mod.rs:10:22
+   |
+10 | use crate::semantic::types::Type;
+   |                      ^^^^^ could not find `types` in `semantic`
+
+error[E0432]: unresolved import `crate::error::CompilerError`
+ --> compiler/src/codegen/llvm_backend.rs:6:28
+  |
+6 | use crate::error::{Result, CompilerError};
+  |                            ^^^^^^^^^^^^^ no `CompilerError` in `error`
+
+error[E0432]: unresolved import `crate::error::CompilerError`
+ --> compiler/src/codegen/target.rs:3:28
+  |
+3 | use crate::error::{Result, CompilerError};
+  |                            ^^^^^^^^^^^^^ no `CompilerError` in `error`
+
+error[E0432]: unresolved import `crate::error::CompilerError`
+ --> compiler/src/codegen/linker.rs:3:28
+  |
+3 | use crate::error::{Result, CompilerError};
+  |                            ^^^^^^^^^^^^^ no `CompilerError` in `error`
+
+error[E0532]: expected tuple struct or tuple variant, found unit variant `Constant::Null`
+   --> compiler/src/codegen/llvm_backend.rs:129:13
+    |
+129 |             Constant::Null(ty) => format!("{} null", self.type_to_llvm(ty)),
+    |             ^^^^^^^^^^^^^^^^^^ help: use this syntax instead: `Constant::Null`
+    |
+   ::: compiler/src/ir/ssa.rs:30:5
+    |
+ 30 |     Null,
+    |     ---- `Constant::Null` defined here
+
+error[E0532]: expected tuple struct or tuple variant, found unit variant `Constant::Undef`
+   --> compiler/src/codegen/llvm_backend.rs:130:13
+    |
+130 |             Constant::Undef(ty) => format!("{} undef", self.type_to_llvm(ty)),
+    |             ^^^^^^^^^^^^^^^^^^^ help: use this syntax instead: `Constant::Undef`
+    |
+   ::: compiler/src/ir/ssa.rs:31:5
+    |
+ 31 |     Undef,
+    |     ----- `Constant::Undef` defined here
+
+error[E0412]: cannot find type `Thread` in this scope
+   --> compiler/src/async_runtime/executor.rs:113:18
+    |
+113 |     threads: Vec<Thread>,
+    |                  ^^^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+  4 + use std::thread::Thread;
+    |
+
+error[E0412]: cannot find type `Arc` in this scope
+   --> compiler/src/async_runtime/executor.rs:114:17
+    |
+114 |     task_queue: Arc<Mutex<VecDeque<Box<dyn Task>>>>,
+    |                 ^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+  4 + use std::sync::Arc;
+    |
+
+error[E0412]: cannot find type `Mutex` in this scope
+   --> compiler/src/async_runtime/executor.rs:114:21
+    |
+114 |     task_queue: Arc<Mutex<VecDeque<Box<dyn Task>>>>,
+    |                     ^^^^^ not found in this scope
+    |
+help: consider importing one of these structs
+    |
+  4 + use std::sync::Mutex;
+    |
+  4 + use std::sync::nonpoison::Mutex;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Arc`
+   --> compiler/src/async_runtime/executor.rs:119:26
+    |
+119 |         let task_queue = Arc::new(Mutex::new(VecDeque::new()));
+    |                          ^^^ use of undeclared type `Arc`
+    |
+help: consider importing this struct
+    |
+  4 + use std::sync::Arc;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Mutex`
+   --> compiler/src/async_runtime/executor.rs:119:35
+    |
+119 |         let task_queue = Arc::new(Mutex::new(VecDeque::new()));
+    |                                   ^^^^^ use of undeclared type `Mutex`
+    |
+help: consider importing one of these structs
+    |
+  4 + use std::sync::Mutex;
+    |
+  4 + use std::sync::nonpoison::Mutex;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Thread`
+   --> compiler/src/async_runtime/executor.rs:124:26
+    |
+124 |             let thread = Thread::spawn(move || {
+    |                          ^^^^^^ use of undeclared type `Thread`
+    |
+help: consider importing this struct
+    |
+  4 + use std::thread::Thread;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Thread`
+   --> compiler/src/async_runtime/executor.rs:136:25
+    |
+136 |                         Thread::sleep(Duration::from_millis(10));
+    |                         ^^^^^^ use of undeclared type `Thread`
+    |
+help: consider importing this struct
+    |
+  4 + use std::thread::Thread;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:113:77
+    |
+113 |                     _ => Err(Error::new("Unsupported literal type for SMT", Span::dummy())),
+    |                                                                             ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:122:21
+    |
+122 |                     BinaryOp::Add => "+",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:123:21
+    |
+123 |                     BinaryOp::Sub => "-",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:124:21
+    |
+124 |                     BinaryOp::Mul => "*",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:125:21
+    |
+125 |                     BinaryOp::Div => "div",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:126:21
+    |
+126 |                     BinaryOp::Eq => "=",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:127:21
+    |
+127 |                     BinaryOp::Ne => "distinct",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:128:21
+    |
+128 |                     BinaryOp::Lt => "<",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:129:21
+    |
+129 |                     BinaryOp::Le => "<=",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:130:21
+    |
+130 |                     BinaryOp::Gt => ">",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:131:21
+    |
+131 |                     BinaryOp::Ge => ">=",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:132:21
+    |
+132 |                     BinaryOp::And => "and",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/verification/smt_solver.rs:133:21
+    |
+133 |                     BinaryOp::Or => "or",
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:134:87
+    |
+134 |                     _ => return Err(Error::new("Unsupported binary operator for SMT", Span::dummy())),
+    |                                                                                       ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/verification/smt_solver.rs:143:21
+    |
+143 |                     UnaryOp::Not => "not",
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/verification/smt_solver.rs:144:21
+    |
+144 |                     UnaryOp::Neg => "-",
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:145:86
+    |
+145 |                     _ => return Err(Error::new("Unsupported unary operator for SMT", Span::dummy())),
+    |                                                                                      ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:150:72
+    |
+150 |             _ => Err(Error::new("Unsupported expression type for SMT", Span::dummy())),
+    |                                                                        ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:195:83
+    |
+195 |             .map_err(|e| Error::new(format!("Failed to spawn SMT solver: {}", e), Span::dummy()))?;
+    |                                                                                   ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:199:90
+    |
+199 |                 .map_err(|e| Error::new(format!("Failed to write to SMT solver: {}", e), Span::dummy()))?;
+    |                                                                                          ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/smt_solver.rs:203:89
+    |
+203 |             .map_err(|e| Error::new(format!("Failed to read SMT solver output: {}", e), Span::dummy()))?;
+    |                                                                                         ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/verification/mod.rs:235:19
+    |
+235 |             span: Span::dummy(),
+    |                   ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  9 + use crate::prelude::Span;
+    |
+
+error[E0412]: cannot find type `BinaryOp` in this scope
+   --> compiler/src/gpu/mod.rs:285:34
+    |
+285 |     fn binary_op_str(&self, op: &BinaryOp) -> &str {
+    |                                  ^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:287:13
+    |
+287 |             BinaryOp::Add => "+",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:288:13
+    |
+288 |             BinaryOp::Sub => "-",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:289:13
+    |
+289 |             BinaryOp::Mul => "*",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:290:13
+    |
+290 |             BinaryOp::Div => "/",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:291:13
+    |
+291 |             BinaryOp::Mod => "%",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:292:13
+    |
+292 |             BinaryOp::Eq => "==",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:293:13
+    |
+293 |             BinaryOp::Ne => "!=",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:294:13
+    |
+294 |             BinaryOp::Lt => "<",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:295:13
+    |
+295 |             BinaryOp::Le => "<=",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:296:13
+    |
+296 |             BinaryOp::Gt => ">",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/gpu/mod.rs:297:13
+    |
+297 |             BinaryOp::Ge => ">=",
+    |             ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  9 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/consteval/mod.rs:68:25
+   |
+68 |                         Span::dummy()
+   |                         ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:108:17
+    |
+108 |                 Span::dummy()
+    |                 ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0412]: cannot find type `BinaryOp` in this scope
+   --> compiler/src/consteval/mod.rs:123:34
+    |
+123 |     fn eval_binary_op(&self, op: BinaryOp, left: &ConstValue, right: &ConstValue) -> Result<ConstValue> {
+    |                                  ^^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:127:21
+    |
+127 |                     BinaryOp::Add => ConstValue::Int(l + r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:128:21
+    |
+128 |                     BinaryOp::Sub => ConstValue::Int(l - r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:129:21
+    |
+129 |                     BinaryOp::Mul => ConstValue::Int(l * r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:130:21
+    |
+130 |                     BinaryOp::Div => {
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:132:71
+    |
+132 | ...                   return Err(Error::new("Division by zero", Span::dummy()));
+    |                                                                 ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:136:21
+    |
+136 |                     BinaryOp::Mod => ConstValue::Int(l % r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:137:21
+    |
+137 |                     BinaryOp::Eq => ConstValue::Bool(l == r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:138:21
+    |
+138 |                     BinaryOp::Ne => ConstValue::Bool(l != r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:139:21
+    |
+139 |                     BinaryOp::Lt => ConstValue::Bool(l < r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:140:21
+    |
+140 |                     BinaryOp::Le => ConstValue::Bool(l <= r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:141:21
+    |
+141 |                     BinaryOp::Gt => ConstValue::Bool(l > r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:142:21
+    |
+142 |                     BinaryOp::Ge => ConstValue::Bool(l >= r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:143:21
+    |
+143 |                     BinaryOp::BitAnd => ConstValue::Int(l & r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:144:21
+    |
+144 |                     BinaryOp::BitOr => ConstValue::Int(l | r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:145:21
+    |
+145 |                     BinaryOp::BitXor => ConstValue::Int(l ^ r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:146:21
+    |
+146 |                     BinaryOp::Shl => ConstValue::Int(l << r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:147:21
+    |
+147 |                     BinaryOp::Shr => ConstValue::Int(l >> r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:148:80
+    |
+148 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                                                                ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:155:21
+    |
+155 |                     BinaryOp::Add => ConstValue::Float(l + r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:156:21
+    |
+156 |                     BinaryOp::Sub => ConstValue::Float(l - r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:157:21
+    |
+157 |                     BinaryOp::Mul => ConstValue::Float(l * r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:158:21
+    |
+158 |                     BinaryOp::Div => ConstValue::Float(l / r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:159:21
+    |
+159 |                     BinaryOp::Eq => ConstValue::Bool(l == r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:160:21
+    |
+160 |                     BinaryOp::Ne => ConstValue::Bool(l != r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:161:21
+    |
+161 |                     BinaryOp::Lt => ConstValue::Bool(l < r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:162:21
+    |
+162 |                     BinaryOp::Le => ConstValue::Bool(l <= r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:163:21
+    |
+163 |                     BinaryOp::Gt => ConstValue::Bool(l > r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:164:21
+    |
+164 |                     BinaryOp::Ge => ConstValue::Bool(l >= r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:165:80
+    |
+165 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                                                                ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:172:21
+    |
+172 |                     BinaryOp::And => ConstValue::Bool(*l && *r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:173:21
+    |
+173 |                     BinaryOp::Or => ConstValue::Bool(*l || *r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:174:21
+    |
+174 |                     BinaryOp::Eq => ConstValue::Bool(l == r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `BinaryOp`
+   --> compiler/src/consteval/mod.rs:175:21
+    |
+175 |                     BinaryOp::Ne => ConstValue::Bool(l != r),
+    |                     ^^^^^^^^ use of undeclared type `BinaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::BinaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:176:80
+    |
+176 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                                                                ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:181:70
+    |
+181 |             _ => Err(Error::new("Type mismatch in binary operation", Span::dummy())),
+    |                                                                      ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0412]: cannot find type `UnaryOp` in this scope
+   --> compiler/src/consteval/mod.rs:185:33
+    |
+185 |     fn eval_unary_op(&self, op: UnaryOp, val: &ConstValue) -> Result<ConstValue> {
+    |                                 ^^^^^^^ not found in this scope
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/consteval/mod.rs:189:21
+    |
+189 |                     UnaryOp::Neg => ConstValue::Int(-n),
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/consteval/mod.rs:190:21
+    |
+190 |                     UnaryOp::Not => ConstValue::Bool(*n == 0),
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/consteval/mod.rs:191:21
+    |
+191 |                     UnaryOp::BitNot => ConstValue::Int(!n),
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:192:79
+    |
+192 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                                                               ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/consteval/mod.rs:199:21
+    |
+199 |                     UnaryOp::Neg => ConstValue::Float(-f),
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:200:79
+    |
+200 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                                                               ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `UnaryOp`
+   --> compiler/src/consteval/mod.rs:207:21
+    |
+207 |                     UnaryOp::Not => ConstValue::Bool(!b),
+    |                     ^^^^^^^ use of undeclared type `UnaryOp`
+    |
+help: consider importing this enum
+    |
+  4 + use crate::ir::instructions::UnaryOp;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:208:79
+    |
+208 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                                                               ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:213:69
+    |
+213 |             _ => Err(Error::new("Type mismatch in unary operation", Span::dummy())),
+    |                                                                     ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:221:65
+    |
+221 |             _ => return Err(Error::new("Invalid function call", Span::dummy())),
+    |                                                                 ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:239:17
+    |
+239 |                 Span::dummy()
+    |                 ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:246:61
+    |
+246 |             return Err(Error::new("abs expects 1 argument", Span::dummy()));
+    |                                                             ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:252:65
+    |
+252 |             _ => Err(Error::new("abs expects numeric argument", Span::dummy())),
+    |                                                                 ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:258:62
+    |
+258 |             return Err(Error::new("min expects 2 arguments", Span::dummy()));
+    |                                                              ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:264:66
+    |
+264 |             _ => Err(Error::new("min expects numeric arguments", Span::dummy())),
+    |                                                                  ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:270:62
+    |
+270 |             return Err(Error::new("max expects 2 arguments", Span::dummy()));
+    |                                                              ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:276:66
+    |
+276 |             _ => Err(Error::new("max expects numeric arguments", Span::dummy())),
+    |                                                                  ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:282:62
+    |
+282 |             return Err(Error::new("pow expects 2 arguments", Span::dummy()));
+    |                                                              ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:291:80
+    |
+291 |                     return Err(Error::new("Negative exponent for integer pow", Span::dummy()));
+    |                                                                                ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:295:66
+    |
+295 |             _ => Err(Error::new("pow expects numeric arguments", Span::dummy())),
+    |                                                                  ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:301:62
+    |
+301 |             return Err(Error::new("sqrt expects 1 argument", Span::dummy()));
+    |                                                              ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:307:70
+    |
+307 |                     return Err(Error::new("sqrt of negative number", Span::dummy()));
+    |                                                                      ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/consteval/mod.rs:311:64
+    |
+311 |             _ => Err(Error::new("sqrt expects float argument", Span::dummy())),
+    |                                                                ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/api.rs:51:19
+   |
+51 |             span: Span::dummy(),
+   |                   ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/api.rs:58:19
+   |
+58 |             span: Span::dummy(),
+   |                   ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/api.rs:65:19
+   |
+65 |             span: Span::dummy(),
+   |                   ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0412]: cannot find type `BinaryOp` in this scope
+  --> compiler/src/plugin/api.rs:69:40
+   |
+69 |     pub fn create_binary_op(&self, op: BinaryOp, left: Expr, right: Expr) -> Expr {
+   |                                        ^^^^^^^^ not found in this scope
+   |
+help: consider importing this enum
+   |
+ 4 + use crate::ir::instructions::BinaryOp;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/api.rs:74:19
+   |
+74 |             span: Span::dummy(),
+   |                   ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/api.rs:82:19
+   |
+82 |             span: Span::dummy(),
+   |                   ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/loader.rs:45:85
+   |
+45 |                 .map_err(|e| Error::new(format!("Failed to read directory: {}", e), Span::dummy()))?;
+   |                                                                                     ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/loader.rs:70:17
+   |
+70 |                 Span::dummy(),
+   |                 ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+  --> compiler/src/plugin/loader.rs:84:80
+   |
+84 |             .map_err(|e| Error::new(format!("Failed to read manifest: {}", e), Span::dummy()))?;
+   |                                                                                ^^^^ use of undeclared type `Span`
+   |
+help: consider importing this struct through its public re-export
+   |
+ 4 + use crate::prelude::Span;
+   |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/plugin/loader.rs:127:13
+    |
+127 |             Span::dummy(),
+    |             ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  4 + use crate::prelude::Span;
+    |
+
+error[E0412]: cannot find type `Span` in this scope
+   --> compiler/src/plugin/mod.rs:152:19
+    |
+152 |     pub location: Span,
+    |                   ^^^^ not found in this scope
+    |
+help: consider importing this struct through its public re-export
+    |
+  9 + use crate::prelude::Span;
+    |
+
+error[E0433]: failed to resolve: use of undeclared type `Span`
+   --> compiler/src/plugin/mod.rs:275:21
+    |
+275 |                     Span::dummy(),
+    |                     ^^^^ use of undeclared type `Span`
+    |
+help: consider importing this struct through its public re-export
+    |
+  9 + use crate::prelude::Span;
+    |
+
+error[E0659]: `Function` is ambiguous
+  --> compiler/src/gpu/mod.rs:78:42
+   |
+78 |     pub fn generate_kernel(&self, func: &Function) -> Result<String> {
+   |                                          ^^^^^^^^ ambiguous name
+   |
+   = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+  --> compiler/src/gpu/mod.rs:9:5
+   |
+ 9 | use crate::parser::ast::*;
+   |     ^^^^^^^^^^^^^^^^^^^^^
+   = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+  --> compiler/src/gpu/mod.rs:10:5
+   |
+10 | use crate::ir::ssa::*;
+   |     ^^^^^^^^^^^^^^^^^
+   = help: consider adding an explicit import of `Function` to disambiguate
+
+error[E0659]: `Function` is ambiguous
+  --> compiler/src/gpu/mod.rs:87:43
+   |
+87 |     fn generate_cuda_kernel(&self, func: &Function) -> Result<String> {
+   |                                           ^^^^^^^^ ambiguous name
+   |
+   = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+  --> compiler/src/gpu/mod.rs:9:5
+   |
+ 9 | use crate::parser::ast::*;
+   |     ^^^^^^^^^^^^^^^^^^^^^
+   = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+  --> compiler/src/gpu/mod.rs:10:5
+   |
+10 | use crate::ir::ssa::*;
+   |     ^^^^^^^^^^^^^^^^^
+   = help: consider adding an explicit import of `Function` to disambiguate
+
+error[E0659]: `Function` is ambiguous
+   --> compiler/src/gpu/mod.rs:120:44
+    |
+120 |     fn generate_metal_kernel(&self, func: &Function) -> Result<String> {
+    |                                            ^^^^^^^^ ambiguous name
+    |
+    = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:9:5
+    |
+  9 | use crate::parser::ast::*;
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:10:5
+    |
+ 10 | use crate::ir::ssa::*;
+    |     ^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+
+error[E0659]: `Function` is ambiguous
+   --> compiler/src/gpu/mod.rs:157:45
+    |
+157 |     fn generate_vulkan_kernel(&self, func: &Function) -> Result<String> {
+    |                                             ^^^^^^^^ ambiguous name
+    |
+    = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:9:5
+    |
+  9 | use crate::parser::ast::*;
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:10:5
+    |
+ 10 | use crate::ir::ssa::*;
+    |     ^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+
+error[E0659]: `Function` is ambiguous
+   --> compiler/src/gpu/mod.rs:193:45
+    |
+193 |     fn generate_opencl_kernel(&self, func: &Function) -> Result<String> {
+    |                                             ^^^^^^^^ ambiguous name
+    |
+    = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:9:5
+    |
+  9 | use crate::parser::ast::*;
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:10:5
+    |
+ 10 | use crate::ir::ssa::*;
+    |     ^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+
+error[E0659]: `Function` is ambiguous
+   --> compiler/src/gpu/mod.rs:227:43
+    |
+227 |     fn generate_kernel_body(&self, func: &Function) -> Result<String> {
+    |                                           ^^^^^^^^ ambiguous name
+    |
+    = note: ambiguous because of multiple glob imports of a name in the same module
+note: `Function` could refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:9:5
+    |
+  9 | use crate::parser::ast::*;
+    |     ^^^^^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+note: `Function` could also refer to the struct imported here
+   --> compiler/src/gpu/mod.rs:10:5
+    |
+ 10 | use crate::ir::ssa::*;
+    |     ^^^^^^^^^^^^^^^^^
+    = help: consider adding an explicit import of `Function` to disambiguate
+
+warning: unused import: `TypeVar`
+ --> compiler/src/semantic/type_checker.rs:6:69
+  |
+6 | use super::type_env::{TypeEnv, InferredType, Substitution, Unifier, TypeVar};
+  |                                                                     ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `BasicBlock`
+ --> compiler/src/ir/builder.rs:5:42
+  |
+5 | use super::ssa::{Function as IrFunction, BasicBlock, Value, ValueId, Constant, Module};
+  |                                          ^^^^^^^^^^
+
+warning: unused import: `crate::ir::types::IrType`
+ --> compiler/src/optimizer/constant_folding.rs:5:5
+  |
+5 | use crate::ir::types::IrType;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ValueId`
+ --> compiler/src/optimizer/inline.rs:3:54
+  |
+3 | use crate::ir::ssa::{Module, Function as IrFunction, ValueId};
+  |                                                      ^^^^^^^
+
+warning: unused import: `Path`
+ --> compiler/src/codegen/linker.rs:5:17
+  |
+5 | use std::path::{Path, PathBuf};
+  |                 ^^^^
+
+warning: unused import: `crate::parser::ast::*`
+ --> compiler/src/macro_system/mod.rs:9:5
+  |
+9 | use crate::parser::ast::*;
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::prelude::*`
+ --> compiler/src/async_runtime/mod.rs:9:5
+  |
+9 | use std::prelude::*;
+  |     ^^^^^^^^^^^^^^^
+
+warning: unused import: `Error`
+  --> compiler/src/verification/mod.rs:11:20
+   |
+11 | use crate::error::{Error, Result};
+   |                    ^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> compiler/src/verification/mod.rs:12:5
+   |
+12 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::ir::ssa::*`
+  --> compiler/src/gpu/mod.rs:10:5
+   |
+10 | use crate::ir::ssa::*;
+   |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Error`
+  --> compiler/src/gpu/mod.rs:11:20
+   |
+11 | use crate::error::{Error, Result};
+   |                    ^^^^^
+
+error[E0277]: `F1` is not a future
+   --> compiler/src/async_runtime/mod.rs:113:17
+    |
+113 |     let r1 = f1.await;
+    |                 ^^^^^ `F1` is not a future
+    |
+    = note: F1 must be a future or must implement `IntoFuture` to be awaited
+    = note: required for `F1` to implement `IntoFuture`
+help: remove the `.await`
+    |
+113 -     let r1 = f1.await;
+113 +     let r1 = f1;
+    |
+help: consider further restricting type parameter `F1` with trait `Future`
+    |
+110 |     F1: Future + std::future::Future,
+    |                +++++++++++++++++++++
+
+error[E0277]: `F2` is not a future
+   --> compiler/src/async_runtime/mod.rs:114:17
+    |
+114 |     let r2 = f2.await;
+    |                 ^^^^^ `F2` is not a future
+    |
+    = note: F2 must be a future or must implement `IntoFuture` to be awaited
+    = note: required for `F2` to implement `IntoFuture`
+help: remove the `.await`
+    |
+114 -     let r2 = f2.await;
+114 +     let r2 = f2;
+    |
+help: consider further restricting type parameter `F2` with trait `Future`
+    |
+111 |     F2: Future + std::future::Future,
+    |                +++++++++++++++++++++
+
+error[E0023]: this pattern has 1 field, but the corresponding tuple variant has 2 fields
+  --> compiler/src/lexer/token.rs:66:35
+   |
+26 |     IntLiteral(String, Option<String>),   // value, optional suffix (i32, u64, etc.)
+   |                ------  -------------- tuple variant has 2 fields
+...
+66 |             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_) |
+   |                                   ^ expected 2 fields, found 1
+   |
+help: use `_` to explicitly ignore each field
+   |
+66 |             TokenKind::IntLiteral(_, _) | TokenKind::FloatLiteral(_) |
+   |                                    +++
+help: use `..` to ignore all fields
+   |
+66 -             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_) |
+66 +             TokenKind::IntLiteral(..) | TokenKind::FloatLiteral(_) |
+   |
+
+error[E0023]: this pattern has 1 field, but the corresponding tuple variant has 2 fields
+  --> compiler/src/lexer/token.rs:66:64
+   |
+27 |     FloatLiteral(String, Option<String>), // value, optional suffix (f32, f64)
+   |                  ------  -------------- tuple variant has 2 fields
+...
+66 |             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_) |
+   |                                                                ^ expected 2 fields, found 1
+   |
+help: use `_` to explicitly ignore each field
+   |
+66 |             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_, _) |
+   |                                                                 +++
+help: use `..` to ignore all fields
+   |
+66 -             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_) |
+66 +             TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(..) |
+   |
+
+error[E0308]: mismatched types
+   --> compiler/src/lexer/mod.rs:689:13
+    |
+682 |     fn lex_slash(&mut self) -> Result<TokenKind> {
+    |                                ----------------- expected `std::result::Result<TokenKind, error::Error>` because of return type
+...
+689 |             self.next_token() // Skip comment and get next token
+    |             ^^^^^^^^^^^^^^^^^ expected `Result<TokenKind, Error>`, found `Result<Token, Error>`
+    |
+    = note: expected enum `std::result::Result<TokenKind, _>`
+               found enum `std::result::Result<Token, _>`
+
+error[E0308]: mismatched types
+   --> compiler/src/lexer/mod.rs:698:32
+    |
+682 |     fn lex_slash(&mut self) -> Result<TokenKind> {
+    |                                ----------------- expected `std::result::Result<TokenKind, error::Error>` because of return type
+...
+698 |                         return self.next_token(); // Skip comment
+    |                                ^^^^^^^^^^^^^^^^^ expected `Result<TokenKind, Error>`, found `Result<Token, Error>`
+    |
+    = note: expected enum `std::result::Result<TokenKind, _>`
+               found enum `std::result::Result<Token, _>`
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+  --> compiler/src/semantic/resolver.rs:66:19
+   |
+66 |             Span::default(),
+   |                   ^^^^^^^ function or associated item not found in `span::Span`
+   |
+  ::: compiler/src/span.rs:31:1
+   |
+31 | pub struct Span {
+   | --------------- function or associated item `default` not found for this struct
+   |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+  --> compiler/src/span.rs:37:5
+   |
+37 |     pub fn new(start: Position, end: Position) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: items from traits can only be used if the trait is implemented and in scope
+   = note: the following trait defines an item `default`, perhaps you need to implement it:
+           candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+  --> compiler/src/semantic/resolver.rs:71:50
+   |
+71 |             self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+   |                                                  ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+   |
+  ::: compiler/src/error.rs:18:1
+   |
+18 | pub enum ErrorKind {
+   | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+  --> compiler/src/semantic/resolver.rs:84:23
+   |
+84 |                 Span::default(),
+   |                       ^^^^^^^ function or associated item not found in `span::Span`
+   |
+  ::: compiler/src/span.rs:31:1
+   |
+31 | pub struct Span {
+   | --------------- function or associated item `default` not found for this struct
+   |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+  --> compiler/src/span.rs:37:5
+   |
+37 |     pub fn new(start: Position, end: Position) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: items from traits can only be used if the trait is implemented and in scope
+   = note: the following trait defines an item `default`, perhaps you need to implement it:
+           candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+  --> compiler/src/semantic/resolver.rs:89:54
+   |
+89 |                 self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+   |                                                      ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+   |
+  ::: compiler/src/error.rs:18:1
+   |
+18 | pub enum ErrorKind {
+   | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+  --> compiler/src/semantic/resolver.rs:99:23
+   |
+99 |                 Span::default(),
+   |                       ^^^^^^^ function or associated item not found in `span::Span`
+   |
+  ::: compiler/src/span.rs:31:1
+   |
+31 | pub struct Span {
+   | --------------- function or associated item `default` not found for this struct
+   |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+  --> compiler/src/span.rs:37:5
+   |
+37 |     pub fn new(start: Position, end: Position) -> Self {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: items from traits can only be used if the trait is implemented and in scope
+   = note: the following trait defines an item `default`, perhaps you need to implement it:
+           candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:104:54
+    |
+104 |                 self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                      ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:122:19
+    |
+122 |             Span::default(),
+    |                   ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:127:50
+    |
+127 |             self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                  ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:136:19
+    |
+136 |             Span::default(),
+    |                   ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:141:50
+    |
+141 |             self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                  ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:151:23
+    |
+151 |                 Span::default(),
+    |                       ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:156:54
+    |
+156 |                 self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                      ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:166:19
+    |
+166 |             Span::default(),
+    |                   ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:171:50
+    |
+171 |             self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                  ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:185:23
+    |
+185 |                 Span::default(),
+    |                       ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:190:54
+    |
+190 |                 self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                      ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:217:19
+    |
+217 |             Span::default(),
+    |                   ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:222:50
+    |
+222 |             self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                  ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:250:27
+    |
+250 |                     Span::default(),
+    |                           ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:259:58
+    |
+259 |                     self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                          ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:357:27
+    |
+357 |                     Span::default(),
+    |                           ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:362:58
+    |
+362 |                     self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                          ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no function or associated item named `default` found for struct `span::Span` in the current scope
+   --> compiler/src/semantic/resolver.rs:407:27
+    |
+407 |                     Span::default(),
+    |                           ^^^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `default` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `default`, perhaps you need to implement it:
+            candidate #1: `Default`
+
+error[E0599]: no variant or associated item named `DuplicateSymbol` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/resolver.rs:412:58
+    |
+412 |                     self.add_error(Error::new(ErrorKind::DuplicateSymbol, e));
+    |                                                          ^^^^^^^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `DuplicateSymbol` not found for this enum
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:239:36
+    |
+239 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+239 -                         ErrorKind::TypeError,
+240 -                         "Occurs check failed: infinite type"
+241 -                     ))
+239 +                         ErrorKind::MoveError)
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:253:36
+    |
+253 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+253 -                         ErrorKind::TypeError,
+254 -                         format!("Function arity mismatch: {} vs {}", params1.len(), params2.len())
+255 -                     ));
+253 +                         ErrorKind::MoveError);
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:275:36
+    |
+275 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+275 -                         ErrorKind::TypeError,
+276 -                         format!("Type mismatch: {} vs {}", name1, name2)
+277 -                     ));
+275 +                         ErrorKind::MoveError);
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:282:36
+    |
+282 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+282 -                         ErrorKind::TypeError,
+283 -                         "Generic argument count mismatch"
+284 -                     ));
+282 +                         ErrorKind::MoveError);
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:300:36
+    |
+300 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+300 -                         ErrorKind::TypeError,
+301 -                         "Tuple size mismatch"
+302 -                     ));
+300 +                         ErrorKind::MoveError);
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:318:36
+    |
+318 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+318 -                         ErrorKind::TypeError,
+319 -                         "Array size mismatch"
+320 -                     ));
+318 +                         ErrorKind::MoveError);
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:341:36
+    |
+341 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+341 -                         ErrorKind::TypeError,
+342 -                         format!("Type mismatch: {} vs {}", n1, n2)
+343 -                     ))
+341 +                         ErrorKind::MoveError)
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_env.rs:349:28
+    |
+349 |                 ErrorKind::TypeError,
+    |                            ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+349 -                 ErrorKind::TypeError,
+350 -                 format!("Cannot unify types: {:?} and {:?}", t1, t2)
+351 -             ))
+349 +                 ErrorKind::MoveError)
+    |
+
+error[E0599]: no variant or associated item named `TypeError` found for enum `error::ErrorKind` in the current scope
+   --> compiler/src/semantic/type_checker.rs:144:36
+    |
+144 |                         ErrorKind::TypeError,
+    |                                    ^^^^^^^^^ variant or associated item not found in `error::ErrorKind`
+    |
+   ::: compiler/src/error.rs:18:1
+    |
+ 18 | pub enum ErrorKind {
+    | ------------------ variant or associated item `TypeError` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+144 -                         ErrorKind::TypeError,
+145 -                         "Let binding must have type annotation or initializer"
+146 -                     ));
+144 +                         ErrorKind::MoveError);
+    |
+
+warning: unreachable expression
+  --> compiler/src/codegen/llvm_backend.rs:46:9
+   |
+33 |         return "x86_64-unknown-linux-gnu".to_string();
+   |         --------------------------------------------- any code following this expression is unreachable
+...
+46 |         "unknown-unknown-unknown".to_string()
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unreachable expression
+   |
+   = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no variant or associated item named `I1` found for enum `IrType` in the current scope
+  --> compiler/src/codegen/llvm_backend.rs:60:21
+   |
+60 |             IrType::I1 => "i1".to_string(),
+   |                     ^^ variant or associated item not found in `IrType`
+   |
+  ::: compiler/src/ir/types.rs:7:1
+   |
+ 7 | pub enum IrType {
+   | --------------- variant or associated item `I1` not found for this enum
+   |
+help: there is a variant with a similar name
+   |
+60 -             IrType::I1 => "i1".to_string(),
+60 +             IrType::I8 => "i1".to_string(),
+   |
+
+error[E0599]: no variant or associated item named `Ptr` found for enum `IrType` in the current scope
+  --> compiler/src/codegen/llvm_backend.rs:73:21
+   |
+73 |             IrType::Ptr(inner) => format!("{}*", self.type_to_llvm(inner)),
+   |                     ^^^ variant or associated item not found in `IrType`
+   |
+  ::: compiler/src/ir/types.rs:7:1
+   |
+ 7 | pub enum IrType {
+   | --------------- variant or associated item `Ptr` not found for this enum
+
+error[E0026]: variant `Instruction::Branch` does not have fields named `true_bb`, `false_bb`
+   --> compiler/src/codegen/llvm_backend.rs:290:41
+    |
+290 |             Instruction::Branch { cond, true_bb, false_bb } => {
+    |                                         ^^^^^^^  ^^^^^^^^ variant `Instruction::Branch` does not have these fields
+
+error[E0027]: pattern does not mention fields `then_block`, `else_block`
+   --> compiler/src/codegen/llvm_backend.rs:290:13
+    |
+290 |             Instruction::Branch { cond, true_bb, false_bb } => {
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ missing fields `then_block`, `else_block`
+    |
+help: include the missing fields in the pattern
+    |
+290 |             Instruction::Branch { cond, true_bb, false_bb, then_block, else_block } => {
+    |                                                          ++++++++++++++++++++++++
+help: if you don't care about these missing fields, you can explicitly ignore them
+    |
+290 |             Instruction::Branch { cond, true_bb, false_bb, then_block: _, else_block: _ } => {
+    |                                                          ++++++++++++++++++++++++++++++
+help: or always ignore missing fields here
+    |
+290 |             Instruction::Branch { cond, true_bb, false_bb, .. } => {
+    |                                                          ++++
+
+error[E0609]: no field `0` on type `&usize`
+   --> compiler/src/codegen/llvm_backend.rs:295:53
+    |
+295 |                 Ok(format!("br label %bb{}", target.0))
+    |                                                     ^ unknown field
+
+error[E0609]: no field `0` on type `&usize`
+   --> compiler/src/codegen/llvm_backend.rs:305:63
+    |
+305 |                         format!("[ {}, %bb{} ]", val_name, bb.0)
+    |                                                               ^ unknown field
+
+error[E0599]: no variant or associated item named `I1` found for enum `IrType` in the current scope
+   --> compiler/src/codegen/llvm_backend.rs:337:59
+    |
+337 |             Value::Constant(Constant::Bool(_)) => IrType::I1,
+    |                                                           ^^ variant or associated item not found in `IrType`
+    |
+   ::: compiler/src/ir/types.rs:7:1
+    |
+  7 | pub enum IrType {
+    | --------------- variant or associated item `I1` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+337 -             Value::Constant(Constant::Bool(_)) => IrType::I1,
+337 +             Value::Constant(Constant::Bool(_)) => IrType::I8,
+    |
+
+error[E0599]: no variant named `MacroCall` found for enum `ast::Expr`
+  --> compiler/src/macro_system/expander.rs:25:19
+   |
+25 |             Expr::MacroCall { name, args, span } => {
+   |                   ^^^^^^^^^ variant not found in `ast::Expr`
+   |
+  ::: compiler/src/parser/ast.rs:94:1
+   |
+94 | pub enum Expr {
+   | ------------- variant `MacroCall` not found here
+
+error[E0769]: tuple variant `Expr::Binary` written as struct variant
+  --> compiler/src/macro_system/expander.rs:28:13
+   |
+28 |             Expr::Binary { op, left, right, span } => {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: use the tuple variant pattern syntax instead
+   |
+28 -             Expr::Binary { op, left, right, span } => {
+28 +             Expr::Binary(_, _, _) => {
+   |
+
+error[E0769]: tuple variant `Expr::Call` written as struct variant
+  --> compiler/src/macro_system/expander.rs:38:13
+   |
+38 |             Expr::Call { func, args, span } => {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: use the tuple variant pattern syntax instead
+   |
+38 -             Expr::Call { func, args, span } => {
+38 +             Expr::Call(_, _) => {
+   |
+
+error[E0769]: tuple variant `Expr::Block` written as struct variant
+  --> compiler/src/macro_system/expander.rs:49:13
+   |
+49 |             Expr::Block { stmts, span } => {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: use the tuple variant pattern syntax instead
+   |
+49 -             Expr::Block { stmts, span } => {
+49 +             Expr::Block(_) => {
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `op`
+  --> compiler/src/macro_system/expander.rs:32:21
+   |
+32 |                     op: *op,
+   |                     ^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+31 -                 Ok(Expr::Binary {
+32 -                     op: *op,
+33 -                     left,
+34 -                     right,
+35 -                     span: *span,
+36 -                 })
+31 +                 Ok(Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `left`
+  --> compiler/src/macro_system/expander.rs:33:21
+   |
+33 |                     left,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+31 -                 Ok(Expr::Binary {
+32 -                     op: *op,
+33 -                     left,
+34 -                     right,
+35 -                     span: *span,
+36 -                 })
+31 +                 Ok(Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `right`
+  --> compiler/src/macro_system/expander.rs:34:21
+   |
+34 |                     right,
+   |                     ^^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+31 -                 Ok(Expr::Binary {
+32 -                     op: *op,
+33 -                     left,
+34 -                     right,
+35 -                     span: *span,
+36 -                 })
+31 +                 Ok(Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `span`
+  --> compiler/src/macro_system/expander.rs:35:21
+   |
+35 |                     span: *span,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+31 -                 Ok(Expr::Binary {
+32 -                     op: *op,
+33 -                     left,
+34 -                     right,
+35 -                     span: *span,
+36 -                 })
+31 +                 Ok(Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `func`
+  --> compiler/src/macro_system/expander.rs:44:21
+   |
+44 |                     func,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+43 -                 Ok(Expr::Call {
+44 -                     func,
+45 -                     args,
+46 -                     span: *span,
+47 -                 })
+43 +                 Ok(Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `args`
+  --> compiler/src/macro_system/expander.rs:45:21
+   |
+45 |                     args,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+43 -                 Ok(Expr::Call {
+44 -                     func,
+45 -                     args,
+46 -                     span: *span,
+47 -                 })
+43 +                 Ok(Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `span`
+  --> compiler/src/macro_system/expander.rs:46:21
+   |
+46 |                     span: *span,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+43 -                 Ok(Expr::Call {
+44 -                     func,
+45 -                     args,
+46 -                     span: *span,
+47 -                 })
+43 +                 Ok(Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Expr::Block` has no field named `stmts`
+   --> compiler/src/macro_system/expander.rs:54:21
+    |
+ 54 |                     stmts,
+    |                     ^^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:103:5
+    |
+103 |     Block(Vec<Stmt>),
+    |     ----- `ast::Expr::Block` defined here
+    |
+help: `ast::Expr::Block` is a tuple variant, use the appropriate syntax
+    |
+ 53 -                 Ok(Expr::Block {
+ 54 -                     stmts,
+ 55 -                     span: *span,
+ 56 -                 })
+ 53 +                 Ok(Expr::Block(/* Vec<ast::Stmt> */))
+    |
+
+error[E0559]: variant `ast::Expr::Block` has no field named `span`
+   --> compiler/src/macro_system/expander.rs:55:21
+    |
+ 55 |                     span: *span,
+    |                     ^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:103:5
+    |
+103 |     Block(Vec<Stmt>),
+    |     ----- `ast::Expr::Block` defined here
+    |
+help: `ast::Expr::Block` is a tuple variant, use the appropriate syntax
+    |
+ 53 -                 Ok(Expr::Block {
+ 54 -                     stmts,
+ 55 -                     span: *span,
+ 56 -                 })
+ 53 +                 Ok(Expr::Block(/* Vec<ast::Stmt> */))
+    |
+
+error[E0769]: tuple variant `Stmt::Let` written as struct variant
+  --> compiler/src/macro_system/expander.rs:67:13
+   |
+67 |             Stmt::Let { pattern, ty, init, span } => {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+help: use the tuple variant pattern syntax instead
+   |
+67 -             Stmt::Let { pattern, ty, init, span } => {
+67 +             Stmt::Let(_, _, _) => {
+   |
+
+error[E0559]: variant `ast::Stmt::Let` has no field named `pattern`
+  --> compiler/src/macro_system/expander.rs:73:21
+   |
+73 |                     pattern: pattern.clone(),
+   |                     ^^^^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:87:5
+   |
+87 |     Let(String, Option<Type>, Option<Expr>),
+   |     --- `ast::Stmt::Let` defined here
+   |
+help: `ast::Stmt::Let` is a tuple variant, use the appropriate syntax
+   |
+72 -                 Ok(Stmt::Let {
+73 -                     pattern: pattern.clone(),
+74 -                     ty: ty.clone(),
+75 -                     init,
+76 -                     span: *span,
+77 -                 })
+72 +                 Ok(Stmt::Let(/* String */, /* Option<ast::Type> */, /* Option<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Stmt::Let` has no field named `ty`
+  --> compiler/src/macro_system/expander.rs:74:21
+   |
+74 |                     ty: ty.clone(),
+   |                     ^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:87:5
+   |
+87 |     Let(String, Option<Type>, Option<Expr>),
+   |     --- `ast::Stmt::Let` defined here
+   |
+help: `ast::Stmt::Let` is a tuple variant, use the appropriate syntax
+   |
+72 -                 Ok(Stmt::Let {
+73 -                     pattern: pattern.clone(),
+74 -                     ty: ty.clone(),
+75 -                     init,
+76 -                     span: *span,
+77 -                 })
+72 +                 Ok(Stmt::Let(/* String */, /* Option<ast::Type> */, /* Option<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Stmt::Let` has no field named `init`
+  --> compiler/src/macro_system/expander.rs:75:21
+   |
+75 |                     init,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:87:5
+   |
+87 |     Let(String, Option<Type>, Option<Expr>),
+   |     --- `ast::Stmt::Let` defined here
+   |
+help: `ast::Stmt::Let` is a tuple variant, use the appropriate syntax
+   |
+72 -                 Ok(Stmt::Let {
+73 -                     pattern: pattern.clone(),
+74 -                     ty: ty.clone(),
+75 -                     init,
+76 -                     span: *span,
+77 -                 })
+72 +                 Ok(Stmt::Let(/* String */, /* Option<ast::Type> */, /* Option<ast::Expr> */))
+   |
+
+error[E0559]: variant `ast::Stmt::Let` has no field named `span`
+  --> compiler/src/macro_system/expander.rs:76:21
+   |
+76 |                     span: *span,
+   |                     ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:87:5
+   |
+87 |     Let(String, Option<Type>, Option<Expr>),
+   |     --- `ast::Stmt::Let` defined here
+   |
+help: `ast::Stmt::Let` is a tuple variant, use the appropriate syntax
+   |
+72 -                 Ok(Stmt::Let {
+73 -                     pattern: pattern.clone(),
+74 -                     ty: ty.clone(),
+75 -                     init,
+76 -                     span: *span,
+77 -                 })
+72 +                 Ok(Stmt::Let(/* String */, /* Option<ast::Type> */, /* Option<ast::Expr> */))
+   |
+
+error[E0308]: mismatched types
+  --> compiler/src/macro_system/expander.rs:86:17
+   |
+86 |                 format!("macro expansion depth exceeded (max: {})", self.max_depth),
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `String: From<span::Span>` is not satisfied
+  --> compiler/src/macro_system/expander.rs:87:17
+   |
+85 |             return Err(Error::new(
+   |                        ---------- required by a bound introduced by this call
+86 |                 format!("macro expansion depth exceeded (max: {})", self.max_depth),
+87 |                 span,
+   |                 ^^^^ the trait `From<span::Span>` is not implemented for `String`
+   |
+   = help: the following other types implement trait `From<T>`:
+             `String` implements `From<&String>`
+             `String` implements `From<&mut str>`
+             `String` implements `From<&str>`
+             `String` implements `From<Box<str>>`
+             `String` implements `From<Cow<'_, str>>`
+             `String` implements `From<char>`
+   = note: required for `span::Span` to implement `Into<String>`
+note: required by a bound in `error::Error::new`
+  --> compiler/src/error.rs:47:47
+   |
+47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+   |                                               ^^^^^^^^^^^^ required by this bound in `Error::new`
+
+error[E0308]: mismatched types
+  --> compiler/src/macro_system/expander.rs:92:39
+   |
+92 |             .ok_or_else(|| Error::new(format!("undefined macro: {}", name), span))?;
+   |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `String: From<span::Span>` is not satisfied
+  --> compiler/src/macro_system/expander.rs:92:77
+   |
+92 |             .ok_or_else(|| Error::new(format!("undefined macro: {}", name), span))?;
+   |                            ----------                                       ^^^^ the trait `From<span::Span>` is not implemented for `String`
+   |                            |
+   |                            required by a bound introduced by this call
+   |
+   = help: the following other types implement trait `From<T>`:
+             `String` implements `From<&String>`
+             `String` implements `From<&mut str>`
+             `String` implements `From<&str>`
+             `String` implements `From<Box<str>>`
+             `String` implements `From<Cow<'_, str>>`
+             `String` implements `From<char>`
+   = note: required for `span::Span` to implement `Into<String>`
+note: required by a bound in `error::Error::new`
+  --> compiler/src/error.rs:47:47
+   |
+47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+   |                                               ^^^^^^^^^^^^ required by this bound in `Error::new`
+
+error[E0308]: mismatched types
+   --> compiler/src/macro_system/expander.rs:110:21
+    |
+110 |                     format!("no matching macro rule for {}", def.name),
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the trait bound `String: From<span::Span>` is not satisfied
+   --> compiler/src/macro_system/expander.rs:111:21
+    |
+109 |                 Err(Error::new(
+    |                     ---------- required by a bound introduced by this call
+110 |                     format!("no matching macro rule for {}", def.name),
+111 |                     span,
+    |                     ^^^^ the trait `From<span::Span>` is not implemented for `String`
+    |
+    = help: the following other types implement trait `From<T>`:
+              `String` implements `From<&String>`
+              `String` implements `From<&mut str>`
+              `String` implements `From<&str>`
+              `String` implements `From<Box<str>>`
+              `String` implements `From<Cow<'_, str>>`
+              `String` implements `From<char>`
+    = note: required for `span::Span` to implement `Into<String>`
+note: required by a bound in `error::Error::new`
+   --> compiler/src/error.rs:47:47
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |                                               ^^^^^^^^^^^^ required by this bound in `Error::new`
+
+error[E0277]: the trait bound `String: From<span::Span>` is not satisfied
+   --> compiler/src/macro_system/expander.rs:116:73
+    |
+116 |                 Err(Error::new("procedural macros not yet implemented", span))
+    |                     ----------                                          ^^^^ the trait `From<span::Span>` is not implemented for `String`
+    |                     |
+    |                     required by a bound introduced by this call
+    |
+    = help: the following other types implement trait `From<T>`:
+              `String` implements `From<&String>`
+              `String` implements `From<&mut str>`
+              `String` implements `From<&str>`
+              `String` implements `From<Box<str>>`
+              `String` implements `From<Cow<'_, str>>`
+              `String` implements `From<char>`
+    = note: required for `span::Span` to implement `Into<String>`
+note: required by a bound in `error::Error::new`
+   --> compiler/src/error.rs:47:47
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |                                               ^^^^^^^^^^^^ required by this bound in `Error::new`
+
+error[E0308]: mismatched types
+   --> compiler/src/macro_system/expander.rs:116:32
+    |
+116 |                 Err(Error::new("procedural macros not yet implemented", span))
+    |                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                     |
+    |                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0559]: variant `ast::Expr::Block` has no field named `stmts`
+   --> compiler/src/macro_system/expander.rs:224:13
+    |
+224 |             stmts: vec![],
+    |             ^^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:103:5
+    |
+103 |     Block(Vec<Stmt>),
+    |     ----- `ast::Expr::Block` defined here
+    |
+help: `ast::Expr::Block` is a tuple variant, use the appropriate syntax
+    |
+223 -         Ok(Expr::Block {
+224 -             stmts: vec![],
+225 -             span,
+226 -         })
+223 +         Ok(Expr::Block(/* Vec<ast::Stmt> */))
+    |
+
+error[E0559]: variant `ast::Expr::Block` has no field named `span`
+   --> compiler/src/macro_system/expander.rs:225:13
+    |
+225 |             span,
+    |             ^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:103:5
+    |
+103 |     Block(Vec<Stmt>),
+    |     ----- `ast::Expr::Block` defined here
+    |
+help: `ast::Expr::Block` is a tuple variant, use the appropriate syntax
+    |
+223 -         Ok(Expr::Block {
+224 -             stmts: vec![],
+225 -             span,
+226 -         })
+223 +         Ok(Expr::Block(/* Vec<ast::Stmt> */))
+    |
+
+error[E0599]: no function or associated item named `dummy` found for struct `span::Span` in the current scope
+   --> compiler/src/macro_system/mod.rs:132:29
+    |
+132 |                 span: Span::dummy(),
+    |                             ^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `dummy` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no function or associated item named `dummy` found for struct `span::Span` in the current scope
+   --> compiler/src/macro_system/mod.rs:187:29
+    |
+187 |                 span: Span::dummy(),
+    |                             ^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `dummy` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no function or associated item named `dummy` found for struct `span::Span` in the current scope
+   --> compiler/src/macro_system/mod.rs:209:29
+    |
+209 |                 span: Span::dummy(),
+    |                             ^^^^^ function or associated item not found in `span::Span`
+    |
+   ::: compiler/src/span.rs:31:1
+    |
+ 31 | pub struct Span {
+    | --------------- function or associated item `dummy` not found for this struct
+    |
+note: if you're trying to build a new `span::Span`, consider using `span::Span::new` which returns `span::Span`
+   --> compiler/src/span.rs:37:5
+    |
+ 37 |     pub fn new(start: Position, end: Position) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0282]: type annotations needed
+   --> compiler/src/async_runtime/executor.rs:133:25
+    |
+133 |                         task.poll(&waker);
+    |                         ^^^^ cannot infer type
+
+error[E0599]: no function or associated item named `from_millis` found for struct `async_runtime::Duration` in the current scope
+   --> compiler/src/async_runtime/executor.rs:136:49
+    |
+136 |                         Thread::sleep(Duration::from_millis(10));
+    |                                                 ^^^^^^^^^^^ function or associated item not found in `async_runtime::Duration`
+    |
+   ::: compiler/src/async_runtime/mod.rs:142:1
+    |
+142 | pub struct Duration {
+    | ------------------- function or associated item `from_millis` not found for this struct
+
+error[E0026]: variant `ast::Expr::Literal` does not have a field named `value`
+   --> compiler/src/verification/smt_solver.rs:109:29
+    |
+109 |             Expr::Literal { value, .. } => {
+    |                             ^^^^^
+    |                             |
+    |                             variant `ast::Expr::Literal` does not have this field
+    |                             help: `ast::Expr::Literal` has a field named `0`
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+   --> compiler/src/verification/smt_solver.rs:116:19
+    |
+116 |             Expr::Variable { name, .. } => Ok(name.clone()),
+    |                   ^^^^^^^^ variant not found in `ast::Expr`
+    |
+   ::: compiler/src/parser/ast.rs:94:1
+    |
+ 94 | pub enum Expr {
+    | ------------- variant `Variable` not found here
+
+error[E0026]: variant `ast::Expr::Binary` does not have fields named `op`, `left`, `right`
+   --> compiler/src/verification/smt_solver.rs:117:28
+    |
+117 |             Expr::Binary { op, left, right, .. } => {
+    |                            ^^  ^^^^  ^^^^^ variant `ast::Expr::Binary` does not have these fields
+
+error[E0026]: variant `ast::Expr::Unary` does not have fields named `op`, `operand`
+   --> compiler/src/verification/smt_solver.rs:139:27
+    |
+139 |             Expr::Unary { op, operand, .. } => {
+    |                           ^^  ^^^^^^^ variant `ast::Expr::Unary` does not have these fields
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:113:41
+    |
+113 |                     _ => Err(Error::new("Unsupported literal type for SMT", Span::dummy())),
+    |                              ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                              |
+    |                              arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:134:48
+    |
+134 |                     _ => return Err(Error::new("Unsupported binary operator for SMT", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:145:48
+    |
+145 |                     _ => return Err(Error::new("Unsupported unary operator for SMT", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:150:33
+    |
+150 |             _ => Err(Error::new("Unsupported expression type for SMT", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+   --> compiler/src/verification/smt_solver.rs:164:19
+    |
+164 |             Expr::Variable { name, .. } => {
+    |                   ^^^^^^^^ variant not found in `ast::Expr`
+    |
+   ::: compiler/src/parser/ast.rs:94:1
+    |
+ 94 | pub enum Expr {
+    | ------------- variant `Variable` not found here
+
+error[E0026]: variant `ast::Expr::Binary` does not have fields named `left`, `right`
+   --> compiler/src/verification/smt_solver.rs:167:28
+    |
+167 |             Expr::Binary { left, right, .. } => {
+    |                            ^^^^  ^^^^^ variant `ast::Expr::Binary` does not have these fields
+
+error[E0026]: variant `ast::Expr::Unary` does not have a field named `operand`
+   --> compiler/src/verification/smt_solver.rs:171:27
+    |
+171 |             Expr::Unary { operand, .. } => {
+    |                           ^^^^^^^ variant `ast::Expr::Unary` does not have this field
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:195:37
+    |
+195 |             .map_err(|e| Error::new(format!("Failed to spawn SMT solver: {}", e), Span::dummy()))?;
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:199:41
+    |
+199 |                 .map_err(|e| Error::new(format!("Failed to write to SMT solver: {}", e), Span::dummy()))?;
+    |                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> compiler/src/verification/smt_solver.rs:203:37
+    |
+203 |             .map_err(|e| Error::new(format!("Failed to read SMT solver output: {}", e), Span::dummy()))?;
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0609]: no field `attributes` on type `&ast::Function`
+   --> compiler/src/verification/mod.rs:204:27
+    |
+204 |         for attr in &func.attributes {
+    |                           ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `name`, `generics`, `params`, `return_type`, `where_clause`, `body`
+
+error[E0282]: type annotations needed
+   --> compiler/src/verification/mod.rs:207:40
+    |
+207 |                     preconditions.push(expr.clone());
+    |                                        ^^^^ cannot infer type
+
+error[E0609]: no field `attributes` on type `&ast::Function`
+   --> compiler/src/verification/mod.rs:219:27
+    |
+219 |         for attr in &func.attributes {
+    |                           ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `name`, `generics`, `params`, `return_type`, `where_clause`, `body`
+
+error[E0282]: type annotations needed
+   --> compiler/src/verification/mod.rs:222:41
+    |
+222 |                     postconditions.push(expr.clone());
+    |                                         ^^^^ cannot infer type
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `value`
+   --> compiler/src/verification/mod.rs:234:13
+    |
+234 |             value: Literal::Bool(true),
+    |             ^^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:95:5
+    |
+ 95 |     Literal(Literal),
+    |     ------- `ast::Expr::Literal` defined here
+    |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+    |
+233 -         Ok(Expr::Literal {
+234 -             value: Literal::Bool(true),
+235 -             span: Span::dummy(),
+236 -         })
+233 +         Ok(Expr::Literal(/* ast::Literal */))
+    |
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `span`
+   --> compiler/src/verification/mod.rs:235:13
+    |
+235 |             span: Span::dummy(),
+    |             ^^^^ field does not exist
+    |
+   ::: compiler/src/parser/ast.rs:95:5
+    |
+ 95 |     Literal(Literal),
+    |     ------- `ast::Expr::Literal` defined here
+    |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+    |
+233 -         Ok(Expr::Literal {
+234 -             value: Literal::Bool(true),
+235 -             span: Span::dummy(),
+236 -         })
+233 +         Ok(Expr::Literal(/* ast::Literal */))
+    |
+
+error[E0026]: variant `ast::Stmt::Let` does not have fields named `pattern`, `init`
+   --> compiler/src/gpu/mod.rs:243:25
+    |
+243 |             Stmt::Let { pattern, init, .. } => {
+    |                         ^^^^^^^  ^^^^ variant `ast::Stmt::Let` does not have these fields
+
+error[E0026]: variant `ast::Expr::Literal` does not have a field named `value`
+   --> compiler/src/gpu/mod.rs:259:29
+    |
+259 |             Expr::Literal { value, .. } => {
+    |                             ^^^^^
+    |                             |
+    |                             variant `ast::Expr::Literal` does not have this field
+    |                             help: `ast::Expr::Literal` has a field named `0`
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+   --> compiler/src/gpu/mod.rs:267:19
+    |
+267 |             Expr::Variable { name, .. } => Ok(name.clone()),
+    |                   ^^^^^^^^ variant not found in `ast::Expr`
+    |
+   ::: compiler/src/parser/ast.rs:94:1
+    |
+ 94 | pub enum Expr {
+    | ------------- variant `Variable` not found here
+
+error[E0026]: variant `ast::Expr::Binary` does not have fields named `op`, `left`, `right`
+   --> compiler/src/gpu/mod.rs:268:28
+    |
+268 |             Expr::Binary { op, left, right, .. } => {
+    |                            ^^  ^^^^  ^^^^^ variant `ast::Expr::Binary` does not have these fields
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:304:19
+    |
+304 |             Type::I32 => Ok("int".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:305:19
+    |
+305 |             Type::I64 => Ok("long".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:306:19
+    |
+306 |             Type::F32 => Ok("float".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:307:19
+    |
+307 |             Type::F64 => Ok("double".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `Pointer` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:308:19
+    |
+308 |             Type::Pointer(inner) => Ok(format!("{}*", self.cuda_type(inner)?)),
+    |                   ^^^^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `Pointer` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:315:19
+    |
+315 |             Type::I32 => Ok("device int*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:316:19
+    |
+316 |             Type::I64 => Ok("device long*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:317:19
+    |
+317 |             Type::F32 => Ok("device float*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:318:19
+    |
+318 |             Type::F64 => Ok("device double*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:325:19
+    |
+325 |             Type::I32 => Ok("int".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:326:19
+    |
+326 |             Type::I64 => Ok("int64_t".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:327:19
+    |
+327 |             Type::F32 => Ok("float".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:328:19
+    |
+328 |             Type::F64 => Ok("double".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:335:19
+    |
+335 |             Type::I32 => Ok("int*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:336:19
+    |
+336 |             Type::I64 => Ok("long*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:337:19
+    |
+337 |             Type::F32 => Ok("float*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/gpu/mod.rs:338:19
+    |
+338 |             Type::F64 => Ok("double*".to_string()),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0026]: variant `ast::Expr::Literal` does not have a field named `value`
+  --> compiler/src/consteval/mod.rs:61:29
+   |
+61 |             Expr::Literal { value, .. } => self.eval_literal(value),
+   |                             ^^^^^
+   |                             |
+   |                             variant `ast::Expr::Literal` does not have this field
+   |                             help: `ast::Expr::Literal` has a field named `0`
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+  --> compiler/src/consteval/mod.rs:63:19
+   |
+63 |             Expr::Variable { name, .. } => {
+   |                   ^^^^^^^^ variant not found in `ast::Expr`
+   |
+  ::: compiler/src/parser/ast.rs:94:1
+   |
+94 | pub enum Expr {
+   | ------------- variant `Variable` not found here
+
+error[E0026]: variant `ast::Expr::Binary` does not have fields named `op`, `left`, `right`
+  --> compiler/src/consteval/mod.rs:72:28
+   |
+72 |             Expr::Binary { op, left, right, .. } => {
+   |                            ^^  ^^^^  ^^^^^ variant `ast::Expr::Binary` does not have these fields
+
+error[E0026]: variant `ast::Expr::Unary` does not have fields named `op`, `operand`
+  --> compiler/src/consteval/mod.rs:78:27
+   |
+78 |             Expr::Unary { op, operand, .. } => {
+   |                           ^^  ^^^^^^^ variant `ast::Expr::Unary` does not have these fields
+
+error[E0026]: variant `ast::Expr::Call` does not have fields named `func`, `args`
+  --> compiler/src/consteval/mod.rs:83:26
+   |
+83 |             Expr::Call { func, args, .. } => {
+   |                          ^^^^  ^^^^ variant `ast::Expr::Call` does not have these fields
+
+error[E0026]: variant `ast::Expr::If` does not have fields named `condition`, `then_branch`, `else_branch`
+  --> compiler/src/consteval/mod.rs:87:24
+   |
+87 |             Expr::If { condition, then_branch, else_branch, .. } => {
+   |                        ^^^^^^^^^  ^^^^^^^^^^^  ^^^^^^^^^^^ variant `ast::Expr::If` does not have these fields
+
+error[E0026]: variant `ast::Expr::Array` does not have a field named `elements`
+  --> compiler/src/consteval/mod.rs:98:27
+   |
+98 |             Expr::Array { elements, .. } => {
+   |                           ^^^^^^^^
+   |                           |
+   |                           variant `ast::Expr::Array` does not have this field
+   |                           help: `ast::Expr::Array` has a field named `0`
+
+error[E0308]: mismatched types
+  --> compiler/src/consteval/mod.rs:67:25
+   |
+67 |                         format!("Undefined constant: {}", name),
+   |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:107:17
+    |
+106 |             _ => Err(Error::new(
+    |                      ---------- arguments to this function are incorrect
+107 |                 "Expression cannot be evaluated at compile time",
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:132:51
+    |
+132 | ...                   return Err(Error::new("Division by zero", Span::dummy()));
+    |                                  ---------- ^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                  |
+    |                                  arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:148:48
+    |
+148 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:165:48
+    |
+165 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:176:48
+    |
+176 |                     _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:181:33
+    |
+181 |             _ => Err(Error::new("Type mismatch in binary operation", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:192:48
+    |
+192 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:200:48
+    |
+200 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:208:48
+    |
+208 |                     _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+    |                                     ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                     |
+    |                                     arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:213:33
+    |
+213 |             _ => Err(Error::new("Type mismatch in unary operation", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+   --> compiler/src/consteval/mod.rs:220:19
+    |
+220 |             Expr::Variable { name, .. } => name,
+    |                   ^^^^^^^^ variant not found in `ast::Expr`
+    |
+   ::: compiler/src/parser/ast.rs:94:1
+    |
+ 94 | pub enum Expr {
+    | ------------- variant `Variable` not found here
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:221:40
+    |
+221 |             _ => return Err(Error::new("Invalid function call", Span::dummy())),
+    |                             ---------- ^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                             |
+    |                             arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:238:17
+    |
+238 |                 format!("Unknown compile-time function: {}", func_name),
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:246:35
+    |
+246 |             return Err(Error::new("abs expects 1 argument", Span::dummy()));
+    |                        ---------- ^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                        |
+    |                        arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:252:33
+    |
+252 |             _ => Err(Error::new("abs expects numeric argument", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:258:35
+    |
+258 |             return Err(Error::new("min expects 2 arguments", Span::dummy()));
+    |                        ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                        |
+    |                        arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:264:33
+    |
+264 |             _ => Err(Error::new("min expects numeric arguments", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:270:35
+    |
+270 |             return Err(Error::new("max expects 2 arguments", Span::dummy()));
+    |                        ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                        |
+    |                        arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:276:33
+    |
+276 |             _ => Err(Error::new("max expects numeric arguments", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:282:35
+    |
+282 |             return Err(Error::new("pow expects 2 arguments", Span::dummy()));
+    |                        ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                        |
+    |                        arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:291:43
+    |
+291 |                     return Err(Error::new("Negative exponent for integer pow", Span::dummy()));
+    |                                ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                |
+    |                                arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:295:33
+    |
+295 |             _ => Err(Error::new("pow expects numeric arguments", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:301:35
+    |
+301 |             return Err(Error::new("sqrt expects 1 argument", Span::dummy()));
+    |                        ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                        |
+    |                        arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:307:43
+    |
+307 |                     return Err(Error::new("sqrt of negative number", Span::dummy()));
+    |                                ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                                |
+    |                                arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/consteval/mod.rs:311:33
+    |
+311 |             _ => Err(Error::new("sqrt expects float argument", Span::dummy())),
+    |                      ---------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `&str`
+    |                      |
+    |                      arguments to this function are incorrect
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `value`
+  --> compiler/src/plugin/api.rs:50:13
+   |
+50 |             value: Literal::Int(value),
+   |             ^^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:95:5
+   |
+95 |     Literal(Literal),
+   |     ------- `ast::Expr::Literal` defined here
+   |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+   |
+49 -         Expr::Literal {
+50 -             value: Literal::Int(value),
+51 -             span: Span::dummy(),
+52 -         }
+49 +         Expr::Literal(/* ast::Literal */)
+   |
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `span`
+  --> compiler/src/plugin/api.rs:51:13
+   |
+51 |             span: Span::dummy(),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:95:5
+   |
+95 |     Literal(Literal),
+   |     ------- `ast::Expr::Literal` defined here
+   |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+   |
+49 -         Expr::Literal {
+50 -             value: Literal::Int(value),
+51 -             span: Span::dummy(),
+52 -         }
+49 +         Expr::Literal(/* ast::Literal */)
+   |
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `value`
+  --> compiler/src/plugin/api.rs:57:13
+   |
+57 |             value: Literal::String(value),
+   |             ^^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:95:5
+   |
+95 |     Literal(Literal),
+   |     ------- `ast::Expr::Literal` defined here
+   |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+   |
+56 -         Expr::Literal {
+57 -             value: Literal::String(value),
+58 -             span: Span::dummy(),
+59 -         }
+56 +         Expr::Literal(/* ast::Literal */)
+   |
+
+error[E0559]: variant `ast::Expr::Literal` has no field named `span`
+  --> compiler/src/plugin/api.rs:58:13
+   |
+58 |             span: Span::dummy(),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:95:5
+   |
+95 |     Literal(Literal),
+   |     ------- `ast::Expr::Literal` defined here
+   |
+help: `ast::Expr::Literal` is a tuple variant, use the appropriate syntax
+   |
+56 -         Expr::Literal {
+57 -             value: Literal::String(value),
+58 -             span: Span::dummy(),
+59 -         }
+56 +         Expr::Literal(/* ast::Literal */)
+   |
+
+error[E0599]: no variant named `Variable` found for enum `ast::Expr`
+  --> compiler/src/plugin/api.rs:63:15
+   |
+63 |         Expr::Variable {
+   |               ^^^^^^^^ variant not found in `ast::Expr`
+   |
+  ::: compiler/src/parser/ast.rs:94:1
+   |
+94 | pub enum Expr {
+   | ------------- variant `Variable` not found here
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `op`
+  --> compiler/src/plugin/api.rs:71:13
+   |
+71 |             op,
+   |             ^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+70 -         Expr::Binary {
+71 -             op,
+72 -             left: Box::new(left),
+73 -             right: Box::new(right),
+74 -             span: Span::dummy(),
+75 -         }
+70 +         Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `left`
+  --> compiler/src/plugin/api.rs:72:13
+   |
+72 |             left: Box::new(left),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+70 -         Expr::Binary {
+71 -             op,
+72 -             left: Box::new(left),
+73 -             right: Box::new(right),
+74 -             span: Span::dummy(),
+75 -         }
+70 +         Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `right`
+  --> compiler/src/plugin/api.rs:73:13
+   |
+73 |             right: Box::new(right),
+   |             ^^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+70 -         Expr::Binary {
+71 -             op,
+72 -             left: Box::new(left),
+73 -             right: Box::new(right),
+74 -             span: Span::dummy(),
+75 -         }
+70 +         Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Binary` has no field named `span`
+  --> compiler/src/plugin/api.rs:74:13
+   |
+74 |             span: Span::dummy(),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:97:5
+   |
+97 |     Binary(Box<Expr>, BinOp, Box<Expr>),
+   |     ------ `ast::Expr::Binary` defined here
+   |
+help: `ast::Expr::Binary` is a tuple variant, use the appropriate syntax
+   |
+70 -         Expr::Binary {
+71 -             op,
+72 -             left: Box::new(left),
+73 -             right: Box::new(right),
+74 -             span: Span::dummy(),
+75 -         }
+70 +         Expr::Binary(/* Box<ast::Expr> */, /* ast::BinOp */, /* Box<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `func`
+  --> compiler/src/plugin/api.rs:80:13
+   |
+80 |             func: Box::new(func),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+79 -         Expr::Call {
+80 -             func: Box::new(func),
+81 -             args,
+82 -             span: Span::dummy(),
+83 -         }
+79 +         Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `args`
+  --> compiler/src/plugin/api.rs:81:13
+   |
+81 |             args,
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+79 -         Expr::Call {
+80 -             func: Box::new(func),
+81 -             args,
+82 -             span: Span::dummy(),
+83 -         }
+79 +         Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */)
+   |
+
+error[E0559]: variant `ast::Expr::Call` has no field named `span`
+  --> compiler/src/plugin/api.rs:82:13
+   |
+82 |             span: Span::dummy(),
+   |             ^^^^ field does not exist
+   |
+  ::: compiler/src/parser/ast.rs:99:5
+   |
+99 |     Call(Box<Expr>, Vec<Expr>),
+   |     ---- `ast::Expr::Call` defined here
+   |
+help: `ast::Expr::Call` is a tuple variant, use the appropriate syntax
+   |
+79 -         Expr::Call {
+80 -             func: Box::new(func),
+81 -             args,
+82 -             span: Span::dummy(),
+83 -         }
+79 +         Expr::Call(/* Box<ast::Expr> */, /* Vec<ast::Expr> */)
+   |
+
+error[E0026]: variant `ast::Expr::Binary` does not have fields named `left`, `right`
+   --> compiler/src/plugin/api.rs:150:28
+    |
+150 |             Expr::Binary { left, right, .. } => {
+    |                            ^^^^  ^^^^^ variant `ast::Expr::Binary` does not have these fields
+
+error[E0026]: variant `ast::Expr::Unary` does not have a field named `operand`
+   --> compiler/src/plugin/api.rs:154:27
+    |
+154 |             Expr::Unary { operand, .. } => {
+    |                           ^^^^^^^ variant `ast::Expr::Unary` does not have this field
+
+error[E0026]: variant `ast::Expr::Call` does not have fields named `func`, `args`
+   --> compiler/src/plugin/api.rs:157:26
+    |
+157 |             Expr::Call { func, args, .. } => {
+    |                          ^^^^  ^^^^ variant `ast::Expr::Call` does not have these fields
+
+error[E0026]: variant `ast::Expr::Block` does not have a field named `stmts`
+   --> compiler/src/plugin/api.rs:163:27
+    |
+163 |             Expr::Block { stmts, .. } => {
+    |                           ^^^^^
+    |                           |
+    |                           variant `ast::Expr::Block` does not have this field
+    |                           help: `ast::Expr::Block` has a field named `0`
+
+error[E0026]: variant `ast::Stmt::Let` does not have a field named `init`
+   --> compiler/src/plugin/api.rs:178:25
+    |
+178 |             Stmt::Let { init, .. } => {
+    |                         ^^^^ variant `ast::Stmt::Let` does not have this field
+
+error[E0599]: no variant or associated item named `I8` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:191:19
+    |
+191 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                   ^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I8` not found for this enum
+
+error[E0599]: no variant or associated item named `I16` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:191:30
+    |
+191 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                              ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I16` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:191:42
+    |
+191 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                          ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:191:54
+    |
+191 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                                      ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `I128` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:191:66
+    |
+191 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                                                  ^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I128` not found for this enum
+
+error[E0599]: no variant or associated item named `U8` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:192:19
+    |
+192 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
+    |                   ^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U8` not found for this enum
+
+error[E0599]: no variant or associated item named `U16` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:192:30
+    |
+192 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
+    |                              ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U16` not found for this enum
+
+error[E0599]: no variant or associated item named `U32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:192:42
+    |
+192 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
+    |                                          ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U32` not found for this enum
+
+error[E0599]: no variant or associated item named `U64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:192:54
+    |
+192 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
+    |                                                      ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U64` not found for this enum
+
+error[E0599]: no variant or associated item named `U128` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:192:66
+    |
+192 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
+    |                                                                  ^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U128` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:193:19
+    |
+193 |             Type::F32 | Type::F64
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:193:31
+    |
+193 |             Type::F32 | Type::F64
+    |                               ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `I8` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:200:19
+    |
+200 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                   ^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I8` not found for this enum
+
+error[E0599]: no variant or associated item named `I16` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:200:30
+    |
+200 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                              ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I16` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:200:42
+    |
+200 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                          ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:200:54
+    |
+200 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                                      ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `I128` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:200:66
+    |
+200 |             Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
+    |                                                                  ^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I128` not found for this enum
+
+error[E0599]: no variant or associated item named `U8` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:201:19
+    |
+201 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
+    |                   ^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U8` not found for this enum
+
+error[E0599]: no variant or associated item named `U16` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:201:30
+    |
+201 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
+    |                              ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U16` not found for this enum
+
+error[E0599]: no variant or associated item named `U32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:201:42
+    |
+201 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
+    |                                          ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U32` not found for this enum
+
+error[E0599]: no variant or associated item named `U64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:201:54
+    |
+201 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
+    |                                                      ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U64` not found for this enum
+
+error[E0599]: no variant or associated item named `U128` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:201:66
+    |
+201 |             Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
+    |                                                                  ^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `U128` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:206:28
+    |
+206 |         matches!(ty, Type::F32 | Type::F64)
+    |                            ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:206:40
+    |
+206 |         matches!(ty, Type::F32 | Type::F64)
+    |                                        ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `I32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:220:19
+    |
+220 |             Type::I32 => "i32".to_string(),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I32` not found for this enum
+
+error[E0599]: no variant or associated item named `I64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:221:19
+    |
+221 |             Type::I64 => "i64".to_string(),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `I64` not found for this enum
+
+error[E0599]: no variant or associated item named `F32` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:222:19
+    |
+222 |             Type::F32 => "f32".to_string(),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F32` not found for this enum
+
+error[E0599]: no variant or associated item named `F64` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:223:19
+    |
+223 |             Type::F64 => "f64".to_string(),
+    |                   ^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `F64` not found for this enum
+
+error[E0599]: no variant or associated item named `Bool` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:224:19
+    |
+224 |             Type::Bool => "bool".to_string(),
+    |                   ^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `Bool` not found for this enum
+
+error[E0599]: no variant or associated item named `String` found for enum `ast::Type` in the current scope
+   --> compiler/src/plugin/api.rs:225:19
+    |
+225 |             Type::String => "String".to_string(),
+    |                   ^^^^^^ variant or associated item not found in `ast::Type`
+    |
+   ::: compiler/src/parser/ast.rs:73:1
+    |
+ 73 | pub enum Type {
+    | ------------- variant or associated item `String` not found for this enum
+
+error[E0308]: mismatched types
+  --> compiler/src/plugin/loader.rs:45:41
+   |
+45 |                 .map_err(|e| Error::new(format!("Failed to read directory: {}", e), Span::dummy()))?;
+   |                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+  --> compiler/src/plugin/loader.rs:69:17
+   |
+69 |                 format!("Plugin already loaded: {}", descriptor.name),
+   |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+  --> compiler/src/plugin/loader.rs:84:37
+   |
+84 |             .map_err(|e| Error::new(format!("Failed to read manifest: {}", e), Span::dummy()))?;
+   |                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+   |
+   = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+   --> compiler/src/plugin/loader.rs:126:13
+    |
+125 |         Err(Error::new(
+    |             ---------- arguments to this function are incorrect
+126 |             "Dynamic plugin loading not yet implemented".to_string(),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+note: associated function defined here
+   --> compiler/src/error.rs:47:12
+    |
+ 47 |     pub fn new(kind: ErrorKind, message: impl Into<String>) -> Self {
+    |            ^^^ ---------------
+
+error[E0308]: mismatched types
+   --> compiler/src/plugin/mod.rs:274:21
+    |
+274 |                     format!("Missing dependency: {} v{}", dep.name, dep.version),
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ErrorKind`, found `String`
+    |
+    = note: this error originates in the macro `format` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0499]: cannot borrow `*func` as mutable more than once at a time
+  --> compiler/src/ir/builder.rs:93:40
+   |
+89 |                 if let Some(block) = func.get_block_mut(block_id) {
+   |                                      ---- first mutable borrow occurs here
+...
+93 |                         let value_id = func.add_value(Value::Instruction(ret_inst.clone()));
+   |                                        ^^^^ second mutable borrow occurs here
+94 |                         block.add_instruction(value_id, ret_inst);
+   |                         ----- first borrow later used here
+
+error[E0502]: cannot borrow `*function` as immutable because it is also borrowed as mutable
+   --> compiler/src/optimizer/constant_folding.rs:180:39
+    |
+173 |         for block in &mut function.blocks {
+    |                      --------------------
+    |                      |
+    |                      mutable borrow occurs here
+    |                      mutable borrow later used here
+...
+180 |                         let lhs_val = function.get_value(*lhs);
+    |                                       ^^^^^^^^ immutable borrow occurs here
+
+error[E0502]: cannot borrow `*function` as immutable because it is also borrowed as mutable
+   --> compiler/src/optimizer/constant_folding.rs:181:39
+    |
+173 |         for block in &mut function.blocks {
+    |                      --------------------
+    |                      |
+    |                      mutable borrow occurs here
+    |                      mutable borrow later used here
+...
+181 |                         let rhs_val = function.get_value(*rhs);
+    |                                       ^^^^^^^^ immutable borrow occurs here
+
+error[E0502]: cannot borrow `*function` as immutable because it is also borrowed as mutable
+   --> compiler/src/optimizer/constant_folding.rs:204:59
+    |
+173 |         for block in &mut function.blocks {
+    |                      --------------------
+    |                      |
+    |                      mutable borrow occurs here
+    |                      mutable borrow later used here
+...
+204 |                         if let Some(Value::Constant(c)) = function.get_value(*operand) {
+    |                                                           ^^^^^^^^ immutable borrow occurs here
+
+warning: unused variable: `ty`
+   --> compiler/src/optimizer/constant_folding.rs:178:57
+    |
+178 |                     Instruction::Binary { op, lhs, rhs, ty } => {
+    |                                                         ^^ help: try ignoring the field: `ty: _`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ty`
+   --> compiler/src/optimizer/constant_folding.rs:202:55
+    |
+202 |                     Instruction::Unary { op, operand, ty } => {
+    |                                                       ^^ help: try ignoring the field: `ty: _`
+
+warning: unused variable: `func`
+  --> compiler/src/optimizer/inline.rs:44:44
+   |
+44 |                 if let Instruction::Call { func, .. } = inst {
+   |                                            ^^^^ help: try ignoring the field: `func: _`
+
+warning: unused variable: `callee`
+  --> compiler/src/optimizer/inline.rs:46:33
+   |
+46 |                     if let Some(callee) = module.get_function(&function.name) {
+   |                                 ^^^^^^ help: if this is intentional, prefix it with an underscore: `_callee`
+
+warning: unused variable: `kind`
+  --> compiler/src/symbol.rs:69:44
+   |
+69 |     pub fn insert(&mut self, name: String, kind: SymbolKind) -> SymbolId {
+   |                                            ^^^^ help: if this is intentional, prefix it with an underscore: `_kind`
+
+error[E0596]: cannot borrow data in dereference of `Pin<&mut F>` as mutable
+  --> compiler/src/async_runtime/executor.rs:65:19
+   |
+65 |             match future.as_mut().poll(&waker) {
+   |                   ^^^^^^^^^^^^^^^ cannot borrow as mutable
+   |
+   = help: trait `DerefMut` is required to modify through a dereference, but it is not implemented for `Pin<&mut F>`
+
+warning: unused variable: `task_id`
+   --> compiler/src/async_runtime/executor.rs:106:9
+    |
+106 |     let task_id = data as TaskId;
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_task_id`
+
+warning: unused variable: `f1`
+   --> compiler/src/async_runtime/mod.rs:119:29
+    |
+119 | pub async fn select<F1, F2>(f1: F1, f2: F2) -> Either<F1::Output, F2::Output>
+    |                             ^^ help: if this is intentional, prefix it with an underscore: `_f1`
+
+warning: unused variable: `f2`
+   --> compiler/src/async_runtime/mod.rs:119:37
+    |
+119 | pub async fn select<F1, F2>(f1: F1, f2: F2) -> Either<F1::Output, F2::Output>
+    |                                     ^^ help: if this is intentional, prefix it with an underscore: `_f2`
+
+warning: unused variable: `duration`
+   --> compiler/src/async_runtime/mod.rs:134:25
+    |
+134 | pub async fn timeout<F>(duration: Duration, future: F) -> Result<F::Output, TimeoutError>
+    |                         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_duration`
+
+warning: unused variable: `future`
+   --> compiler/src/async_runtime/mod.rs:134:45
+    |
+134 | pub async fn timeout<F>(duration: Duration, future: F) -> Result<F::Output, TimeoutError>
+    |                                             ^^^^^^ help: if this is intentional, prefix it with an underscore: `_future`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:169:33
+    |
+169 |     fn check_null_safety(&self, func: &Function) -> Result<bool> {
+    |                                 ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:175:36
+    |
+175 |     fn check_use_after_free(&self, func: &Function) -> Result<bool> {
+    |                                    ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:181:35
+    |
+181 |     fn check_buffer_bounds(&self, func: &Function) -> Result<bool> {
+    |                                   ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:187:32
+    |
+187 |     fn check_data_races(&self, func: &Function) -> Result<bool> {
+    |                                ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:194:41
+    |
+194 |     fn check_overflow_safety(&mut self, func: &Function) -> Result<bool> {
+    |                                         ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: unused variable: `func`
+   --> compiler/src/verification/mod.rs:239:39
+    |
+239 |     fn prove_postcondition(&mut self, func: &Function, post: &Expr) -> Result<Proof> {
+    |                                       ^^^^ help: if this is intentional, prefix it with an underscore: `_func`
+
+warning: variable does not need to be mutable
+   --> compiler/src/verification/mod.rs:259:13
+    |
+259 |         let mut proof = Proof {
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> compiler/src/verification/mod.rs:271:13
+    |
+271 |         let mut proof = Proof {
+    |             ----^^^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: unused variable: `loop_stmt`
+   --> compiler/src/verification/mod.rs:270:64
+    |
+270 |     fn prove_invariant_maintained(&mut self, invariant: &Expr, loop_stmt: &Stmt) -> Result<Proof> {
+    |                                                                ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_loop_stmt`
+
+warning: unused variable: `size`
+   --> compiler/src/gpu/mod.rs:396:27
+    |
+396 |     fn cuda_malloc(&self, size: usize) -> Result<u64> {
+    |                           ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ptr`
+   --> compiler/src/gpu/mod.rs:401:25
+    |
+401 |     fn cuda_free(&self, ptr: u64) -> Result<()> {
+    |                         ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+warning: unused variable: `size`
+   --> compiler/src/gpu/mod.rs:406:27
+    |
+406 |     fn metal_alloc(&self, size: usize) -> Result<u64> {
+    |                           ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ptr`
+   --> compiler/src/gpu/mod.rs:411:26
+    |
+411 |     fn metal_free(&self, ptr: u64) -> Result<()> {
+    |                          ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+warning: unused variable: `size`
+   --> compiler/src/gpu/mod.rs:415:28
+    |
+415 |     fn vulkan_alloc(&self, size: usize) -> Result<u64> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ptr`
+   --> compiler/src/gpu/mod.rs:420:27
+    |
+420 |     fn vulkan_free(&self, ptr: u64) -> Result<()> {
+    |                           ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+warning: unused variable: `size`
+   --> compiler/src/gpu/mod.rs:424:28
+    |
+424 |     fn opencl_alloc(&self, size: usize) -> Result<u64> {
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ptr`
+   --> compiler/src/gpu/mod.rs:429:27
+    |
+429 |     fn opencl_free(&self, ptr: u64) -> Result<()> {
+    |                           ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+Some errors have detailed explanations: E0023, E0026, E0027, E0277, E0282, E0308, E0412, E0432, E0433...
+For more information about an error, try `rustc --explain E0023`.
+warning: `vez_compiler` (lib) generated 39 warnings
+error: could not compile `vez_compiler` (lib) due to 352 previous errors; 39 warnings emitted
+
+Build complete. Checking binaries...
+
+✗ vezc binary NOT created
+
+Checking library...
+✗ Compiler library NOT created
+
+Running a simple test...
+    |                            ^^^^ help: if this is intentional, prefix it with an underscore: `_size`
+
+warning: unused variable: `ptr`
+   --> compiler/src/gpu/mod.rs:429:27
+    |
+429 |     fn opencl_free(&self, ptr: u64) -> Result<()> {
+    |                           ^^^ help: if this is intentional, prefix it with an underscore: `_ptr`
+
+warning: variable does not need to be mutable
+   --> compiler/src/consteval/mod.rs:366:13
+    |
+366 |         let mut eval = ConstEvaluator::new();
+    |             ----^^^^
+    |             |
+    |             help: remove this `mut`
+
+Some errors have detailed explanations: E0023, E0026, E0027, E0277, E0282, E0308, E0412, E0428, E0432...
+For more information about an error, try `rustc --explain E0023`.
+warning: `vez_compiler` (lib test) generated 41 warnings
+error: could not compile `vez_compiler` (lib test) due to 374 previous errors; 41 warnings emitted
+
+==========================================

@@ -393,40 +393,40 @@ impl GpuMemory {
         Ok(())
     }
     
-    fn cuda_malloc(&self, size: usize) -> Result<u64> {
+    fn cuda_malloc(&self, _size: usize) -> Result<u64> {
         // Call cudaMalloc via FFI
         Ok(0)
     }
     
-    fn cuda_free(&self, ptr: u64) -> Result<()> {
+    fn cuda_free(&self, _ptr: u64) -> Result<()> {
         // Call cudaFree via FFI
         Ok(())
     }
     
-    fn metal_alloc(&self, size: usize) -> Result<u64> {
+    fn metal_alloc(&self, _size: usize) -> Result<u64> {
         // Metal buffer allocation
         Ok(0)
     }
     
-    fn metal_free(&self, ptr: u64) -> Result<()> {
+    fn metal_free(&self, _ptr: u64) -> Result<()> {
         Ok(())
     }
     
-    fn vulkan_alloc(&self, size: usize) -> Result<u64> {
+    fn vulkan_alloc(&self, _size: usize) -> Result<u64> {
         // Vulkan memory allocation
         Ok(0)
     }
     
-    fn vulkan_free(&self, ptr: u64) -> Result<()> {
+    fn vulkan_free(&self, _ptr: u64) -> Result<()> {
         Ok(())
     }
     
-    fn opencl_alloc(&self, size: usize) -> Result<u64> {
+    fn opencl_alloc(&self, _size: usize) -> Result<u64> {
         // OpenCL buffer allocation
         Ok(0)
     }
     
-    fn opencl_free(&self, ptr: u64) -> Result<()> {
+    fn opencl_free(&self, _ptr: u64) -> Result<()> {
         Ok(())
     }
 }

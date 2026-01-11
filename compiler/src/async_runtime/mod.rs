@@ -116,7 +116,7 @@ where
 }
 
 // Select first completed future
-pub async fn select<F1, F2>(f1: F1, f2: F2) -> Either<F1::Output, F2::Output>
+pub async fn select<F1, F2>(_f1: F1, _f2: F2) -> Either<F1::Output, F2::Output>
 where
     F1: Future,
     F2: Future,
@@ -131,7 +131,7 @@ pub enum Either<L, R> {
 }
 
 // Timeout future
-pub async fn timeout<F>(duration: Duration, future: F) -> Result<F::Output, TimeoutError>
+pub async fn timeout<F>(_duration: Duration, _future: F) -> Result<F::Output, TimeoutError>
 where
     F: Future,
 {

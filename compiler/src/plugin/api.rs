@@ -46,41 +46,23 @@ impl PluginSDK {
     
     // AST utilities
     pub fn create_literal_int(&self, value: i64) -> Expr {
-        Expr::Literal {
-            value: Literal::Int(value),
-            span: Span::dummy(),
-        }
+        Expr::Literal(Literal::Int(value))
     }
     
     pub fn create_literal_string(&self, value: String) -> Expr {
-        Expr::Literal {
-            value: Literal::String(value),
-            span: Span::dummy(),
-        }
+        Expr::Literal(Literal::String(value))
     }
     
     pub fn create_variable(&self, name: String) -> Expr {
-        Expr::Variable {
-            name,
-            span: Span::dummy(),
-        }
+        Expr::Ident(name)
     }
     
     pub fn create_binary_op(&self, op: BinaryOp, left: Expr, right: Expr) -> Expr {
-        Expr::Binary {
-            op,
-            left: Box::new(left),
-            right: Box::new(right),
-            span: Span::dummy(),
-        }
+        Expr::Binary(Box::new(left), op, Box::new(right))
     }
     
     pub fn create_function_call(&self, func: Expr, args: Vec<Expr>) -> Expr {
-        Expr::Call {
-            func: Box::new(func),
-            args,
-            span: Span::dummy(),
-        }
+        Expr::Call(Box::new(func), args)
     }
 }
 
@@ -147,20 +129,20 @@ pub mod helpers {
         visitor(expr);
         
         match expr {
-            Expr::Binary { left, right, .. } => {
+            Expr::Binary(left, _, right) => {
                 visit_expr(left, visitor);
                 visit_expr(right, visitor);
             }
-            Expr::Unary { operand, .. } => {
+            Expr::Unary(_, operand) => {
                 visit_expr(operand, visitor);
             }
-            Expr::Call { func, args, .. } => {
+            Expr::Call(func, args) => {
                 visit_expr(func, visitor);
                 for arg in args {
                     visit_expr(arg, visitor);
                 }
             }
-            Expr::Block { stmts, .. } => {
+            Expr::Block(stmts) => {
                 for stmt in stmts {
                     visit_stmt(stmt, visitor);
                 }
@@ -175,10 +157,8 @@ pub mod helpers {
     {
         match stmt {
             Stmt::Expr(expr) => visit_expr(expr, visitor),
-            Stmt::Let { init, .. } => {
-                if let Some(init_expr) = init {
-                    visit_expr(init_expr, visitor);
-                }
+            Stmt::Let(_, _, Some(init_expr)) => {
+                visit_expr(init_expr, visitor);
             }
             _ => {}
         }
@@ -186,24 +166,20 @@ pub mod helpers {
     
     // Type utilities
     pub fn is_numeric_type(ty: &Type) -> bool {
-        matches!(
-            ty,
-            Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
-            Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128 |
-            Type::F32 | Type::F64
-        )
+        matches!(ty, Type::Named(name) if matches!(name.as_str(), 
+            "i8" | "i16" | "i32" | "i64" | "i128" |
+            "u8" | "u16" | "u32" | "u64" | "u128" |
+            "f32" | "f64"))
     }
     
     pub fn is_integer_type(ty: &Type) -> bool {
-        matches!(
-            ty,
-            Type::I8 | Type::I16 | Type::I32 | Type::I64 | Type::I128 |
-            Type::U8 | Type::U16 | Type::U32 | Type::U64 | Type::U128
-        )
+        matches!(ty, Type::Named(name) if matches!(name.as_str(),
+            "i8" | "i16" | "i32" | "i64" | "i128" |
+            "u8" | "u16" | "u32" | "u64" | "u128"))
     }
     
     pub fn is_float_type(ty: &Type) -> bool {
-        matches!(ty, Type::F32 | Type::F64)
+        matches!(ty, Type::Named(name) if matches!(name.as_str(), "f32" | "f64"))
     }
     
     // Code generation utilities
@@ -217,13 +193,20 @@ pub mod helpers {
     
     pub fn format_type(ty: &Type) -> String {
         match ty {
-            Type::I32 => "i32".to_string(),
-            Type::I64 => "i64".to_string(),
-            Type::F32 => "f32".to_string(),
-            Type::F64 => "f64".to_string(),
-            Type::Bool => "bool".to_string(),
-            Type::String => "String".to_string(),
-            _ => "unknown".to_string(),
+            Type::Named(name) => name.clone(),
+            Type::Generic(name, args) => {
+                format!("{}<{}>", name, args.iter().map(|t| format_type(t)).collect::<Vec<_>>().join(", "))
+            }
+            Type::Reference(inner) => format!("&{}", format_type(inner)),
+            Type::MutableReference(inner) => format!("&mut {}", format_type(inner)),
+            Type::Array(inner, size) => format!("[{}; {}]", format_type(inner), size),
+            Type::Tuple(types) => format!("({})", types.iter().map(|t| format_type(t)).collect::<Vec<_>>().join(", ")),
+            Type::Function(params, ret) => {
+                format!("fn({}) -> {}", 
+                    params.iter().map(|t| format_type(t)).collect::<Vec<_>>().join(", "),
+                    format_type(ret))
+            }
+            Type::TraitObject(traits) => format!("dyn {}", traits.join(" + ")),
         }
     }
 }
@@ -248,7 +231,7 @@ mod tests {
         
         let expr = sdk.create_literal_int(42);
         match expr {
-            Expr::Literal { value: Literal::Int(n), .. } => assert_eq!(n, 42),
+            Expr::Literal(Literal::Int(n)) => assert_eq!(n, 42),
             _ => panic!("Expected integer literal"),
         }
     }

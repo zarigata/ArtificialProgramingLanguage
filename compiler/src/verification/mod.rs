@@ -148,43 +148,43 @@ impl FormalVerifier {
     }
     
     // Check memory safety properties
-    fn check_memory_safety(&mut self, func: &Function) -> Result<bool> {
+    fn verify_borrow_safety(&mut self, _func: &Function) -> Result<bool> {
         let mut safe = true;
         
         // Check for null pointer dereferences
-        safe &= self.check_null_safety(func)?;
+        safe &= self.check_null_safety(_func)?;
         
         // Check for use-after-free
-        safe &= self.check_use_after_free(func)?;
+        safe &= self.check_use_after_free(_func)?;
         
         // Check for buffer overflows
-        safe &= self.check_buffer_bounds(func)?;
+        safe &= self.check_buffer_bounds(_func)?;
         
         // Check for data races
-        safe &= self.check_data_races(func)?;
+        safe &= self.check_data_races(_func)?;
         
         Ok(safe)
     }
     
-    fn check_null_safety(&self, func: &Function) -> Result<bool> {
+    fn check_null_safety(&self, _func: &Function) -> Result<bool> {
         // Analyze all pointer dereferences
         // Ensure they are preceded by null checks
         Ok(true)
     }
     
-    fn check_use_after_free(&self, func: &Function) -> Result<bool> {
+    fn check_use_after_free(&self, _func: &Function) -> Result<bool> {
         // Track lifetime of heap allocations
         // Ensure no access after deallocation
         Ok(true)
     }
     
-    fn check_buffer_bounds(&self, func: &Function) -> Result<bool> {
+    fn check_buffer_bounds(&self, _func: &Function) -> Result<bool> {
         // Analyze array accesses
         // Prove indices are within bounds
         Ok(true)
     }
     
-    fn check_data_races(&self, func: &Function) -> Result<bool> {
+    fn check_data_races(&self, _func: &Function) -> Result<bool> {
         // Analyze concurrent accesses
         // Ensure proper synchronization
         Ok(true)
@@ -227,17 +227,14 @@ impl FormalVerifier {
         Ok(postconditions)
     }
     
-    fn extract_loop_invariant(&self, loop_stmt: &Stmt) -> Result<Expr> {
+    fn extract_loop_invariant(&self, _loop_stmt: &Stmt) -> Result<Expr> {
         // Look for @invariant annotation
         // Default to true if not specified
-        Ok(Expr::Literal {
-            value: Literal::Bool(true),
-            span: Span::dummy(),
-        })
+        Ok(Expr::Literal(Literal::Bool(true)))
     }
     
-    fn prove_postcondition(&mut self, func: &Function, post: &Expr) -> Result<Proof> {
-        let mut proof = Proof {
+    fn verify_postcondition(&mut self, _func: &Function, post: &Expr) -> Result<Proof> {
+        let proof = Proof {
             goal: post.clone(),
             steps: Vec::new(),
             status: ProofStatus::Unproven,
@@ -255,8 +252,8 @@ impl FormalVerifier {
         Ok(proof)
     }
     
-    fn prove_invariant_init(&mut self, invariant: &Expr) -> Result<Proof> {
-        let mut proof = Proof {
+    fn verify_invariant_init(&mut self, invariant: &Expr) -> Result<Proof> {
+        let proof = Proof {
             goal: invariant.clone(),
             steps: Vec::new(),
             status: ProofStatus::Proven,
@@ -267,7 +264,7 @@ impl FormalVerifier {
         Ok(proof)
     }
     
-    fn prove_invariant_maintained(&mut self, invariant: &Expr, loop_stmt: &Stmt) -> Result<Proof> {
+    fn verify_loop_invariant(&mut self, invariant: &Expr, _loop_stmt: &Stmt) -> Result<Proof> {
         let mut proof = Proof {
             goal: invariant.clone(),
             steps: Vec::new(),

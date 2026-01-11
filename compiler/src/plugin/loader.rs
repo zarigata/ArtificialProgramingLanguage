@@ -2,6 +2,7 @@
 // Dynamic loading of plugins from shared libraries
 
 use super::*;
+use crate::error::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::fs;
 
@@ -42,7 +43,7 @@ impl PluginLoader {
             }
             
             let entries = fs::read_dir(search_path)
-                .map_err(|e| Error::new(format!("Failed to read directory: {}", e), Span::dummy()))?;
+                .map_err(|e| Error::new(ErrorKind::IoError, format!("Failed to read directory: {}", e)))?;
             
             for entry in entries.flatten() {
                 let path = entry.path();
@@ -66,8 +67,8 @@ impl PluginLoader {
         // Check if already loaded
         if self.loaded_plugins.contains(&descriptor.name) {
             return Err(Error::new(
+                ErrorKind::DuplicateDefinition,
                 format!("Plugin already loaded: {}", descriptor.name),
-                Span::dummy(),
             ));
         }
         
@@ -81,7 +82,7 @@ impl PluginLoader {
     
     fn load_descriptor(&self, path: &Path) -> Result<PluginDescriptor> {
         let content = fs::read_to_string(path)
-            .map_err(|e| Error::new(format!("Failed to read manifest: {}", e), Span::dummy()))?;
+            .map_err(|e| Error::new(ErrorKind::IoError, format!("Failed to read manifest: {}", e)))?;
         
         // Parse TOML manifest
         self.parse_manifest(&content, path.parent().unwrap())
@@ -118,13 +119,13 @@ impl PluginLoader {
         })
     }
     
-    fn load_plugin_library(&self, path: &Path) -> Result<Box<dyn Plugin>> {
+    fn load_plugin_library(&self, _path: &Path) -> Result<Box<dyn Plugin>> {
         // In production, use libloading or similar to dynamically load shared libraries
         // For now, return a placeholder
         
         Err(Error::new(
-            "Dynamic plugin loading not yet implemented".to_string(),
-            Span::dummy(),
+            ErrorKind::InternalError,
+            "Dynamic plugin loading not yet implemented",
         ))
     }
 }

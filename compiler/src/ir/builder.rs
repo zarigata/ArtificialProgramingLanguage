@@ -86,11 +86,16 @@ impl IrBuilder {
         // Ensure block is terminated
         if let Some(func) = &mut self.current_function {
             if let Some(block_id) = self.current_block {
-                if let Some(block) = func.get_block_mut(block_id) {
-                    if !block.is_terminated() {
-                        // Add implicit return
-                        let ret_inst = Instruction::Return { value: None };
-                        let value_id = func.add_value(Value::Instruction(ret_inst.clone()));
+                // Check if block needs termination
+                let needs_termination = func.get_block(block_id)
+                    .map(|b| !b.is_terminated())
+                    .unwrap_or(false);
+                
+                if needs_termination {
+                    // Add implicit return
+                    let ret_inst = Instruction::Return { value: None };
+                    let value_id = func.add_value(Value::Instruction(ret_inst.clone()));
+                    if let Some(block) = func.get_block_mut(block_id) {
                         block.add_instruction(value_id, ret_inst);
                     }
                 }

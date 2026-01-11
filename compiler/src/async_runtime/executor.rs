@@ -54,15 +54,14 @@ impl Executor {
         }
     }
     
-    pub fn block_on<F>(&mut self, future: F) -> F::Output
+    pub fn block_on<F>(&mut self, mut future: F) -> F::Output
     where
-        F: Future,
+        F: Future + Unpin,
     {
-        let mut future = Box::pin(future);
         let waker = Waker::new(|_| {}, std::ptr::null());
         
         loop {
-            match future.as_mut().poll(&waker) {
+            match Pin::new(&mut future).poll(&waker) {
                 Poll::Ready(value) => return value,
                 Poll::Pending => {
                     // Run other tasks
@@ -103,7 +102,7 @@ where
 
 // Wake function for tasks
 fn wake_task(data: *const ()) {
-    let task_id = data as TaskId;
+    let _task_id = data as TaskId;
     // In production, this would notify the executor
     // that task_id is ready to run
 }

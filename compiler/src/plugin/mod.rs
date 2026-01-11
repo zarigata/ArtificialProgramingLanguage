@@ -7,8 +7,7 @@ pub mod registry;
 pub mod hooks;
 
 use crate::parser::ast::*;
-use crate::semantic::types::Type;
-use crate::error::{Error, Result};
+use crate::error::{Error, ErrorKind, Result};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
@@ -271,8 +270,8 @@ impl PluginManager {
         for dep in &plugin.metadata().dependencies {
             if !self.plugins.contains_key(&dep.name) {
                 return Err(Error::new(
+                    ErrorKind::UndefinedSymbol,
                     format!("Missing dependency: {} v{}", dep.name, dep.version),
-                    Span::dummy(),
                 ));
             }
         }
