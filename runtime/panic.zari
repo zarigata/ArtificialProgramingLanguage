@@ -1,0 +1,210 @@
+// VeZ Runtime - Panic Handler
+// Handles runtime panics with stack unwinding and cleanup
+
+use std::prelude::*;
+use std::io::stderr;
+
+// Panic information
+pub struct PanicInfo {
+    pub message: String,
+    pub file: String,
+    pub line: u32,
+    pub column: u32,
+}
+
+impl PanicInfo {
+    pub fn new(message: String, file: String, line: u32, column: u32) -> PanicInfo {
+        PanicInfo {
+            message,
+            file,
+            line,
+            column,
+        }
+    }
+}
+
+impl Display for PanicInfo {
+    fn display(&self) -> String {
+        format!(
+            "thread panicked at '{}', {}:{}:{}",
+            self.message, self.file, self.line, self.column
+        )
+    }
+}
+
+// Panic hook type
+pub type PanicHook = fn(&PanicInfo);
+
+// Global panic hook
+static mut PANIC_HOOK: Option<PanicHook> = None;
+
+// Set custom panic hook
+pub fn set_panic_hook(hook: PanicHook) {
+    unsafe {
+        PANIC_HOOK = Some(hook);
+    }
+}
+
+// Default panic handler
+fn default_panic_handler(info: &PanicInfo) {
+    eprintln!("{}", info);
+    eprintln!("\nstack backtrace:");
+    print_backtrace();
+}
+
+// Print stack backtrace
+fn print_backtrace() {
+    // Platform-specific backtrace implementation
+    #[cfg(target_os = "linux")]
+    {
+        extern "C" {
+            fn backtrace(buffer: *mut *mut u8, size: i32) -> i32;
+            fn backtrace_symbols(buffer: *const *mut u8, size: i32) -> *mut *mut u8;
+        }
+        
+        unsafe {
+            let mut buffer: [*mut u8; 100] = [null_mut(); 100];
+            let count = backtrace(buffer.as_mut_ptr(), 100);
+            
+            let symbols = backtrace_symbols(buffer.as_ptr(), count);
+            
+            for i in 0..count as usize {
+                let symbol = *symbols.add(i);
+                if !symbol.is_null() {
+                    eprintln!("  {}: {:?}", i, symbol);
+                }
+            }
+        }
+    }
+    
+    #[cfg(not(target_os = "linux"))]
+    {
+        eprintln!("  <backtrace not available on this platform>");
+    }
+}
+
+// Main panic function
+#[no_mangle]
+pub extern "C" fn vez_panic(message: *const u8, file: *const u8, line: u32, column: u32) -> ! {
+    let message_str = unsafe {
+        let len = strlen(message);
+        String::from_raw_parts(message as *mut u8, len, len)
+    };
+    
+    let file_str = unsafe {
+        let len = strlen(file);
+        String::from_raw_parts(file as *mut u8, len, len)
+    };
+    
+    let info = PanicInfo::new(message_str, file_str, line, column);
+    
+    unsafe {
+        if let Some(hook) = PANIC_HOOK {
+            hook(&info);
+        } else {
+            default_panic_handler(&info);
+        }
+    }
+    
+    abort();
+}
+
+// Helper to get string length
+unsafe fn strlen(s: *const u8) -> usize {
+    let mut len = 0;
+    let mut ptr = s;
+    while *ptr != 0 {
+        len += 1;
+        ptr = ptr.add(1);
+    }
+    len
+}
+
+// Abort execution
+fn abort() -> ! {
+    extern "C" {
+        fn abort() -> !;
+    }
+    unsafe { abort() }
+}
+
+// Panic macro
+#[macro_export]
+macro_rules! panic {
+    ($msg:expr) => {
+        vez_panic(
+            $msg.as_ptr(),
+            file!().as_ptr(),
+            line!(),
+            column!()
+        )
+    };
+    ($fmt:expr, $($arg:tt)*) => {
+        panic!(format!($fmt, $($arg)*))
+    };
+}
+
+// Assert macros
+#[macro_export]
+macro_rules! assert {
+    ($cond:expr) => {
+        if !$cond {
+            panic!("assertion failed: {}", stringify!($cond));
+        }
+    };
+    ($cond:expr, $msg:expr) => {
+        if !$cond {
+            panic!($msg);
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! assert_eq {
+    ($left:expr, $right:expr) => {
+        let left_val = $left;
+        let right_val = $right;
+        if left_val != right_val {
+            panic!(
+                "assertion failed: `(left == right)`\n  left: {:?}\n right: {:?}",
+                left_val, right_val
+            );
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! assert_ne {
+    ($left:expr, $right:expr) => {
+        let left_val = $left;
+        let right_val = $right;
+        if left_val == right_val {
+            panic!(
+                "assertion failed: `(left != right)`\n  left: {:?}\n right: {:?}",
+                left_val, right_val
+            );
+        }
+    };
+}
+
+// Unreachable macro
+#[macro_export]
+macro_rules! unreachable {
+    () => {
+        panic!("internal error: entered unreachable code");
+    };
+    ($msg:expr) => {
+        panic!("internal error: entered unreachable code: {}", $msg);
+    };
+}
+
+// Unimplemented macro
+#[macro_export]
+macro_rules! unimplemented {
+    () => {
+        panic!("not yet implemented");
+    };
+    ($msg:expr) => {
+        panic!("not yet implemented: {}", $msg);
+    };
+}

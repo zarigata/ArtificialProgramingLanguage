@@ -1,0 +1,174 @@
+// VeZ Runtime - Stack Unwinding
+// Implements exception-style unwinding for panic recovery
+
+use std::prelude::*;
+
+// Unwind action
+pub enum UnwindAction {
+    Continue,
+    Cleanup,
+    Stop,
+}
+
+// Landing pad for exception handling
+pub struct LandingPad {
+    pub cleanup: Option<fn()>,
+    pub catch_type: Option<TypeId>,
+}
+
+// Unwind context
+pub struct UnwindContext {
+    pub frames: Vec<UnwindFrame>,
+    pub exception: Option<Box<dyn Any>>,
+}
+
+pub struct UnwindFrame {
+    pub function: String,
+    pub file: String,
+    pub line: u32,
+    pub landing_pad: Option<LandingPad>,
+}
+
+impl UnwindContext {
+    pub fn new() -> UnwindContext {
+        UnwindContext {
+            frames: Vec::new(),
+            exception: None,
+        }
+    }
+    
+    pub fn push_frame(&mut self, frame: UnwindFrame) {
+        self.frames.push(frame);
+    }
+    
+    pub fn pop_frame(&mut self) -> Option<UnwindFrame> {
+        self.frames.pop()
+    }
+    
+    pub fn set_exception(&mut self, exception: Box<dyn Any>) {
+        self.exception = Some(exception);
+    }
+    
+    pub fn take_exception(&mut self) -> Option<Box<dyn Any>> {
+        self.exception.take()
+    }
+}
+
+// Global unwind context
+static mut UNWIND_CONTEXT: Option<UnwindContext> = None;
+
+pub fn get_unwind_context() -> &'static mut UnwindContext {
+    unsafe {
+        if UNWIND_CONTEXT.is_none() {
+            UNWIND_CONTEXT = Some(UnwindContext::new());
+        }
+        UNWIND_CONTEXT.as_mut().unwrap()
+    }
+}
+
+// Begin unwinding
+pub fn begin_unwind(exception: Box<dyn Any>) -> ! {
+    let ctx = get_unwind_context();
+    ctx.set_exception(exception);
+    
+    // Walk the stack and run cleanup
+    while let Some(frame) = ctx.pop_frame() {
+        if let Some(landing_pad) = frame.landing_pad {
+            if let Some(cleanup) = landing_pad.cleanup {
+                cleanup();
+            }
+            
+            // If this frame can catch the exception, stop unwinding
+            if let Some(catch_type) = landing_pad.catch_type {
+                if let Some(exception) = ctx.take_exception() {
+                    // Type check and potentially resume
+                    // For now, continue unwinding
+                }
+            }
+        }
+    }
+    
+    // No handler found, abort
+    eprintln!("fatal runtime error: unwinding failed");
+    abort();
+}
+
+// Catch unwind (for panic recovery)
+pub fn catch_unwind<F, R>(f: F) -> Result<R, Box<dyn Any>>
+where
+    F: FnOnce() -> R,
+{
+    let ctx = get_unwind_context();
+    let saved_frames = ctx.frames.len();
+    
+    // Set up landing pad
+    let frame = UnwindFrame {
+        function: String::from("<catch_unwind>"),
+        file: String::from("<unknown>"),
+        line: 0,
+        landing_pad: Some(LandingPad {
+            cleanup: None,
+            catch_type: None,
+        }),
+    };
+    ctx.push_frame(frame);
+    
+    // Try to execute function
+    let result = f();
+    
+    // If we get here, no panic occurred
+    ctx.frames.truncate(saved_frames);
+    Ok(result)
+}
+
+// Resume unwinding
+pub fn resume_unwind() -> ! {
+    let ctx = get_unwind_context();
+    if let Some(exception) = ctx.take_exception() {
+        begin_unwind(exception);
+    } else {
+        eprintln!("fatal runtime error: resume_unwind called without exception");
+        abort();
+    }
+}
+
+// Abort execution
+fn abort() -> ! {
+    extern "C" {
+        fn abort() -> !;
+    }
+    unsafe { abort() }
+}
+
+// Personality function for LLVM exception handling
+#[no_mangle]
+pub extern "C" fn vez_personality(
+    version: i32,
+    actions: i32,
+    exception_class: u64,
+    exception_object: *mut u8,
+    context: *mut u8,
+) -> i32 {
+    // Simplified personality function
+    // In production, this would interact with libunwind
+    
+    const _URC_NO_REASON: i32 = 0;
+    const _URC_HANDLER_FOUND: i32 = 6;
+    const _URC_INSTALL_CONTEXT: i32 = 7;
+    const _URC_CONTINUE_UNWIND: i32 = 8;
+    
+    const _UA_SEARCH_PHASE: i32 = 1;
+    const _UA_CLEANUP_PHASE: i32 = 2;
+    
+    if actions & _UA_SEARCH_PHASE != 0 {
+        // Search phase: look for handler
+        return _URC_HANDLER_FOUND;
+    }
+    
+    if actions & _UA_CLEANUP_PHASE != 0 {
+        // Cleanup phase: run destructors
+        return _URC_INSTALL_CONTEXT;
+    }
+    
+    _URC_CONTINUE_UNWIND
+}
