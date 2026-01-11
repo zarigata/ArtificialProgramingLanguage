@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <meta property="og:title" content="VeZ – AI-First Programming Language for LLMs" />
   <meta property="og:description" content="Hardware-level performance, memory safety, GPU-first design, and deterministic compilation built for large language models to generate optimal code." />
-  <meta property="og:image" content="https://vez-lang.org/assets/og.png" />
+  <meta property="og:image" content="./LOGO.png" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="VeZ – AI-First Programming Language for LLMs" />
@@ -63,8 +63,8 @@
       letter-spacing: 0.02em;
     }
     .logo-mark {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       background: var(--accent);
       display: grid;
@@ -74,6 +74,13 @@
       font-size: 18px;
       font-weight: 700;
       box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .logo-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     nav a { margin-left: 18px; font-weight: 600; color: var(--light); }
     nav a:hover { color: var(--white); }
@@ -231,7 +238,9 @@
 <body>
   <header>
     <div class="logo">
-      <div class="logo-mark">Z</div>
+      <div class="logo-mark">
+        <img src="../LOGO.png" alt="VeZ logo" />
+      </div>
       <div>
         <div style="font-size:16px;">VeZ Language</div>
         <div class="mini">AI-first • Hardware-native</div>
@@ -242,6 +251,7 @@
       <a href="#llm">LLM Fit</a>
       <a href="#docs">Docs</a>
       <a href="#examples">Examples</a>
+      <a href="./comparison.html">Comparisons</a>
       <a href="#contact">Partner</a>
     </nav>
   </header>
