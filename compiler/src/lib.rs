@@ -18,6 +18,12 @@ pub mod driver;
 pub mod error;
 pub mod span;
 pub mod symbol;
+pub mod macro_system;
+pub mod async_runtime;
+pub mod verification;
+pub mod gpu;
+pub mod consteval;
+pub mod plugin;
 
 /// Compiler version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -1,0 +1,8 @@
+error: failed to load manifest for workspace member `/run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/tools/vpm`
+referenced by workspace at `/run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/Cargo.toml`
+
+Caused by:
+  failed to read `/run/media/zarigata/42A0B8BDA0B8B8AD/ARTIFICIAL-INTELIGENCE/ArtificialProgramingLanguage/tools/vpm/Cargo.toml`
+
+Caused by:
+  No such file or directory (os error 2)
