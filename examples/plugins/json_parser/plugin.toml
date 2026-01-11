@@ -1,0 +1,21 @@
+[plugin]
+name = "json-parser"
+version = "1.0.0"
+author = "VeZ Team <team@vez-lang.org>"
+description = "JSON parsing and serialization plugin for VeZ"
+api_version = "1.0"
+license = "MIT"
+
+[capabilities]
+syntax_extension = true
+type_system = true
+macro = true
+
+[dependencies]
+vez-core = "1.0"
+
+[config]
+# Plugin configuration options
+pretty_print = true
+strict_mode = false
+max_depth = 64
