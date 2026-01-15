@@ -1,6 +1,6 @@
 //! Target machine configuration
 
-use crate::error::{Result, CompilerError};
+use crate::error::{Result, Error, ErrorKind};
 
 /// Target architecture
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -146,7 +146,7 @@ impl TargetMachine {
             Some(&"aarch64") => Arch::AArch64,
             Some(&"arm") => Arch::ARM,
             Some(&"riscv64") => Arch::RISCV64,
-            _ => return Err(CompilerError::CodegenError(
+            _ => return Err(Error::new(ErrorKind::InternalError, 
                 format!("Unknown architecture in triple: {}", triple)
             )),
         };
@@ -160,7 +160,7 @@ impl TargetMachine {
         } else if triple.contains("freebsd") {
             OS::FreeBSD
         } else {
-            return Err(CompilerError::CodegenError(
+            return Err(Error::new(ErrorKind::InternalError, 
                 format!("Unknown OS in triple: {}", triple)
             ));
         };

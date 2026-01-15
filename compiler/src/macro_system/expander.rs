@@ -3,7 +3,8 @@
 
 use super::*;
 use crate::parser::ast::*;
-use crate::error::{Error, Result};
+use crate::error::{Error, ErrorKind, Result};
+use std::collections::HashMap;
 
 pub struct MacroExpander {
     registry: MacroRegistry,
@@ -22,38 +23,28 @@ impl MacroExpander {
     
     pub fn expand_expr(&mut self, expr: &Expr) -> Result<Expr> {
         match expr {
-            Expr::MacroCall { name, args, span } => {
-                self.expand_macro_call(name, args, *span)
-            }
-            Expr::Binary { op, left, right, span } => {
-                let left = Box::new(self.expand_expr(left)?);
-                let right = Box::new(self.expand_expr(right)?);
-                Ok(Expr::Binary {
-                    op: *op,
-                    left,
-                    right,
-                    span: *span,
-                })
-            }
-            Expr::Call { func, args, span } => {
+            Expr::Call(func, args) => {
+                if let Expr::Ident(name) = &**func {
+                    if self.registry.get(name).is_some() {
+                        return self.expand_macro_call(name, args, Span::dummy());
+                    }
+                }
                 let func = Box::new(self.expand_expr(func)?);
                 let args = args.iter()
                     .map(|arg| self.expand_expr(arg))
                     .collect::<Result<Vec<_>>>()?;
-                Ok(Expr::Call {
-                    func,
-                    args,
-                    span: *span,
-                })
+                Ok(Expr::Call(func, args))
             }
-            Expr::Block { stmts, span } => {
+            Expr::Binary(left, op, right) => {
+                let left = Box::new(self.expand_expr(left)?);
+                let right = Box::new(self.expand_expr(right)?);
+                Ok(Expr::Binary(left, *op, right))
+            }
+            Expr::Block(stmts) => {
                 let stmts = stmts.iter()
                     .map(|stmt| self.expand_stmt(stmt))
                     .collect::<Result<Vec<_>>>()?;
-                Ok(Expr::Block {
-                    stmts,
-                    span: *span,
-                })
+                Ok(Expr::Block(stmts))
             }
             _ => Ok(expr.clone()),
         }
@@ -64,17 +55,11 @@ impl MacroExpander {
             Stmt::Expr(expr) => {
                 Ok(Stmt::Expr(self.expand_expr(expr)?))
             }
-            Stmt::Let { pattern, ty, init, span } => {
+            Stmt::Let(pattern, ty, init) => {
                 let init = init.as_ref()
                     .map(|e| self.expand_expr(e))
-                    .transpose()?
-                    .map(Box::new);
-                Ok(Stmt::Let {
-                    pattern: pattern.clone(),
-                    ty: ty.clone(),
-                    init,
-                    span: *span,
-                })
+                    .transpose()?;
+                Ok(Stmt::Let(pattern.clone(), ty.clone(), init))
             }
             _ => Ok(stmt.clone()),
         }
@@ -83,16 +68,17 @@ impl MacroExpander {
     fn expand_macro_call(&mut self, name: &str, args: &[Expr], span: Span) -> Result<Expr> {
         if self.expansion_depth >= self.max_depth {
             return Err(Error::new(
+                ErrorKind::InvalidSyntax,
                 format!("macro expansion depth exceeded (max: {})", self.max_depth),
-                span,
-            ));
+            ).with_span(span));
         }
         
         let macro_def = self.registry.get(name)
-            .ok_or_else(|| Error::new(format!("undefined macro: {}", name), span))?;
+            .ok_or_else(|| Error::new(ErrorKind::UndefinedSymbol, format!("undefined macro: {}", name)).with_span(span))?
+            .clone();
         
         self.expansion_depth += 1;
-        let result = self.expand_macro_def(macro_def, args, span);
+        let result = self.expand_macro_def(&macro_def, args, span);
         self.expansion_depth -= 1;
         
         result
@@ -107,13 +93,13 @@ impl MacroExpander {
                     }
                 }
                 Err(Error::new(
+                    ErrorKind::InvalidSyntax,
                     format!("no matching macro rule for {}", def.name),
-                    span,
-                ))
+                ).with_span(span))
             }
             MacroBody::Procedural(_path) => {
                 // Procedural macros would be implemented here
-                Err(Error::new("procedural macros not yet implemented", span))
+                Err(Error::new(ErrorKind::InternalError, "procedural macros not yet implemented").with_span(span))
             }
         }
     }
@@ -220,10 +206,7 @@ impl MacroExpander {
         
         // Parse the expanded code back into an expression
         // This is simplified - in production, we'd use the actual parser
-        Ok(Expr::Block {
-            stmts: vec![],
-            span,
-        })
+        Ok(Expr::Block(vec![]))
     }
 }
 
@@ -237,11 +220,10 @@ mod tests {
         let mut expander = MacroExpander::new(registry);
         
         // Test vec! macro expansion
-        let expr = Expr::MacroCall {
-            name: "vec".to_string(),
-            args: vec![],
-            span: Span::dummy(),
-        };
+        let expr = Expr::Call(
+            Box::new(Expr::Ident("vec".to_string())),
+            vec![],
+        );
         
         let result = expander.expand_expr(&expr);
         assert!(result.is_ok());

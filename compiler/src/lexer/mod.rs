@@ -686,7 +686,7 @@ impl Lexer {
             while !self.is_at_end() && self.current_char() != '\n' {
                 self.advance();
             }
-            self.next_token() // Skip comment and get next token
+            self.next_token().map(|t| t.kind) // Skip comment and get next token
         } else if !self.is_at_end() && self.current_char() == '*' {
             // Block comment
             self.advance();
@@ -695,7 +695,7 @@ impl Lexer {
                     self.advance();
                     if !self.is_at_end() && self.current_char() == '/' {
                         self.advance();
-                        return self.next_token(); // Skip comment
+                        return self.next_token().map(|t| t.kind); // Skip comment
                     }
                 } else {
                     self.advance();

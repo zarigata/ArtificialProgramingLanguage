@@ -98,7 +98,7 @@ impl BasicBlock {
 #[derive(Debug, Clone)]
 pub struct Function {
     pub name: String,
-    pub params: Vec<IrType>,
+    pub params: Vec<(String, IrType)>,
     pub return_type: IrType,
     pub blocks: Vec<BasicBlock>,
     pub values: Vec<Value>,
@@ -107,7 +107,7 @@ pub struct Function {
 }
 
 impl Function {
-    pub fn new(name: String, params: Vec<IrType>, return_type: IrType) -> Self {
+    pub fn new(name: String, params: Vec<(String, IrType)>, return_type: IrType) -> Self {
         let mut func = Function {
             name,
             params: params.clone(),
@@ -119,7 +119,7 @@ impl Function {
         };
         
         // Add parameters as values
-        for (i, param_ty) in params.iter().enumerate() {
+        for (i, (_, param_ty)) in params.iter().enumerate() {
             func.add_value(Value::Parameter(i, param_ty.clone()));
         }
         
@@ -167,11 +167,11 @@ impl Function {
 impl fmt::Display for Function {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "fn {}(", self.name)?;
-        for (i, param) in self.params.iter().enumerate() {
+        for (i, (name, ty)) in self.params.iter().enumerate() {
             if i > 0 {
                 write!(f, ", ")?;
             }
-            write!(f, "{}", param)?;
+            write!(f, "{}: {}", name, ty)?;
         }
         writeln!(f, ") -> {} {{", self.return_type)?;
         
@@ -260,7 +260,7 @@ mod tests {
     fn test_function_creation() {
         let func = Function::new(
             "test".to_string(),
-            vec![IrType::I32, IrType::I32],
+            vec![("a".to_string(), IrType::I32), ("b".to_string(), IrType::I32)],
             IrType::I32,
         );
         

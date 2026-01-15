@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::Command as StdCommand;
 
 // Package manifest (VeZ.toml)
 #[derive(Debug, Clone)]
@@ -167,7 +167,7 @@ impl Builder {
     }
     
     fn compile_package(&self, output: &Path, release: bool) -> Result<(), String> {
-        let mut cmd = Command::new("vezc");
+        let mut cmd = StdCommand::new("vezc");
         cmd.arg("src/main.zari");
         cmd.arg("-o").arg(output);
         
@@ -250,7 +250,7 @@ pub fn execute_command(cmd: Command) -> Result<(), String> {
             let binary = builder.build(release)?;
             
             println!("Running `{}`", binary.display());
-            let mut cmd = Command::new(&binary);
+            let mut cmd = StdCommand::new(&binary);
             cmd.args(&args);
             cmd.status().map_err(|e| e.to_string())?;
         }

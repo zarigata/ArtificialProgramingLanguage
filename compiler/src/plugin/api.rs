@@ -2,6 +2,7 @@
 // High-level API for plugin development
 
 use super::*;
+use crate::parser::ast::{BinOp, Expr, Literal, Stmt, Type, UnOp};
 
 // Plugin SDK - Simplified API for plugin developers
 pub struct PluginSDK {
@@ -57,7 +58,7 @@ impl PluginSDK {
         Expr::Ident(name)
     }
     
-    pub fn create_binary_op(&self, op: BinaryOp, left: Expr, right: Expr) -> Expr {
+    pub fn create_binary_op(&self, op: BinOp, left: Expr, right: Expr) -> Expr {
         Expr::Binary(Box::new(left), op, Box::new(right))
     }
     

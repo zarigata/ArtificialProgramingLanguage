@@ -2,7 +2,9 @@
 // Interfaces with Z3 or similar SMT solvers for automated theorem proving
 
 use crate::parser::ast::*;
-use crate::error::{Error, Result};
+use crate::error::{Error, Result, ErrorKind};
+use crate::span::Span;
+use crate::ir::instructions::{BinaryOp, UnaryOp};
 use std::process::{Command, Stdio};
 use std::io::Write;
 
@@ -106,48 +108,48 @@ impl SmtSolver {
     
     fn expr_to_smt(&self, expr: &Expr) -> Result<String> {
         match expr {
-            Expr::Literal { value, .. } => {
+            Expr::Literal(value) => {
                 match value {
                     Literal::Int(n) => Ok(n.to_string()),
                     Literal::Bool(b) => Ok(b.to_string()),
-                    _ => Err(Error::new("Unsupported literal type for SMT", Span::dummy())),
+                    _ => Err(Error::new(ErrorKind::InternalError, "Unsupported literal type for SMT".to_string())),
                 }
             }
-            Expr::Variable { name, .. } => Ok(name.clone()),
-            Expr::Binary { op, left, right, .. } => {
+            Expr::Ident(name) => Ok(name.clone()),
+            Expr::Binary(left, op, right) => {
                 let left_smt = self.expr_to_smt(left)?;
                 let right_smt = self.expr_to_smt(right)?;
                 
                 let op_smt = match op {
-                    BinaryOp::Add => "+",
-                    BinaryOp::Sub => "-",
-                    BinaryOp::Mul => "*",
-                    BinaryOp::Div => "div",
-                    BinaryOp::Eq => "=",
-                    BinaryOp::Ne => "distinct",
-                    BinaryOp::Lt => "<",
-                    BinaryOp::Le => "<=",
-                    BinaryOp::Gt => ">",
-                    BinaryOp::Ge => ">=",
-                    BinaryOp::And => "and",
-                    BinaryOp::Or => "or",
-                    _ => return Err(Error::new("Unsupported binary operator for SMT", Span::dummy())),
+                    BinOp::Add => "+",
+                    BinOp::Sub => "-",
+                    BinOp::Mul => "*",
+                    BinOp::Div => "div",
+                    BinOp::Eq => "=",
+                    BinOp::Ne => "distinct",
+                    BinOp::Lt => "<",
+                    BinOp::Le => "<=",
+                    BinOp::Gt => ">",
+                    BinOp::Ge => ">=",
+                    BinOp::And => "and",
+                    BinOp::Or => "or",
+                    _ => return Err(Error::new(ErrorKind::InternalError, "Unsupported binary operator for SMT".to_string())),
                 };
                 
                 Ok(format!("({} {} {})", op_smt, left_smt, right_smt))
             }
-            Expr::Unary { op, operand, .. } => {
+            Expr::Unary(op, operand) => {
                 let operand_smt = self.expr_to_smt(operand)?;
                 
                 let op_smt = match op {
-                    UnaryOp::Not => "not",
-                    UnaryOp::Neg => "-",
-                    _ => return Err(Error::new("Unsupported unary operator for SMT", Span::dummy())),
+                    UnOp::Not => "not",
+                    UnOp::Neg => "-",
+                    _ => return Err(Error::new(ErrorKind::InternalError, "Unsupported unary operator for SMT".to_string())),
                 };
                 
                 Ok(format!("({} {})", op_smt, operand_smt))
             }
-            _ => Err(Error::new("Unsupported expression type for SMT", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::InternalError, "Unsupported expression type for SMT".to_string())),
         }
     }
     
@@ -161,14 +163,14 @@ impl SmtSolver {
     
     fn collect_variables_rec(&self, expr: &Expr, vars: &mut Vec<String>) {
         match expr {
-            Expr::Variable { name, .. } => {
+            Expr::Ident(name) => {
                 vars.push(name.clone());
             }
-            Expr::Binary { left, right, .. } => {
+            Expr::Binary(left, _, right) => {
                 self.collect_variables_rec(left, vars);
                 self.collect_variables_rec(right, vars);
             }
-            Expr::Unary { operand, .. } => {
+            Expr::Unary(_, operand) => {
                 self.collect_variables_rec(operand, vars);
             }
             _ => {}
@@ -192,15 +194,15 @@ impl SmtSolver {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
-            .map_err(|e| Error::new(format!("Failed to spawn SMT solver: {}", e), Span::dummy()))?;
+            .map_err(|e| Error::new(ErrorKind::InternalError, format!("Failed to spawn SMT solver: {}", e)))?;
         
         if let Some(mut stdin) = child.stdin.take() {
             stdin.write_all(smt_lib.as_bytes())
-                .map_err(|e| Error::new(format!("Failed to write to SMT solver: {}", e), Span::dummy()))?;
+                .map_err(|e| Error::new(ErrorKind::InternalError, format!("Failed to write to SMT solver: {}", e)))?;
         }
         
         let output = child.wait_with_output()
-            .map_err(|e| Error::new(format!("Failed to read SMT solver output: {}", e), Span::dummy()))?;
+            .map_err(|e| Error::new(ErrorKind::InternalError, format!("Failed to read SMT solver output: {}", e)))?;
         
         Ok(String::from_utf8_lossy(&output.stdout).to_string())
     }

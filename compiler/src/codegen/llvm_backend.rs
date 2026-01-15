@@ -3,7 +3,7 @@
 use crate::ir::ssa::{Module, Function as IrFunction, BasicBlock, ValueId, Value, Constant};
 use crate::ir::instructions::{Instruction, BinaryOp, UnaryOp};
 use crate::ir::types::IrType;
-use crate::error::{Result, CompilerError};
+use crate::error::{Result, Error, ErrorKind};
 use std::collections::HashMap;
 
 /// LLVM code generator
@@ -57,7 +57,7 @@ impl LLVMCodegen {
     fn type_to_llvm(&self, ty: &IrType) -> String {
         match ty {
             IrType::Void => "void".to_string(),
-            IrType::I1 => "i1".to_string(),
+            IrType::Bool => "i1".to_string(),
             IrType::I8 => "i8".to_string(),
             IrType::I16 => "i16".to_string(),
             IrType::I32 => "i32".to_string(),
@@ -70,7 +70,7 @@ impl LLVMCodegen {
             IrType::U128 => "i128".to_string(),
             IrType::F32 => "float".to_string(),
             IrType::F64 => "double".to_string(),
-            IrType::Ptr(inner) => format!("{}*", self.type_to_llvm(inner)),
+            IrType::Pointer(inner) => format!("{}*", self.type_to_llvm(inner)),
             IrType::Array(inner, size) => format!("[{} x {}]", size, self.type_to_llvm(inner)),
             IrType::Struct(fields) => {
                 let field_types: Vec<_> = fields.iter()
@@ -126,8 +126,8 @@ impl LLVMCodegen {
             Constant::Int(val, ty) => format!("{} {}", self.type_to_llvm(ty), val),
             Constant::Float(val, ty) => format!("{} {}", self.type_to_llvm(ty), val),
             Constant::Bool(val) => format!("i1 {}", if *val { 1 } else { 0 }),
-            Constant::Null(ty) => format!("{} null", self.type_to_llvm(ty)),
-            Constant::Undef(ty) => format!("{} undef", self.type_to_llvm(ty)),
+            Constant::Null => format!("{} null", self.type_to_llvm(&IrType::Pointer(Box::new(IrType::Void)))),
+            Constant::Undef => format!("{} undef", self.type_to_llvm(&IrType::Void)),
         }
     }
     
@@ -287,12 +287,12 @@ impl LLVMCodegen {
                     Ok("ret void".to_string())
                 }
             }
-            Instruction::Branch { cond, true_bb, false_bb } => {
+            Instruction::Branch { cond, then_block, else_block } => {
                 let cond_val = self.get_value_name(*cond, function);
-                Ok(format!("br i1 {}, label %bb{}, label %bb{}", cond_val, true_bb.0, false_bb.0))
+                Ok(format!("br i1 {}, label %bb{}, label %bb{}", cond_val, then_block, else_block))
             }
             Instruction::Jump { target } => {
-                Ok(format!("br label %bb{}", target.0))
+                Ok(format!("br label %bb{}", target))
             }
             Instruction::Phi { incoming, ty } => {
                 let temp = self.new_temp();
@@ -302,7 +302,7 @@ impl LLVMCodegen {
                 let incoming_strs: Vec<_> = incoming.iter()
                     .map(|(val, bb)| {
                         let val_name = self.get_value_name(*val, function);
-                        format!("[ {}, %bb{} ]", val_name, bb.0)
+                        format!("[ {}, %bb{} ]", val_name, bb)
                     })
                     .collect();
                 
@@ -334,7 +334,7 @@ impl LLVMCodegen {
         match value {
             Value::Constant(Constant::Int(_, ty)) => ty.clone(),
             Value::Constant(Constant::Float(_, ty)) => ty.clone(),
-            Value::Constant(Constant::Bool(_)) => IrType::I1,
+            Value::Constant(Constant::Bool(_)) => IrType::Bool,
             Value::Parameter(_, ty) => ty.clone(),
             _ => IrType::I32, // Default
         }

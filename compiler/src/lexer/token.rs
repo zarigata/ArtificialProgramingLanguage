@@ -63,7 +63,7 @@ impl TokenKind {
     
     pub fn is_literal(&self) -> bool {
         matches!(self,
-            TokenKind::IntLiteral(_) | TokenKind::FloatLiteral(_) |
+            TokenKind::IntLiteral(_, _) | TokenKind::FloatLiteral(_, _) |
             TokenKind::StringLiteral(_) | TokenKind::CharLiteral(_) |
             TokenKind::True | TokenKind::False
         )

@@ -44,6 +44,19 @@ impl Span {
             end: other.end,
         }
     }
+
+    pub fn dummy() -> Self {
+        Self::default()
+    }
+}
+
+impl Default for Span {
+    fn default() -> Self {
+        Span {
+            start: Position::initial(),
+            end: Position::initial(),
+        }
+    }
 }
 
 impl fmt::Display for Span {

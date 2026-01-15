@@ -7,7 +7,7 @@ pub mod safety_checker;
 pub mod contracts;
 
 use crate::parser::ast::*;
-use crate::semantic::types::Type;
+use crate::parser::ast::Type;
 use crate::error::{Error, Result};
 use std::collections::HashMap;
 
@@ -99,7 +99,7 @@ impl FormalVerifier {
         let mut report = VerificationReport::new(func.name.clone());
         
         // Extract preconditions
-        let preconditions = self.extract_preconditions(func)?;
+        let preconditions: Vec<Expr> = self.extract_preconditions(func)?;
         for pre in &preconditions {
             self.context.assumptions.push(Assumption {
                 expr: pre.clone(),
@@ -108,16 +108,16 @@ impl FormalVerifier {
         }
         
         // Extract postconditions
-        let postconditions = self.extract_postconditions(func)?;
+        let postconditions: Vec<Expr> = self.extract_postconditions(func)?;
         
         // Verify each postcondition
         for post in &postconditions {
-            let proof = self.prove_postcondition(func, post)?;
+            let proof = self.verify_postcondition(func, post)?;
             report.add_proof(proof);
         }
         
         // Check for memory safety
-        let memory_safety = self.check_memory_safety(func)?;
+        let memory_safety = self.verify_borrow_safety(func)?;
         report.memory_safe = memory_safety;
         
         // Check for arithmetic overflow
@@ -133,13 +133,13 @@ impl FormalVerifier {
         let invariant = self.extract_loop_invariant(loop_stmt)?;
         
         // Prove invariant holds initially
-        let init_proof = self.prove_invariant_init(&invariant)?;
+        let init_proof = self.verify_invariant_init(&invariant)?;
         if init_proof.status != ProofStatus::Proven {
             return Ok(false);
         }
         
         // Prove invariant is maintained
-        let maintain_proof = self.prove_invariant_maintained(&invariant, loop_stmt)?;
+        let maintain_proof = self.verify_loop_invariant(&invariant, loop_stmt)?;
         if maintain_proof.status != ProofStatus::Proven {
             return Ok(false);
         }
@@ -234,7 +234,7 @@ impl FormalVerifier {
     }
     
     fn verify_postcondition(&mut self, _func: &Function, post: &Expr) -> Result<Proof> {
-        let proof = Proof {
+        let mut proof = Proof {
             goal: post.clone(),
             steps: Vec::new(),
             status: ProofStatus::Unproven,

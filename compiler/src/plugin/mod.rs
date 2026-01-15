@@ -6,6 +6,7 @@ pub mod loader;
 pub mod registry;
 pub mod hooks;
 
+use crate::span::Span;
 use crate::parser::ast::*;
 use crate::error::{Error, ErrorKind, Result};
 use std::collections::HashMap;

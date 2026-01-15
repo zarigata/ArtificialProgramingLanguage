@@ -1,9 +1,10 @@
 // VeZ Compile-Time Evaluation Engine
 // Executes code at compile time for constant folding and metaprogramming
 
-use crate::parser::ast::*;
-use crate::semantic::types::Type;
-use crate::error::{Error, Result};
+use crate::parser::ast::{Function, Literal, Expr, BinOp, UnOp};
+use crate::span::Span;
+use crate::error::{Error, Result, ErrorKind};
+use crate::parser::ast::Type;
 use std::collections::HashMap;
 
 // Compile-time value
@@ -58,33 +59,33 @@ impl ConstEvaluator {
     // Evaluate expression at compile time
     pub fn eval_expr(&mut self, expr: &Expr) -> Result<ConstValue> {
         match expr {
-            Expr::Literal { value, .. } => self.eval_literal(value),
+            Expr::Literal(value) => self.eval_literal(value),
             
-            Expr::Variable { name, .. } => {
+            Expr::Ident(name) => {
                 self.constants.get(name)
                     .cloned()
                     .ok_or_else(|| Error::new(
-                        format!("Undefined constant: {}", name),
-                        Span::dummy()
-                    ))
+                        ErrorKind::UndefinedSymbol,
+                        format!("Undefined constant: {}", name)
+                    ).with_span(Span::dummy()))
             }
             
-            Expr::Binary { op, left, right, .. } => {
+            Expr::Binary(left, op, right) => {
                 let left_val = self.eval_expr(left)?;
                 let right_val = self.eval_expr(right)?;
                 self.eval_binary_op(*op, &left_val, &right_val)
             }
             
-            Expr::Unary { op, operand, .. } => {
+            Expr::Unary(op, operand) => {
                 let val = self.eval_expr(operand)?;
                 self.eval_unary_op(*op, &val)
             }
             
-            Expr::Call { func, args, .. } => {
+            Expr::Call(func, args) => {
                 self.eval_call(func, args)
             }
             
-            Expr::If { condition, then_branch, else_branch, .. } => {
+            Expr::If(condition, then_branch, else_branch) => {
                 let cond_val = self.eval_expr(condition)?;
                 if cond_val.as_bool().unwrap_or(false) {
                     self.eval_expr(then_branch)
@@ -95,7 +96,7 @@ impl ConstEvaluator {
                 }
             }
             
-            Expr::Array { elements, .. } => {
+            Expr::Array(elements) => {
                 let mut values = Vec::new();
                 for elem in elements {
                     values.push(self.eval_expr(elem)?);
@@ -104,9 +105,9 @@ impl ConstEvaluator {
             }
             
             _ => Err(Error::new(
-                "Expression cannot be evaluated at compile time",
-                Span::dummy()
-            )),
+                ErrorKind::InvalidSyntax,
+                "Expression cannot be evaluated at compile time".to_string()
+            ).with_span(Span::dummy())),
         }
     }
     
@@ -120,105 +121,99 @@ impl ConstEvaluator {
         }
     }
     
-    fn eval_binary_op(&self, op: BinaryOp, left: &ConstValue, right: &ConstValue) -> Result<ConstValue> {
+    fn eval_binary_op(&self, op: BinOp, left: &ConstValue, right: &ConstValue) -> Result<ConstValue> {
         match (left, right) {
             (ConstValue::Int(l), ConstValue::Int(r)) => {
                 let result = match op {
-                    BinaryOp::Add => ConstValue::Int(l + r),
-                    BinaryOp::Sub => ConstValue::Int(l - r),
-                    BinaryOp::Mul => ConstValue::Int(l * r),
-                    BinaryOp::Div => {
+                    BinOp::Add => ConstValue::Int(l + r),
+                    BinOp::Sub => ConstValue::Int(l - r),
+                    BinOp::Mul => ConstValue::Int(l * r),
+                    BinOp::Div => {
                         if *r == 0 {
-                            return Err(Error::new("Division by zero", Span::dummy()));
+                            return Err(Error::new(ErrorKind::InternalError, "Division by zero".to_string()).with_span(Span::dummy()));
                         }
                         ConstValue::Int(l / r)
                     }
-                    BinaryOp::Mod => ConstValue::Int(l % r),
-                    BinaryOp::Eq => ConstValue::Bool(l == r),
-                    BinaryOp::Ne => ConstValue::Bool(l != r),
-                    BinaryOp::Lt => ConstValue::Bool(l < r),
-                    BinaryOp::Le => ConstValue::Bool(l <= r),
-                    BinaryOp::Gt => ConstValue::Bool(l > r),
-                    BinaryOp::Ge => ConstValue::Bool(l >= r),
-                    BinaryOp::BitAnd => ConstValue::Int(l & r),
-                    BinaryOp::BitOr => ConstValue::Int(l | r),
-                    BinaryOp::BitXor => ConstValue::Int(l ^ r),
-                    BinaryOp::Shl => ConstValue::Int(l << r),
-                    BinaryOp::Shr => ConstValue::Int(l >> r),
-                    _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+                    BinOp::Mod => ConstValue::Int(l % r),
+                    BinOp::Eq => ConstValue::Bool(l == r),
+                    BinOp::Ne => ConstValue::Bool(l != r),
+                    BinOp::Lt => ConstValue::Bool(l < r),
+                    BinOp::Le => ConstValue::Bool(l <= r),
+                    BinOp::Gt => ConstValue::Bool(l > r),
+                    BinOp::Ge => ConstValue::Bool(l >= r),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported binary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
             (ConstValue::Float(l), ConstValue::Float(r)) => {
                 let result = match op {
-                    BinaryOp::Add => ConstValue::Float(l + r),
-                    BinaryOp::Sub => ConstValue::Float(l - r),
-                    BinaryOp::Mul => ConstValue::Float(l * r),
-                    BinaryOp::Div => ConstValue::Float(l / r),
-                    BinaryOp::Eq => ConstValue::Bool(l == r),
-                    BinaryOp::Ne => ConstValue::Bool(l != r),
-                    BinaryOp::Lt => ConstValue::Bool(l < r),
-                    BinaryOp::Le => ConstValue::Bool(l <= r),
-                    BinaryOp::Gt => ConstValue::Bool(l > r),
-                    BinaryOp::Ge => ConstValue::Bool(l >= r),
-                    _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+                    BinOp::Add => ConstValue::Float(l + r),
+                    BinOp::Sub => ConstValue::Float(l - r),
+                    BinOp::Mul => ConstValue::Float(l * r),
+                    BinOp::Div => ConstValue::Float(l / r),
+                    BinOp::Eq => ConstValue::Bool(l == r),
+                    BinOp::Ne => ConstValue::Bool(l != r),
+                    BinOp::Lt => ConstValue::Bool(l < r),
+                    BinOp::Le => ConstValue::Bool(l <= r),
+                    BinOp::Gt => ConstValue::Bool(l > r),
+                    BinOp::Ge => ConstValue::Bool(l >= r),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported binary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
             (ConstValue::Bool(l), ConstValue::Bool(r)) => {
                 let result = match op {
-                    BinaryOp::And => ConstValue::Bool(*l && *r),
-                    BinaryOp::Or => ConstValue::Bool(*l || *r),
-                    BinaryOp::Eq => ConstValue::Bool(l == r),
-                    BinaryOp::Ne => ConstValue::Bool(l != r),
-                    _ => return Err(Error::new("Unsupported binary operation", Span::dummy())),
+                    BinOp::And => ConstValue::Bool(*l && *r),
+                    BinOp::Or => ConstValue::Bool(*l || *r),
+                    BinOp::Eq => ConstValue::Bool(l == r),
+                    BinOp::Ne => ConstValue::Bool(l != r),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported binary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
-            _ => Err(Error::new("Type mismatch in binary operation", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "Type mismatch in binary operation".to_string()).with_span(Span::dummy())),
         }
     }
     
-    fn eval_unary_op(&self, op: UnaryOp, val: &ConstValue) -> Result<ConstValue> {
+    fn eval_unary_op(&self, op: UnOp, val: &ConstValue) -> Result<ConstValue> {
         match val {
             ConstValue::Int(n) => {
                 let result = match op {
-                    UnaryOp::Neg => ConstValue::Int(-n),
-                    UnaryOp::Not => ConstValue::Bool(*n == 0),
-                    UnaryOp::BitNot => ConstValue::Int(!n),
-                    _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+                    UnOp::Neg => ConstValue::Int(-n),
+                    UnOp::Not => ConstValue::Bool(*n == 0),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported unary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
             ConstValue::Float(f) => {
                 let result = match op {
-                    UnaryOp::Neg => ConstValue::Float(-f),
-                    _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+                    UnOp::Neg => ConstValue::Float(-f),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported unary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
             ConstValue::Bool(b) => {
                 let result = match op {
-                    UnaryOp::Not => ConstValue::Bool(!b),
-                    _ => return Err(Error::new("Unsupported unary operation", Span::dummy())),
+                    UnOp::Not => ConstValue::Bool(!b),
+                    _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Unsupported unary operation".to_string()).with_span(Span::dummy())),
                 };
                 Ok(result)
             }
             
-            _ => Err(Error::new("Type mismatch in unary operation", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "Type mismatch in unary operation".to_string()).with_span(Span::dummy())),
         }
     }
     
     fn eval_call(&mut self, func: &Expr, args: &[Expr]) -> Result<ConstValue> {
         // Get function name
         let func_name = match func {
-            Expr::Variable { name, .. } => name,
-            _ => return Err(Error::new("Invalid function call", Span::dummy())),
+            Expr::Ident(name) => name,
+            _ => return Err(Error::new(ErrorKind::InvalidSyntax, "Invalid function call".to_string()).with_span(Span::dummy())),
         };
         
         // Evaluate arguments
@@ -235,51 +230,51 @@ impl ConstEvaluator {
             "pow" => self.builtin_pow(&arg_values),
             "sqrt" => self.builtin_sqrt(&arg_values),
             _ => Err(Error::new(
-                format!("Unknown compile-time function: {}", func_name),
-                Span::dummy()
-            )),
+                ErrorKind::UndefinedSymbol,
+                format!("Unknown compile-time function: {}", func_name)
+            ).with_span(Span::dummy())),
         }
     }
     
     fn builtin_abs(&self, args: &[ConstValue]) -> Result<ConstValue> {
         if args.len() != 1 {
-            return Err(Error::new("abs expects 1 argument", Span::dummy()));
+            return Err(Error::new(ErrorKind::InvalidSyntax, "abs expects 1 argument".to_string()).with_span(Span::dummy()));
         }
         
         match &args[0] {
             ConstValue::Int(n) => Ok(ConstValue::Int(n.abs())),
             ConstValue::Float(f) => Ok(ConstValue::Float(f.abs())),
-            _ => Err(Error::new("abs expects numeric argument", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "abs expects numeric argument".to_string()).with_span(Span::dummy())),
         }
     }
     
     fn builtin_min(&self, args: &[ConstValue]) -> Result<ConstValue> {
         if args.len() != 2 {
-            return Err(Error::new("min expects 2 arguments", Span::dummy()));
+            return Err(Error::new(ErrorKind::InvalidSyntax, "min expects 2 arguments".to_string()).with_span(Span::dummy()));
         }
         
         match (&args[0], &args[1]) {
             (ConstValue::Int(a), ConstValue::Int(b)) => Ok(ConstValue::Int(*a.min(b))),
             (ConstValue::Float(a), ConstValue::Float(b)) => Ok(ConstValue::Float(a.min(*b))),
-            _ => Err(Error::new("min expects numeric arguments", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "min expects numeric arguments".to_string()).with_span(Span::dummy())),
         }
     }
     
     fn builtin_max(&self, args: &[ConstValue]) -> Result<ConstValue> {
         if args.len() != 2 {
-            return Err(Error::new("max expects 2 arguments", Span::dummy()));
+            return Err(Error::new(ErrorKind::InvalidSyntax, "max expects 2 arguments".to_string()).with_span(Span::dummy()));
         }
         
         match (&args[0], &args[1]) {
             (ConstValue::Int(a), ConstValue::Int(b)) => Ok(ConstValue::Int(*a.max(b))),
             (ConstValue::Float(a), ConstValue::Float(b)) => Ok(ConstValue::Float(a.max(*b))),
-            _ => Err(Error::new("max expects numeric arguments", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "max expects numeric arguments".to_string()).with_span(Span::dummy())),
         }
     }
     
     fn builtin_pow(&self, args: &[ConstValue]) -> Result<ConstValue> {
         if args.len() != 2 {
-            return Err(Error::new("pow expects 2 arguments", Span::dummy()));
+            return Err(Error::new(ErrorKind::InvalidSyntax, "pow expects 2 arguments".to_string()).with_span(Span::dummy()));
         }
         
         match (&args[0], &args[1]) {
@@ -288,27 +283,27 @@ impl ConstEvaluator {
             }
             (ConstValue::Int(base), ConstValue::Int(exp)) => {
                 if *exp < 0 {
-                    return Err(Error::new("Negative exponent for integer pow", Span::dummy()));
+                    return Err(Error::new(ErrorKind::InvalidSyntax, "Negative exponent for integer pow".to_string()).with_span(Span::dummy()));
                 }
                 Ok(ConstValue::Int(base.pow(*exp as u32)))
             }
-            _ => Err(Error::new("pow expects numeric arguments", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "pow expects numeric arguments".to_string()).with_span(Span::dummy())),
         }
     }
     
     fn builtin_sqrt(&self, args: &[ConstValue]) -> Result<ConstValue> {
         if args.len() != 1 {
-            return Err(Error::new("sqrt expects 1 argument", Span::dummy()));
+            return Err(Error::new(ErrorKind::InvalidSyntax, "sqrt expects 1 argument".to_string()).with_span(Span::dummy()));
         }
         
         match &args[0] {
             ConstValue::Float(f) => {
                 if *f < 0.0 {
-                    return Err(Error::new("sqrt of negative number", Span::dummy()));
+                    return Err(Error::new(ErrorKind::InvalidSyntax, "sqrt of negative number".to_string()).with_span(Span::dummy()));
                 }
                 Ok(ConstValue::Float(f.sqrt()))
             }
-            _ => Err(Error::new("sqrt expects float argument", Span::dummy())),
+            _ => Err(Error::new(ErrorKind::TypeMismatch, "sqrt expects float argument".to_string()).with_span(Span::dummy())),
         }
     }
     
@@ -331,10 +326,7 @@ mod tests {
     fn test_eval_literal() {
         let mut eval = ConstEvaluator::new();
         
-        let expr = Expr::Literal {
-            value: Literal::Int(42),
-            span: Span::dummy(),
-        };
+        let expr = Expr::Literal(Literal::Int(42));
         
         let result = eval.eval_expr(&expr).unwrap();
         assert_eq!(result, ConstValue::Int(42));
@@ -344,18 +336,11 @@ mod tests {
     fn test_eval_binary_add() {
         let mut eval = ConstEvaluator::new();
         
-        let expr = Expr::Binary {
-            op: BinaryOp::Add,
-            left: Box::new(Expr::Literal {
-                value: Literal::Int(10),
-                span: Span::dummy(),
-            }),
-            right: Box::new(Expr::Literal {
-                value: Literal::Int(32),
-                span: Span::dummy(),
-            }),
-            span: Span::dummy(),
-        };
+        let expr = Expr::Binary(
+            Box::new(Expr::Literal(Literal::Int(10))),
+            BinOp::Add,
+            Box::new(Expr::Literal(Literal::Int(32))),
+        );
         
         let result = eval.eval_expr(&expr).unwrap();
         assert_eq!(result, ConstValue::Int(42));

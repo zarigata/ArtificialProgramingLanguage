@@ -22,12 +22,21 @@ pub enum Item {
 #[derive(Debug, Clone)]
 pub struct Function {
     pub name: String,
+    pub attributes: Vec<Attribute>,
     pub generics: Vec<GenericParam>,
     pub params: Vec<Param>,
     pub return_type: Option<Type>,
     pub where_clause: Option<WhereClause>,
     pub body: Vec<Stmt>,
 }
+
+/// Attribute
+#[derive(Debug, Clone)]
+pub struct Attribute {
+    pub name: String,
+    pub value: Option<Expr>,
+}
+
 
 /// Function parameter
 #[derive(Debug, Clone)]

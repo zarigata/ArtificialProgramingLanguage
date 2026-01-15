@@ -101,6 +101,7 @@ impl Parser {
         
         Ok(Item::Function(Function {
             name,
+            attributes: Vec::new(),
             generics,
             params,
             return_type,

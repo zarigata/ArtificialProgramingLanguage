@@ -1,0 +1,125 @@
+// JavaScript-style VeZ Example
+// This file demonstrates writing VeZ code using JavaScript/TypeScript syntax
+
+function fibonacci(n) {
+    // Calculate the nth Fibonacci number
+    if (n <= 1) {
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+function factorial(n) {
+    // Calculate factorial of n
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+// Arrow function examples
+const square = (x) => x * x;
+const cube = (x) => x * x * x;
+
+const add = (a, b) => {
+    return a + b;
+};
+
+// Class definition
+class Vector {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    magnitude() {
+        return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+    
+    dot(other) {
+        return this.x * other.x + this.y * other.y;
+    }
+    
+    add(other) {
+        return new Vector(this.x + other.x, this.y + other.y);
+    }
+}
+
+// Async function example
+async function fetchData(url) {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+}
+
+// Higher-order functions
+const map = (arr, fn) => {
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+        result.push(fn(arr[i]));
+    }
+    return result;
+};
+
+const filter = (arr, predicate) => {
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+        if (predicate(arr[i])) {
+            result.push(arr[i]);
+        }
+    }
+    return result;
+};
+
+const reduce = (arr, fn, initial) => {
+    let acc = initial;
+    for (let i = 0; i < arr.length; i++) {
+        acc = fn(acc, arr[i]);
+    }
+    return acc;
+};
+
+// Ternary operator
+function max(a, b) {
+    return a > b ? a : b;
+}
+
+function min(a, b) {
+    return a < b ? a : b;
+}
+
+// Object destructuring (if supported)
+function processPoint({x, y}) {
+    return x * x + y * y;
+}
+
+// Array destructuring
+function getFirstTwo(arr) {
+    const [first, second] = arr;
+    return [first, second];
+}
+
+// Main function
+function main() {
+    console.log("Fibonacci(10) =", fibonacci(10));
+    console.log("Factorial(5) =", factorial(5));
+    console.log("Square(7) =", square(7));
+    console.log("Cube(3) =", cube(3));
+    
+    const v1 = new Vector(3, 4);
+    const v2 = new Vector(1, 2);
+    console.log("Vector magnitude:", v1.magnitude());
+    console.log("Dot product:", v1.dot(v2));
+    
+    const numbers = [1, 2, 3, 4, 5];
+    const squared = map(numbers, square);
+    console.log("Squared:", squared);
+    
+    const evens = filter(numbers, x => x % 2 === 0);
+    console.log("Evens:", evens);
+    
+    const sum = reduce(numbers, (a, b) => a + b, 0);
+    console.log("Sum:", sum);
+}
+
+main();

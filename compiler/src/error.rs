@@ -30,6 +30,8 @@ pub enum ErrorKind {
     // Semantic errors
     UndefinedSymbol,
     TypeMismatch,
+    TypeError,
+    DuplicateSymbol,
     InvalidType,
     DuplicateDefinition,
     

@@ -3,6 +3,11 @@
 
 use super::*;
 use std::collections::VecDeque;
+use std::pin::Pin;
+use std::thread;
+use std::sync::{Arc, Mutex};
+use std::time::Duration;
+use std::marker::Unpin;
 
 // Task executor
 pub struct Executor {
@@ -109,18 +114,18 @@ fn wake_task(data: *const ()) {
 
 // Thread pool executor
 pub struct ThreadPoolExecutor {
-    threads: Vec<Thread>,
-    task_queue: Arc<Mutex<VecDeque<Box<dyn Task>>>>,
+    threads: Vec<thread::JoinHandle<()>>,
+    task_queue: Arc<Mutex<VecDeque<Box<dyn Task + Send>>>>,
 }
 
 impl ThreadPoolExecutor {
     pub fn new(num_threads: usize) -> Self {
-        let task_queue = Arc::new(Mutex::new(VecDeque::new()));
+        let task_queue: Arc<Mutex<VecDeque<Box<dyn Task + Send>>>> = Arc::new(Mutex::new(VecDeque::new()));
         let mut threads = Vec::new();
         
         for _ in 0..num_threads {
             let queue = task_queue.clone();
-            let thread = Thread::spawn(move || {
+            let thread = thread::spawn(move || {
                 loop {
                     let task = {
                         let mut queue = queue.lock().unwrap();
@@ -129,10 +134,10 @@ impl ThreadPoolExecutor {
                     
                     if let Some(mut task) = task {
                         let waker = Waker::new(|_| {}, std::ptr::null());
-                        task.poll(&waker);
+                        task.as_mut().poll(&waker);
                     } else {
                         // No tasks, sleep briefly
-                        Thread::sleep(Duration::from_millis(10));
+                        thread::sleep(std::time::Duration::from_millis(10));
                     }
                 }
             });
@@ -147,7 +152,7 @@ impl ThreadPoolExecutor {
     
     pub fn spawn<F>(&self, future: F)
     where
-        F: Future<Output = ()> + 'static,
+        F: Future<Output = ()> + Send + 'static,
     {
         let task = TaskWrapper::new(0, future);
         let mut queue = self.task_queue.lock().unwrap();

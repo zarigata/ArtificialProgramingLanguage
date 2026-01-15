@@ -7,6 +7,7 @@ pub mod task;
 pub mod waker;
 
 use std::prelude::*;
+use crate::error::Result;
 
 // Future trait
 pub trait Future {
@@ -105,24 +106,109 @@ macro_rules! await_future {
 }
 
 // Join multiple futures
-pub async fn join<F1, F2>(f1: F1, f2: F2) -> (F1::Output, F2::Output)
+pub fn join<F1, F2>(f1: F1, f2: F2) -> impl Future<Output = (F1::Output, F2::Output)>
 where
     F1: Future,
     F2: Future,
 {
-    let r1 = f1.await;
-    let r2 = f2.await;
-    (r1, r2)
+    Join {
+        f1: Some(f1),
+        f2: Some(f2),
+        r1: None,
+        r2: None,
+    }
 }
 
-// Select first completed future
-pub async fn select<F1, F2>(_f1: F1, _f2: F2) -> Either<F1::Output, F2::Output>
+pub struct Join<F1, F2>
 where
     F1: Future,
     F2: Future,
 {
-    // Implementation would poll both and return first ready
-    unimplemented!()
+    f1: Option<F1>,
+    f2: Option<F2>,
+    r1: Option<F1::Output>,
+    r2: Option<F2::Output>,
+}
+
+impl<F1, F2> Future for Join<F1, F2>
+where
+    F1: Future,
+    F2: Future,
+{
+    type Output = (F1::Output, F2::Output);
+
+    fn poll(&mut self, waker: &Waker) -> Poll<Self::Output> {
+        if self.r1.is_none() {
+            if let Some(mut f1) = self.f1.take() {
+                match f1.poll(waker) {
+                    Poll::Ready(r1) => self.r1 = Some(r1),
+                    Poll::Pending => {
+                        self.f1 = Some(f1);
+                        return Poll::Pending;
+                    }
+                }
+            }
+        }
+
+        if self.r2.is_none() {
+            if let Some(mut f2) = self.f2.take() {
+                match f2.poll(waker) {
+                    Poll::Ready(r2) => self.r2 = Some(r2),
+                    Poll::Pending => {
+                        self.f2 = Some(f2);
+                        return Poll::Pending;
+                    }
+                }
+            }
+        }
+
+        if self.r1.is_some() && self.r2.is_some() {
+            Poll::Ready((self.r1.take().unwrap(), self.r2.take().unwrap()))
+        } else {
+            Poll::Pending
+        }
+    }
+}
+
+
+// Select first completed future
+pub fn select<F1, F2>(f1: F1, f2: F2) -> impl Future<Output = Either<F1::Output, F2::Output>>
+where
+    F1: Future,
+    F2: Future,
+{
+    Select { f1: Some(f1), f2: Some(f2) }
+}
+
+pub struct Select<F1, F2> {
+    f1: Option<F1>,
+    f2: Option<F2>,
+}
+
+impl<F1, F2> Future for Select<F1, F2>
+where
+    F1: Future,
+    F2: Future,
+{
+    type Output = Either<F1::Output, F2::Output>;
+
+    fn poll(&mut self, waker: &Waker) -> Poll<Self::Output> {
+        if let Some(mut f1) = self.f1.take() {
+            match f1.poll(waker) {
+                Poll::Ready(r1) => return Poll::Ready(Either::Left(r1)),
+                Poll::Pending => self.f1 = Some(f1),
+            }
+        }
+
+        if let Some(mut f2) = self.f2.take() {
+            match f2.poll(waker) {
+                Poll::Ready(r2) => return Poll::Ready(Either::Right(r2)),
+                Poll::Pending => self.f2 = Some(f2),
+            }
+        }
+
+        Poll::Pending
+    }
 }
 
 pub enum Either<L, R> {
@@ -131,12 +217,45 @@ pub enum Either<L, R> {
 }
 
 // Timeout future
-pub async fn timeout<F>(_duration: Duration, _future: F) -> Result<F::Output, TimeoutError>
+pub fn timeout<F>(duration: Duration, future: F) -> impl Future<Output = std::result::Result<F::Output, TimeoutError>>
 where
     F: Future,
 {
-    // Implementation would race future against timer
-    unimplemented!()
+    Timeout {
+        future: Some(future),
+        deadline: std::time::Instant::now() + std::time::Duration::new(duration.secs, duration.nanos),
+    }
+}
+
+pub struct Timeout<F> {
+    future: Option<F>,
+    deadline: std::time::Instant,
+}
+
+impl<F> Future for Timeout<F>
+where
+    F: Future,
+{
+    type Output = std::result::Result<F::Output, TimeoutError>;
+
+    fn poll(&mut self, waker: &Waker) -> Poll<Self::Output> {
+        if let Some(mut future) = self.future.take() {
+            match future.poll(waker) {
+                Poll::Ready(res) => return Poll::Ready(Ok(res)),
+                Poll::Pending => self.future = Some(future),
+            }
+        }
+
+        if std::time::Instant::now() >= self.deadline {
+            Poll::Ready(Err(TimeoutError))
+        } else {
+            // This is not a good implementation of timeout,
+            // as it will spin until the deadline is reached.
+            // A proper implementation would use a timer.
+            waker.wake();
+            Poll::Pending
+        }
+    }
 }
 
 pub struct Duration {

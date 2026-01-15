@@ -24,6 +24,7 @@ pub mod verification;
 pub mod gpu;
 pub mod consteval;
 pub mod plugin;
+pub mod style_adapters;
 
 /// Compiler version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

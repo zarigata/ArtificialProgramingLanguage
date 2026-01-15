@@ -1,6 +1,6 @@
 //! Linker integration for creating executables
 
-use crate::error::{Result, CompilerError};
+use crate::error::{Result, Error, ErrorKind};
 use crate::codegen::target::TargetMachine;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -244,7 +244,7 @@ impl Linker {
         }
         
         if self.object_files.is_empty() {
-            return Err(CompilerError::CodegenError(
+            return Err(Error::new(ErrorKind::InternalError,
                 "No object files to link".to_string()
             ));
         }
@@ -254,13 +254,13 @@ impl Linker {
         println!("Linking: {:?}", cmd);
         
         let output = cmd.output()
-            .map_err(|e| CompilerError::CodegenError(
+            .map_err(|e| Error::new(ErrorKind::InternalError,
                 format!("Failed to run linker: {}", e)
             ))?;
         
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(CompilerError::CodegenError(
+            return Err(Error::new(ErrorKind::InternalError,
                 format!("Linker failed: {}", stderr)
             ));
         }
