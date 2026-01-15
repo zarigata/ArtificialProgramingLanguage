@@ -322,6 +322,38 @@ fn softmax(logits: &Vec<f32>) -> Vec<f32> {
       </div>
     </section>
 
+    <section id="download" class="reveal" style="background: linear-gradient(135deg, rgba(0,128,255,0.08), rgba(107,47,255,0.12)); border-top: 1px solid rgba(0,217,255,0.2);">
+      <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+        <div class="tag">Get Started Now</div>
+        <h2>Download VeZ</h2>
+        <p class="lead" style="margin: 0 auto 32px;">One-line installation for all platforms. Start building with VeZ in seconds.</p>
+        
+        <div id="download-buttons" class="cta-row" style="justify-content: center; margin-bottom: 24px;">
+          <!-- Platform-specific buttons will be inserted here by JavaScript -->
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-top: 24px;">
+          <h3 style="margin-top: 0; font-size: 18px; color: var(--cyan);">Quick Install</h3>
+          <div id="install-command" style="font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.5); padding: 16px; border-radius: 8px; text-align: left; position: relative; overflow-x: auto;">
+            <!-- Install command will be inserted here -->
+          </div>
+          <button id="copy-btn" class="btn btn-secondary" style="margin-top: 12px;" onclick="copyInstallCommand()">
+            📋 Copy Command
+          </button>
+        </div>
+
+        <div class="pill-row" style="justify-content: center; margin-top: 24px;">
+          <div class="pill">✅ Linux (x64, ARM64)</div>
+          <div class="pill">✅ macOS (Intel, Apple Silicon)</div>
+          <div class="pill">✅ Windows (x64)</div>
+        </div>
+
+        <p class="mini" style="margin-top: 20px;">
+          All releases include: <strong>vezc</strong> (compiler), <strong>vpm</strong> (package manager), <strong>vez-lsp</strong> (language server)
+        </p>
+      </div>
+    </section>
+
     <section id="metrics" class="reveal">
       <div class="tag">By The Numbers</div>
       <h2>Production-Ready Performance & Safety</h2>
@@ -633,6 +665,155 @@ $ ./target/release/vezc examples/fibonacci.zari</div>
       });
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Platform detection and download setup
+    const GITHUB_REPO = 'YOUR_USERNAME/VeZ'; // Update with actual repo
+    const INSTALL_SCRIPT_BASE = `https://raw.githubusercontent.com/${GITHUB_REPO}/main`;
+
+    function detectPlatform() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const platform = navigator.platform.toLowerCase();
+      
+      if (platform.includes('win') || userAgent.includes('windows')) {
+        return 'windows';
+      } else if (platform.includes('mac') || userAgent.includes('mac')) {
+        return 'macos';
+      } else if (platform.includes('linux') || userAgent.includes('linux')) {
+        return 'linux';
+      }
+      return 'linux'; // Default to Linux
+    }
+
+    function getInstallCommand(platform) {
+      switch(platform) {
+        case 'windows':
+          return `iwr -useb ${INSTALL_SCRIPT_BASE}/install.ps1 | iex`;
+        case 'macos':
+        case 'linux':
+          return `curl -fsSL ${INSTALL_SCRIPT_BASE}/install.sh | bash`;
+        default:
+          return `curl -fsSL ${INSTALL_SCRIPT_BASE}/install.sh | bash`;
+      }
+    }
+
+    function getDownloadUrl(platform) {
+      // This will be updated with actual release URLs
+      return `https://github.com/${GITHUB_REPO}/releases/latest`;
+    }
+
+    function setupDownloadButtons() {
+      const detectedPlatform = detectPlatform();
+      const buttonsContainer = document.getElementById('download-buttons');
+      const commandContainer = document.getElementById('install-command');
+      
+      // Platform configurations
+      const platforms = {
+        windows: {
+          name: 'Windows',
+          icon: '🪟',
+          ext: '.exe',
+          installer: 'MSI Installer'
+        },
+        macos: {
+          name: 'macOS',
+          icon: '🍎',
+          ext: '.dmg',
+          installer: 'DMG Package'
+        },
+        linux: {
+          name: 'Linux',
+          icon: '🐧',
+          ext: '.tar.gz',
+          installer: 'Binary Archive'
+        }
+      };
+
+      // Create download buttons for all platforms
+      let buttonsHTML = '';
+      Object.keys(platforms).forEach(platform => {
+        const config = platforms[platform];
+        const isPrimary = platform === detectedPlatform;
+        const btnClass = isPrimary ? 'btn-primary' : 'btn-secondary';
+        
+        buttonsHTML += `
+          <a class="btn ${btnClass}" 
+             href="${getDownloadUrl(platform)}" 
+             onclick="trackDownload('${platform}')"
+             style="${isPrimary ? 'font-size: 16px;' : ''}">
+            ${config.icon} Download for ${config.name}
+            ${isPrimary ? ' (Detected)' : ''}
+          </a>
+        `;
+      });
+      
+      buttonsContainer.innerHTML = buttonsHTML;
+
+      // Set install command
+      const installCmd = getInstallCommand(detectedPlatform);
+      commandContainer.innerHTML = `<code style="color: #00d9ff;">${installCmd}</code>`;
+      
+      // Store command for copying
+      window.currentInstallCommand = installCmd;
+    }
+
+    function copyInstallCommand() {
+      const command = window.currentInstallCommand;
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(command).then(() => {
+          const btn = document.getElementById('copy-btn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✅ Copied!';
+          btn.style.background = 'rgba(0, 217, 255, 0.2)';
+          
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = '';
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+          fallbackCopy(command);
+        });
+      } else {
+        fallbackCopy(command);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        const btn = document.getElementById('copy-btn');
+        btn.innerHTML = '✅ Copied!';
+        setTimeout(() => {
+          btn.innerHTML = '📋 Copy Command';
+        }, 2000);
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+      }
+      
+      document.body.removeChild(textarea);
+    }
+
+    function trackDownload(platform) {
+      // Analytics tracking (optional)
+      if (window.gtag) {
+        gtag('event', 'download', {
+          'event_category': 'Downloads',
+          'event_label': platform
+        });
+      }
+      console.log(`Download initiated for platform: ${platform}`);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', setupDownloadButtons);
   </script>
 </body>
 </html>
