@@ -158,8 +158,8 @@ impl LLVMCodegen {
         let ret_type = self.type_to_llvm(&function.return_type);
         let params: Vec<_> = function.params.iter()
             .enumerate()
-            .map(|(i, ty)| {
-                let param_name = format!("%arg{}", i);
+            .map(|(i, (name, ty))| {
+                let param_name = format!("%{}", name);
                 self.value_map.insert(ValueId(i), param_name.clone());
                 format!("{} {}", self.type_to_llvm(ty), param_name)
             })

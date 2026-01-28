@@ -1,11 +1,11 @@
 //! Integration tests for VeZ compiler
 
-use vez_compiler::lexer::Lexer;
-use vez_compiler::parser::Parser;
-use vez_compiler::semantic::Resolver;
-use vez_compiler::semantic::TypeChecker;
-use vez_compiler::borrow::BorrowChecker;
-use vez_compiler::ir::IrBuilder;
+use vezc::lexer::Lexer;
+use vezc::parser::Parser;
+use vezc::semantic::Resolver;
+use vezc::semantic::TypeChecker;
+use vezc::borrow::BorrowChecker;
+use vezc::ir::IrBuilder;
 
 /// Test complete compilation pipeline
 fn compile_source(source: &str) -> Result<String, String> {

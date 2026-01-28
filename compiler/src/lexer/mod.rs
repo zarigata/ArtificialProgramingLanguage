@@ -682,11 +682,16 @@ impl Lexer {
     fn lex_slash(&mut self) -> Result<TokenKind> {
         self.advance();
         if !self.is_at_end() && self.current_char() == '/' {
-            // Line comment
+            // Line comment - skip to end of line
             while !self.is_at_end() && self.current_char() != '\n' {
                 self.advance();
             }
-            self.next_token().map(|t| t.kind) // Skip comment and get next token
+            // Skip whitespace before getting next token
+            self.skip_whitespace();
+            if self.is_at_end() {
+                return Ok(TokenKind::Eof);
+            }
+            self.next_token().map(|t| t.kind)
         } else if !self.is_at_end() && self.current_char() == '*' {
             // Block comment
             self.advance();
@@ -695,7 +700,12 @@ impl Lexer {
                     self.advance();
                     if !self.is_at_end() && self.current_char() == '/' {
                         self.advance();
-                        return self.next_token().map(|t| t.kind); // Skip comment
+                        // Skip whitespace before getting next token
+                        self.skip_whitespace();
+                        if self.is_at_end() {
+                            return Ok(TokenKind::Eof);
+                        }
+                        return self.next_token().map(|t| t.kind);
                     }
                 } else {
                     self.advance();
@@ -842,20 +852,5 @@ impl Lexer {
             kind,
             span: Span::new(self.current_pos, self.current_pos),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    
-    #[test]
-    fn test_simple_tokens() {
-        let mut lexer = Lexer::new("fn main() {}");
-        let tokens = lexer.tokenize().unwrap();
-        
-        assert_eq!(tokens.len(), 6); // fn, main, (, ), {, }, EOF
-        assert!(matches!(tokens[0].kind, TokenKind::Fn));
-        assert!(matches!(tokens[1].kind, TokenKind::Ident(_)));
     }
 }

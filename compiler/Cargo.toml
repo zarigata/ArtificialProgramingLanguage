@@ -14,7 +14,7 @@ log = "0.4"
 [dev-dependencies]
 
 [lib]
-name = "vez_compiler"
+name = "vezc"
 path = "src/lib.rs"
 
 [[bin]]

@@ -36,5 +36,9 @@ pub const FILE_EXTENSION: &str = "zari";
 pub mod prelude {
     pub use crate::error::{Error, Result};
     pub use crate::span::{Span, Position};
-    pub use crate::driver::Compiler;
+    pub use crate::driver::{
+        Compiler, CompilerConfig, CompilationResult,
+        OutputType, OptLevel,
+        check_file, check_source, compile_to_llvm_ir,
+    };
 }

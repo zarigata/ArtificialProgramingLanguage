@@ -6,8 +6,9 @@ pub mod metal;
 pub mod vulkan;
 pub mod kernel;
 
-use crate::parser::ast::{self as ast, Stmt, Expr, Pattern, Literal, Type};
+use crate::parser::ast::{self as ast, Stmt, Expr, Literal};
 use crate::ir::ssa::{self as ir, Function, BasicBlock, ValueId, Value, Constant};
+use crate::ir::types::IrType;
 use crate::error::{Error, Result};
 use crate::ir::instructions::BinaryOp;
 
@@ -98,9 +99,9 @@ impl GpuCodegen {
             if i > 0 {
                 code.push_str(", ");
             }
-            code.push_str(&self.cuda_type(&param.ty)?);
+            code.push_str(&self.cuda_type(&param.1)?);
             code.push_str(" ");
-            code.push_str(&param.name);
+            code.push_str(&param.0);
         }
         
         code.push_str(") {\n");
@@ -135,9 +136,9 @@ impl GpuCodegen {
                 code.push_str(",\n");
             }
             code.push_str("    ");
-            code.push_str(&self.metal_type(&param.ty)?);
+            code.push_str(&self.metal_type(&param.1)?);
             code.push_str(" ");
-            code.push_str(&param.name);
+            code.push_str(&param.0);
             code.push_str(" [[buffer(");
             code.push_str(&i.to_string());
             code.push_str(")]]");
@@ -164,9 +165,9 @@ impl GpuCodegen {
         for (i, param) in func.params.iter().enumerate() {
             code.push_str(&format!("layout(binding = {}) buffer Buffer{} {{\n", i, i));
             code.push_str("    ");
-            code.push_str(&self.glsl_type(&param.ty)?);
+            code.push_str(&self.glsl_type(&param.1)?);
             code.push_str(" ");
-            code.push_str(&param.name);
+            code.push_str(&param.0);
             code.push_str("[];\n");
             code.push_str("};\n\n");
         }
@@ -205,9 +206,9 @@ impl GpuCodegen {
                 code.push_str(",\n");
             }
             code.push_str("    __global ");
-            code.push_str(&self.opencl_type(&param.ty)?);
+            code.push_str(&self.opencl_type(&param.1)?);
             code.push_str(" ");
-            code.push_str(&param.name);
+            code.push_str(&param.0);
         }
         
         code.push_str("\n) {\n");
@@ -227,59 +228,58 @@ impl GpuCodegen {
     
     fn generate_kernel_body(&self, func: &ir::Function) -> Result<String> {
         let mut code = String::new();
-        
-        // Generate body from function statements
-        for stmt in &func.body {
-            code.push_str(&self.generate_statement(stmt)?);
+
+        // Generate body from IR basic blocks
+        for block in &func.blocks {
+            for (value_id, instruction) in &block.instructions {
+                code.push_str(&self.generate_ir_instruction(value_id, instruction)?);
+            }
         }
-        
+
         Ok(code)
     }
-    
-    fn generate_statement(&self, stmt: &Stmt) -> Result<String> {
-        match stmt {
-            Stmt::Expr(expr) => {
-                Ok(format!("    {};\n", self.generate_expression(expr)?))
+
+    fn generate_ir_instruction(&self, value_id: &ValueId, instruction: &crate::ir::instructions::Instruction) -> Result<String> {
+        use crate::ir::instructions::Instruction;
+
+        match instruction {
+            Instruction::Binary { op, lhs, rhs, .. } => {
+                let op_str = self.ir_binary_op_str(op);
+                Ok(format!("    int v{} = v{} {} v{};\n", value_id.0, lhs.0, op_str, rhs.0))
             }
-            Stmt::Let(pattern, _, init) => {
-                let mut code = String::from("    ");
-                code.push_str(&self.generate_pattern(pattern)?);
-                if let Some(init_expr) = init {
-                    code.push_str(" = ");
-                    code.push_str(&self.generate_expression(init_expr)?);
-                }
-                code.push_str(";\n");
-                Ok(code)
+            Instruction::Return { value: Some(val) } => {
+                Ok(format!("    return v{};\n", val.0))
             }
-            _ => Ok(String::new()),
-        }
-    }
-    
-    fn generate_expression(&self, expr: &Expr) -> Result<String> {
-        match expr {
-            Expr::Literal(value) => {
-                match value {
-                    Literal::Int(n) => Ok(n.to_string()),
-                    Literal::Float(f) => Ok(f.to_string()),
-                    Literal::Bool(b) => Ok(b.to_string()),
-                    _ => Ok(String::new()),
-                }
+            Instruction::Return { value: None } => {
+                Ok("    return;\n".to_string())
             }
-            Expr::Ident(name) => Ok(name.clone()),
-            Expr::Binary(left, op, right) => {
-                let left_str = self.generate_expression(left)?;
-                let right_str = self.generate_expression(right)?;
-                let op_str = self.binary_op_str(op);
-                Ok(format!("({} {} {})", left_str, op_str, right_str))
+            Instruction::Load { ptr, .. } => {
+                Ok(format!("    int v{} = *v{};\n", value_id.0, ptr.0))
+            }
+            Instruction::Store { ptr, value } => {
+                Ok(format!("    *v{} = v{};\n", ptr.0, value.0))
+            }
+            Instruction::Alloca { .. } => {
+                Ok(format!("    // alloca v{}\n", value_id.0))
             }
             _ => Ok(String::new()),
         }
     }
-    
-    fn generate_pattern(&self, pattern: &Pattern) -> Result<String> {
-        match pattern {
-            Pattern::Ident(name) => Ok(name.clone()),
-            _ => Ok(String::new()),
+
+    fn ir_binary_op_str(&self, op: &BinaryOp) -> &str {
+        match op {
+            BinaryOp::Add => "+",
+            BinaryOp::Sub => "-",
+            BinaryOp::Mul => "*",
+            BinaryOp::Div => "/",
+            BinaryOp::Rem => "%",
+            BinaryOp::Eq => "==",
+            BinaryOp::Ne => "!=",
+            BinaryOp::Lt => "<",
+            BinaryOp::Le => "<=",
+            BinaryOp::Gt => ">",
+            BinaryOp::Ge => ">=",
+            _ => "",
         }
     }
     
@@ -300,55 +300,47 @@ impl GpuCodegen {
         }
     }
     
-    fn cuda_type(&self, ty: &Type) -> Result<String> {
+    fn cuda_type(&self, ty: &IrType) -> Result<String> {
         match ty {
-            Type::Named(name) => match name.as_str() {
-                "i32" => Ok("int".to_string()),
-                "i64" => Ok("long".to_string()),
-                "f32" => Ok("float".to_string()),
-                "f64" => Ok("double".to_string()),
-                _ => Ok("void".to_string()),
-            },
-            Type::Reference(inner) => Ok(format!("{}*", self.cuda_type(inner)?)),
+            IrType::I32 => Ok("int".to_string()),
+            IrType::I64 => Ok("long".to_string()),
+            IrType::F32 => Ok("float".to_string()),
+            IrType::F64 => Ok("double".to_string()),
+            IrType::Bool => Ok("bool".to_string()),
+            IrType::Pointer(inner) => Ok(format!("{}*", self.cuda_type(inner)?)),
             _ => Ok("void".to_string()),
         }
     }
-    
-    fn metal_type(&self, ty: &Type) -> Result<String> {
+
+    fn metal_type(&self, ty: &IrType) -> Result<String> {
         match ty {
-            Type::Named(name) => match name.as_str() {
-                "i32" => Ok("device int*".to_string()),
-                "i64" => Ok("device long*".to_string()),
-                "f32" => Ok("device float*".to_string()),
-                "f64" => Ok("device double*".to_string()),
-                _ => Ok("device void*".to_string()),
-            },
+            IrType::I32 => Ok("device int*".to_string()),
+            IrType::I64 => Ok("device long*".to_string()),
+            IrType::F32 => Ok("device float*".to_string()),
+            IrType::F64 => Ok("device double*".to_string()),
+            IrType::Pointer(inner) => Ok(format!("device {}*", self.metal_type(inner)?)),
             _ => Ok("device void*".to_string()),
         }
     }
-    
-    fn glsl_type(&self, ty: &Type) -> Result<String> {
+
+    fn glsl_type(&self, ty: &IrType) -> Result<String> {
         match ty {
-            Type::Named(name) => match name.as_str() {
-                "i32" => Ok("int".to_string()),
-                "i64" => Ok("int64_t".to_string()),
-                "f32" => Ok("float".to_string()),
-                "f64" => Ok("double".to_string()),
-                _ => Ok("void".to_string()),
-            },
+            IrType::I32 => Ok("int".to_string()),
+            IrType::I64 => Ok("int64_t".to_string()),
+            IrType::F32 => Ok("float".to_string()),
+            IrType::F64 => Ok("double".to_string()),
+            IrType::Bool => Ok("bool".to_string()),
             _ => Ok("void".to_string()),
         }
     }
-    
-    fn opencl_type(&self, ty: &Type) -> Result<String> {
+
+    fn opencl_type(&self, ty: &IrType) -> Result<String> {
         match ty {
-            Type::Named(name) => match name.as_str() {
-                "i32" => Ok("int*".to_string()),
-                "i64" => Ok("long*".to_string()),
-                "f32" => Ok("float*".to_string()),
-                "f64" => Ok("double*".to_string()),
-                _ => Ok("void*".to_string()),
-            },
+            IrType::I32 => Ok("int*".to_string()),
+            IrType::I64 => Ok("long*".to_string()),
+            IrType::F32 => Ok("float*".to_string()),
+            IrType::F64 => Ok("double*".to_string()),
+            IrType::Pointer(inner) => Ok(format!("{}*", self.opencl_type(inner)?)),
             _ => Ok("void*".to_string()),
         }
     }

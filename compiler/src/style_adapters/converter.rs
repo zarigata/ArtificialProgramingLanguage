@@ -266,7 +266,7 @@ fn format_stmt_python(stmt: &Stmt) -> String {
         Stmt::Return(None) => "return".to_string(),
         Stmt::Let(name, _, init) => {
             if let Some(e) = init {
-                format!("{} = {}", name, format_expr(expr))
+                format!("{} = {}", name, format_expr(e))
             } else {
                 format!("{} = None", name)
             }

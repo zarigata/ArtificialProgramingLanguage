@@ -4,7 +4,8 @@
 
 use clap::{Parser, ValueEnum};
 use std::path::PathBuf;
-use vezc::prelude::*;
+use vezc::driver::{Compiler, CompilerConfig, OutputType, OptLevel};
+use vezc::error::Result;
 
 #[derive(Parser)]
 #[command(name = "vezc")]
@@ -23,7 +24,7 @@ struct Cli {
     #[arg(short = 'O', long, default_value = "2")]
     opt_level: String,
 
-    /// Emit type (exe, lib, obj, llvm-ir, asm)
+    /// Emit type (exe, lib, obj, llvm-ir, asm, check)
     #[arg(long, default_value = "exe")]
     emit: EmitType,
 
@@ -64,6 +65,21 @@ enum EmitType {
     LlvmIr,
     /// Assembly
     Asm,
+    /// Check only (no output)
+    Check,
+}
+
+impl From<EmitType> for OutputType {
+    fn from(emit: EmitType) -> Self {
+        match emit {
+            EmitType::Exe => OutputType::Executable,
+            EmitType::Lib => OutputType::Object, // TODO: proper library support
+            EmitType::Obj => OutputType::Object,
+            EmitType::LlvmIr => OutputType::LlvmIr,
+            EmitType::Asm => OutputType::Assembly,
+            EmitType::Check => OutputType::Check,
+        }
+    }
 }
 
 fn main() {
@@ -100,28 +116,63 @@ fn main() {
         }
     }
 
-    // TODO: Create compiler configuration
+    // Parse optimization level
+    let opt_level = OptLevel::from_str(&cli.opt_level).unwrap_or_else(|| {
+        eprintln!("Warning: Invalid optimization level '{}', using O2", cli.opt_level);
+        OptLevel::O2
+    });
+
+    // Determine output type
+    let output_type = if cli.check {
+        OutputType::Check
+    } else {
+        cli.emit.into()
+    };
+
+    // Create compiler configuration
+    let config = CompilerConfig {
+        input_files: cli.input.clone(),
+        output_path: cli.output,
+        output_type,
+        opt_level,
+        target_triple: cli.target,
+        dump_ast: cli.dump_ast,
+        dump_ir: cli.dump_ir,
+        verbose: cli.verbose,
+    };
+
     log::info!("Compilation configuration:");
-    log::info!("  Optimization level: {}", cli.opt_level);
-    log::info!("  Emit type: {:?}", cli.emit);
-    log::info!("  Check only: {}", cli.check);
+    log::info!("  Optimization level: {:?}", config.opt_level);
+    log::info!("  Output type: {:?}", config.output_type);
 
-    // TODO: Initialize compiler
-    // let mut compiler = Compiler::new(config);
+    // Run compilation
+    match run_compilation(config) {
+        Ok(()) => {
+            log::info!("Compilation successful!");
+            println!("Compilation successful!");
+        }
+        Err(e) => {
+            eprintln!("Compilation failed: {}", e);
+            std::process::exit(1);
+        }
+    }
+}
 
-    // TODO: Run compilation
-    // match compiler.compile() {
-    //     Ok(_) => {
-    //         log::info!("Compilation successful!");
-    //     }
-    //     Err(e) => {
-    //         eprintln!("Compilation failed: {}", e);
-    //         std::process::exit(1);
-    //     }
-    // }
+fn run_compilation(config: CompilerConfig) -> Result<()> {
+    let mut compiler = Compiler::new(config);
+    let results = compiler.compile()?;
 
-    println!("VeZ compiler initialized successfully!");
-    println!("Note: Compiler implementation is in progress (Phase 1)");
-    println!("Input files: {:?}", cli.input);
-    println!("Output: {:?}", cli.output.unwrap_or_else(|| PathBuf::from("a.out")));
+    for result in results {
+        println!("Compiled: {}", result.source_path.display());
+
+        if let Some(output_file) = result.output_file {
+            println!("  Output: {}", output_file.display());
+        }
+
+        if let Some(ref llvm_ir) = result.llvm_ir {
+            log::debug!("Generated {} bytes of LLVM IR", llvm_ir.len());
+        }
+    }
+
+    Ok(())
 }

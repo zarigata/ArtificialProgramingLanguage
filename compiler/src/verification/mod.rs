@@ -358,12 +358,9 @@ mod tests {
     #[test]
     fn test_contract_creation() {
         let mut contract = Contract::new();
-        
-        let precond = Expr::Literal {
-            value: Literal::Bool(true),
-            span: Span::dummy(),
-        };
-        
+
+        let precond = Expr::Literal(Literal::Bool(true));
+
         contract.add_precondition(precond);
         assert_eq!(contract.requires.len(), 1);
     }

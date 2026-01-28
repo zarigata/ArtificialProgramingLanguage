@@ -53,18 +53,18 @@ impl IrBuilder {
     }
     
     fn build_function(&mut self, func: &Function) -> Result<()> {
-        // Convert parameter types
-        let param_types: Vec<IrType> = func.params.iter()
-            .map(|p| self.convert_type(&p.ty))
+        // Convert parameter types (with names)
+        let params: Vec<(String, IrType)> = func.params.iter()
+            .map(|p| (p.name.clone(), self.convert_type(&p.ty)))
             .collect();
-        
+
         // Convert return type
         let return_type = func.return_type.as_ref()
             .map(|ty| self.convert_type(ty))
             .unwrap_or(IrType::Void);
-        
+
         // Create IR function
-        let mut ir_func = IrFunction::new(func.name.clone(), param_types, return_type);
+        let mut ir_func = IrFunction::new(func.name.clone(), params, return_type);
         
         // Create entry block
         let entry_block = ir_func.add_named_block("entry".to_string());

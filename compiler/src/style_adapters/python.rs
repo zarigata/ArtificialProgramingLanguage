@@ -740,7 +740,7 @@ impl PyParser {
     }
 
     fn expect(&mut self, expected: PyToken) -> Result<()> {
-        if std::mem::discriminant(&self.current()) == std::mem::discriminant(&expected) {
+        if std::mem::discriminant(self.current()) == std::mem::discriminant(&expected) {
             self.advance();
             Ok(())
         } else {
