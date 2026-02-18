@@ -1,0 +1,377 @@
+## String Module
+## Provides comprehensive string manipulation functions
+
+## String builder for efficient string concatenation
+class StringBuilder:
+    def __init__(self):
+        self._parts = []
+        self._length = 0
+    
+    def append(self, s: string) -> StringBuilder:
+        self._parts.append(s)
+        self._length += len(s)
+        return self
+    
+    def append_char(self, c: char) -> StringBuilder:
+        self._parts.append(c)
+        self._length += 1
+        return self
+    
+    def append_line(self, s: string) -> StringBuilder:
+        self.append(s)
+        self.append_char('\n')
+        return self
+    
+    def append_format(self, fmt: string, *args) -> StringBuilder:
+        result = format(fmt, *args)
+        self.append(result)
+        return self
+    
+    def clear(self):
+        self._parts = []
+        self._length = 0
+    
+    def length(self) -> int:
+        return self._length
+    
+    def is_empty(self) -> bool:
+        return self._length == 0
+    
+    def build(self) -> string:
+        return ''.join(self._parts)
+    
+    def __str__(self) -> string:
+        return self.build()
+
+
+## String manipulation functions
+def len(s: string) -> int:
+    return s.__len__()
+
+def is_empty(s: string) -> bool:
+    return len(s) == 0
+
+def is_blank(s: string) -> bool:
+    return len(trim(s)) == 0
+
+def trim(s: string) -> string:
+    return s.strip()
+
+def trim_start(s: string) -> string:
+    return s.lstrip()
+
+def trim_end(s: string) -> string:
+    return s.rstrip()
+
+def lower(s: string) -> string:
+    return s.lower()
+
+def upper(s: string) -> string:
+    return s.upper()
+
+def capitalize(s: string) -> string:
+    if is_empty(s):
+        return s
+    return upper(s[0]) + lower(s[1:])
+
+def title(s: string) -> string:
+    return ' '.join(capitalize(word) for word in split(s, ' '))
+
+def reverse(s: string) -> string:
+    return s[::-1]
+
+def repeat(s: string, n: int) -> string:
+    return s * n
+
+def contains(s: string, substr: string) -> bool:
+    return substr in s
+
+def starts_with(s: string, prefix: string) -> bool:
+    return s.startswith(prefix)
+
+def ends_with(s: string, suffix: string) -> bool:
+    return s.endswith(suffix)
+
+def find(s: string, substr: string) -> int:
+    return s.find(substr)
+
+def find_last(s: string, substr: string) -> int:
+    return s.rfind(substr)
+
+def count(s: string, substr: string) -> int:
+    return s.count(substr)
+
+def replace(s: string, old: string, new: string) -> string:
+    return s.replace(old, new)
+
+def replace_all(s: string, old: string, new: string) -> string:
+    return s.replace(old, new)
+
+def split(s: string, sep: string) -> [string]:
+    return s.split(sep)
+
+def split_lines(s: string) -> [string]:
+    return s.splitlines()
+
+def split_whitespace(s: string) -> [string]:
+    return s.split()
+
+def join(parts: [string], sep: string) -> string:
+    return sep.join(parts)
+
+def slice(s: string, start: int, end: int = -1) -> string:
+    if end == -1:
+        return s[start:]
+    return s[start:end]
+
+def char_at(s: string, index: int) -> char:
+    return s[index]
+
+def chars(s: string) -> [char]:
+    return list(s)
+
+def from_chars(chars: [char]) -> string:
+    return ''.join(chars)
+
+def left(s: string, n: int) -> string:
+    return s[:n]
+
+def right(s: string, n: int) -> string:
+    return s[-n:] if n > 0 else ''
+
+def pad_left(s: string, width: int, char: char = ' ') -> string:
+    return s.rjust(width, char)
+
+def pad_right(s: string, width: int, char: char = ' ') -> string:
+    return s.ljust(width, char)
+
+def center(s: string, width: int, char: char = ' ') -> string:
+    return s.center(width, char)
+
+def truncate(s: string, max_len: int, suffix: string = '...') -> string:
+    if len(s) <= max_len:
+        return s
+    return s[:max_len - len(suffix)] + suffix
+
+def remove_prefix(s: string, prefix: string) -> string:
+    if starts_with(s, prefix):
+        return s[len(prefix):]
+    return s
+
+def remove_suffix(s: string, suffix: string) -> string:
+    if ends_with(s, suffix):
+        return s[:-len(suffix)]
+    return s
+
+def is_numeric(s: string) -> bool:
+    return s.isnumeric()
+
+def is_alpha(s: string) -> bool:
+    return s.isalpha()
+
+def is_alphanumeric(s: string) -> bool:
+    return s.isalnum()
+
+def is_whitespace(s: string) -> bool:
+    return s.isspace()
+
+def is_lower(s: string) -> bool:
+    return s.islower()
+
+def is_upper(s: string) -> bool:
+    return s.isupper()
+
+def is_ascii(s: string) -> bool:
+    return s.isascii()
+
+def to_int(s: string, base: int = 10) -> int:
+    return int(s, base)
+
+def to_float(s: string) -> float:
+    return float(s)
+
+def to_bool(s: string) -> bool:
+    lower_s = lower(s)
+    return lower_s in ['true', 'yes', '1', 'on']
+
+def escape(s: string) -> string:
+    result = StringBuilder()
+    for c in chars(s):
+        if c == '\n':
+            result.append('\\n')
+        elif c == '\t':
+            result.append('\\t')
+        elif c == '\r':
+            result.append('\\r')
+        elif c == '\\':
+            result.append('\\\\')
+        elif c == '"':
+            result.append('\\"')
+        else:
+            result.append_char(c)
+    return result.build()
+
+def unescape(s: string) -> string:
+    result = StringBuilder()
+    i = 0
+    cs = chars(s)
+    while i < len(cs):
+        c = cs[i]
+        if c == '\\' and i + 1 < len(cs):
+            next_c = cs[i + 1]
+            if next_c == 'n':
+                result.append_char('\n')
+            elif next_c == 't':
+                result.append_char('\t')
+            elif next_c == 'r':
+                result.append_char('\r')
+            elif next_c == '\\':
+                result.append_char('\\')
+            elif next_c == '"':
+                result.append_char('"')
+            else:
+                result.append_char(next_c)
+            i += 2
+        else:
+            result.append_char(c)
+            i += 1
+    return result.build()
+
+def format(template: string, *args) -> string:
+    result = StringBuilder()
+    arg_index = 0
+    i = 0
+    while i < len(template):
+        c = char_at(template, i)
+        if c == '{' and i + 1 < len(template):
+            if char_at(template, i + 1) == '{':
+                result.append_char('{')
+                i += 2
+            elif char_at(template, i + 1) == '}':
+                if arg_index < len(args):
+                    result.append(str(args[arg_index]))
+                    arg_index += 1
+                i += 2
+            else:
+                end = find(slice(template, i), '}')
+                if end != -1:
+                    spec = slice(template, i + 1, i + end)
+                    if is_numeric(spec):
+                        idx = to_int(spec)
+                        if idx < len(args):
+                            result.append(str(args[idx]))
+                    else:
+                        result.append('{')
+                        result.append(spec)
+                        result.append('}')
+                    i += end + 1
+                else:
+                    result.append_char(c)
+                    i += 1
+        else:
+            result.append_char(c)
+            i += 1
+    return result.build()
+
+def indent(s: string, prefix: string = '    ') -> string:
+    lines = split_lines(s)
+    return join([prefix + line for line in lines], '\n')
+
+def dedent(s: string) -> string:
+    lines = split_lines(s)
+    if is_empty(lines):
+        return s
+    
+    min_indent = -1
+    for line in lines:
+        if not is_blank(line):
+            indent = 0
+            for c in chars(line):
+                if c == ' ' or c == '\t':
+                    indent += 1
+                else:
+                    break
+            if min_indent == -1 or indent < min_indent:
+                min_indent = indent
+    
+    if min_indent <= 0:
+        return s
+    
+    result = [slice(line, min_indent) for line in lines]
+    return join(result, '\n')
+
+def wrap(s: string, width: int = 80) -> string:
+    words = split_whitespace(s)
+    lines = []
+    current_line = StringBuilder()
+    
+    for word in words:
+        if current_line.length() + len(word) + 1 > width:
+            if current_line.length() > 0:
+                lines.append(current_line.build())
+                current_line = StringBuilder()
+        if current_line.length() > 0:
+            current_line.append_char(' ')
+        current_line.append(word)
+    
+    if current_line.length() > 0:
+        lines.append(current_line.build())
+    
+    return join(lines, '\n')
+
+def similarity(s1: string, s2: string) -> float:
+    if s1 == s2:
+        return 1.0
+    
+    len1 = len(s1)
+    len2 = len(s2)
+    
+    if len1 == 0 or len2 == 0:
+        return 0.0
+    
+    matrix = [[0] * (len2 + 1) for _ in range(len1 + 1)]
+    
+    for i in range(len1 + 1):
+        matrix[i][0] = i
+    for j in range(len2 + 1):
+        matrix[0][j] = j
+    
+    for i in range(1, len1 + 1):
+        for j in range(1, len2 + 1):
+            cost = 0 if char_at(s1, i - 1) == char_at(s2, j - 1) else 1
+            matrix[i][j] = min(
+                matrix[i - 1][j] + 1,
+                matrix[i][j - 1] + 1,
+                matrix[i - 1][j - 1] + cost
+            )
+    
+    distance = matrix[len1][len2]
+    max_len = max(len1, len2)
+    return 1.0 - (distance / max_len)
+
+def levenshtein_distance(s1: string, s2: string) -> int:
+    if s1 == s2:
+        return 0
+    
+    len1 = len(s1)
+    len2 = len(s2)
+    
+    if len1 == 0:
+        return len2
+    if len2 == 0:
+        return len1
+    
+    prev_row = list(range(len2 + 1))
+    
+    for i in range(1, len1 + 1):
+        curr_row = [i] + [0] * len2
+        for j in range(1, len2 + 1):
+            cost = 0 if char_at(s1, i - 1) == char_at(s2, j - 1) else 1
+            curr_row[j] = min(
+                prev_row[j] + 1,
+                curr_row[j - 1] + 1,
+                prev_row[j - 1] + cost
+            )
+        prev_row = curr_row
+    
+    return prev_row[len2]

@@ -34,6 +34,12 @@ pub mod allocator;
 pub mod docgen;
 pub mod testing;
 pub mod formatter;
+pub mod linter;
+pub mod diagnostics;
+pub mod pgo;
+pub mod profiles;
+pub mod ffi;
+pub mod profiler;
 
 /// Compiler version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

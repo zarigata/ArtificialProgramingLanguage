@@ -1,0 +1,1066 @@
+## JSON Module
+## Provides JSON parsing, serialization, and manipulation
+
+## JSON value types
+enum JsonType:
+    Null
+    Bool
+    Number
+    String
+    Array
+    Object
+
+## Represents a JSON value
+class JsonValue:
+    def __init__(self):
+        self._type = JsonType.Null
+        self._bool_val = false
+        self._num_val = 0.0
+        self._str_val = ""
+        self._arr_val = []
+        self._obj_val = {}
+    
+    ## Create null value
+    def null() -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Null
+        return val
+    
+    ## Create boolean value
+    def from_bool(b: bool) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Bool
+        val._bool_val = b
+        return val
+    
+    ## Create number value from int
+    def from_int(n: int) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Number
+        val._num_val = float(n)
+        return val
+    
+    ## Create number value from float
+    def from_float(n: float) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Number
+        val._num_val = n
+        return val
+    
+    ## Create string value
+    def from_string(s: string) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.String
+        val._str_val = s
+        return val
+    
+    ## Create array value
+    def from_array(arr: [JsonValue]) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Array
+        val._arr_val = arr
+        return val
+    
+    ## Create object value
+    def from_object(obj: {string: JsonValue}) -> JsonValue:
+        val = JsonValue()
+        val._type = JsonType.Object
+        val._obj_val = obj
+        return val
+    
+    ## Get the type of this value
+    def type(self) -> JsonType:
+        return self._type
+    
+    ## Check if value is null
+    def is_null(self) -> bool:
+        return self._type == JsonType.Null
+    
+    ## Check if value is boolean
+    def is_bool(self) -> bool:
+        return self._type == JsonType.Bool
+    
+    ## Check if value is number
+    def is_number(self) -> bool:
+        return self._type == JsonType.Number
+    
+    ## Check if value is string
+    def is_string(self) -> bool:
+        return self._type == JsonType.String
+    
+    ## Check if value is array
+    def is_array(self) -> bool:
+        return self._type == JsonType.Array
+    
+    ## Check if value is object
+    def is_object(self) -> bool:
+        return self._type == JsonType.Object
+    
+    ## Get boolean value (returns false if not a bool)
+    def as_bool(self) -> bool:
+        if self._type == JsonType.Bool:
+            return self._bool_val
+        return false
+    
+    ## Get number as int (returns 0 if not a number)
+    def as_int(self) -> int:
+        if self._type == JsonType.Number:
+            return int(self._num_val)
+        return 0
+    
+    ## Get number as float (returns 0.0 if not a number)
+    def as_float(self) -> float:
+        if self._type == JsonType.Number:
+            return self._num_val
+        return 0.0
+    
+    ## Get string value (returns empty if not a string)
+    def as_string(self) -> string:
+        if self._type == JsonType.String:
+            return self._str_val
+        return ""
+    
+    ## Get array value (returns empty if not an array)
+    def as_array(self) -> [JsonValue]:
+        if self._type == JsonType.Array:
+            return self._arr_val
+        return []
+    
+    ## Get object value (returns empty if not an object)
+    def as_object(self) -> {string: JsonValue}:
+        if self._type == JsonType.Object:
+            return self._obj_val
+        return {}
+    
+    ## Get array element by index
+    def get(self, index: int) -> JsonValue:
+        if self._type == JsonType.Array and index >= 0 and index < len(self._arr_val):
+            return self._arr_val[index]
+        return JsonValue.null()
+    
+    ## Get object value by key
+    def get(self, key: string) -> JsonValue:
+        if self._type == JsonType.Object and key in self._obj_val:
+            return self._obj_val[key]
+        return JsonValue.null()
+    
+    ## Set array element
+    def set(self, index: int, value: JsonValue):
+        if self._type == JsonType.Array and index >= 0 and index < len(self._arr_val):
+            self._arr_val[index] = value
+    
+    ## Set object value
+    def set(self, key: string, value: JsonValue):
+        if self._type == JsonType.Object:
+            self._obj_val[key] = value
+    
+    ## Push value to array
+    def push(self, value: JsonValue):
+        if self._type == JsonType.Array:
+            self._arr_val.append(value)
+    
+    ## Get array length
+    def len(self) -> int:
+        if self._type == JsonType.Array:
+            return len(self._arr_val)
+        if self._type == JsonType.Object:
+            return len(self._obj_val)
+        return 0
+    
+    ## Check if object has key
+    def has(self, key: string) -> bool:
+        if self._type == JsonType.Object:
+            return key in self._obj_val
+        return false
+    
+    ## Get object keys
+    def keys(self) -> [string]:
+        if self._type == JsonType.Object:
+            return list(self._obj_val.keys())
+        return []
+    
+    ## Get object values
+    def values(self) -> [JsonValue]:
+        if self._type == JsonType.Object:
+            return list(self._obj_val.values())
+        return []
+    
+    ## Remove object key
+    def remove(self, key: string) -> bool:
+        if self._type == JsonType.Object and key in self._obj_val:
+            del self._obj_val[key]
+            return true
+        return false
+    
+    ## Deep clone this value
+    def clone(self) -> JsonValue:
+        result = JsonValue()
+        result._type = self._type
+        result._bool_val = self._bool_val
+        result._num_val = self._num_val
+        result._str_val = self._str_val
+        
+        if self._type == JsonType.Array:
+            result._arr_val = [v.clone() for v in self._arr_val]
+        elif self._type == JsonType.Object:
+            result._obj_val = {k: v.clone() for k, v in self._obj_val}
+        
+        return result
+    
+    ## Equality check
+    def __eq__(self, other: JsonValue) -> bool:
+        if self._type != other._type:
+            return false
+        
+        if self._type == JsonType.Null:
+            return true
+        elif self._type == JsonType.Bool:
+            return self._bool_val == other._bool_val
+        elif self._type == JsonType.Number:
+            return self._num_val == other._num_val
+        elif self._type == JsonType.String:
+            return self._str_val == other._str_val
+        elif self._type == JsonType.Array:
+            if len(self._arr_val) != len(other._arr_val):
+                return false
+            for i in range(len(self._arr_val)):
+                if self._arr_val[i] != other._arr_val[i]:
+                    return false
+            return true
+        elif self._type == JsonType.Object:
+            if len(self._obj_val) != len(other._obj_val):
+                return false
+            for k, v in self._obj_val:
+                if k not in other._obj_val or v != other._obj_val[k]:
+                    return false
+            return true
+        
+        return false
+
+
+## JSON parser result
+struct ParseResult:
+    value: JsonValue
+    error: string
+    pos: int
+    
+    def is_ok(self) -> bool:
+        return is_empty(self.error)
+    
+    def is_err(self) -> bool:
+        return not is_empty(self.error)
+
+
+## JSON parser
+class JsonParser:
+    def __init__(self, input: string):
+        self._input = input
+        self._pos = 0
+        self._len = len(input)
+    
+    ## Parse JSON string
+    def parse(self) -> ParseResult:
+        self._skip_whitespace()
+        
+        if self._pos >= self._len:
+            return ParseResult(JsonValue.null(), "Empty input", 0)
+        
+        value = self._parse_value()
+        
+        if value.is_null() and self._pos < self._len:
+            return ParseResult(value, format("Unexpected character at position {}", self._pos), self._pos)
+        
+        self._skip_whitespace()
+        
+        if self._pos < self._len:
+            return ParseResult(value, "Unexpected characters after JSON", self._pos)
+        
+        return ParseResult(value, "", self._pos)
+    
+    def _skip_whitespace(self):
+        while self._pos < self._len:
+            c = self._current()
+            if c == ' ' or c == '\t' or c == '\n' or c == '\r':
+                self._pos += 1
+            else:
+                break
+    
+    def _current(self) -> char:
+        if self._pos < self._len:
+            return self._input[self._pos]
+        return '\0'
+    
+    def _peek(self, offset: int = 1) -> char:
+        pos = self._pos + offset
+        if pos < self._len:
+            return self._input[pos]
+        return '\0'
+    
+    def _advance(self) -> char:
+        c = self._current()
+        self._pos += 1
+        return c
+    
+    def _parse_value(self) -> JsonValue:
+        self._skip_whitespace()
+        
+        if self._pos >= self._len:
+            return JsonValue.null()
+        
+        c = self._current()
+        
+        if c == 'n':
+            return self._parse_null()
+        elif c == 't':
+            return self._parse_true()
+        elif c == 'f':
+            return self._parse_false()
+        elif c == '"':
+            return self._parse_string()
+        elif c == '[':
+            return self._parse_array()
+        elif c == '{':
+            return self._parse_object()
+        elif c == '-' or (c >= '0' and c <= '9'):
+            return self._parse_number()
+        
+        return JsonValue.null()
+    
+    def _parse_null(self) -> JsonValue:
+        if self._match("null"):
+            return JsonValue.null()
+        return JsonValue.null()
+    
+    def _parse_true(self) -> JsonValue:
+        if self._match("true"):
+            return JsonValue.from_bool(true)
+        return JsonValue.null()
+    
+    def _parse_false(self) -> JsonValue:
+        if self._match("false"):
+            return JsonValue.from_bool(false)
+        return JsonValue.null()
+    
+    def _match(self, s: string) -> bool:
+        if self._pos + len(s) <= self._len:
+            substr = slice(self._input, self._pos, self._pos + len(s))
+            if substr == s:
+                self._pos += len(s)
+                return true
+        return false
+    
+    def _parse_string(self) -> JsonValue:
+        if self._current() != '"':
+            return JsonValue.null()
+        
+        self._advance()  # Skip opening quote
+        
+        result = StringBuilder()
+        
+        while self._pos < self._len:
+            c = self._current()
+            
+            if c == '"':
+                self._advance()  # Skip closing quote
+                return JsonValue.from_string(result.build())
+            elif c == '\\':
+                self._advance()
+                escaped = self._parse_escape()
+                if escaped != '\0':
+                    result.append_char(escaped)
+            else:
+                result.append_char(c)
+                self._advance()
+        
+        return JsonValue.null()  # Unclosed string
+    
+    def _parse_escape(self) -> char:
+        if self._pos >= self._len:
+            return '\0'
+        
+        c = self._advance()
+        
+        if c == '"':
+            return '"'
+        elif c == '\\':
+            return '\\'
+        elif c == '/':
+            return '/'
+        elif c == 'b':
+            return '\b'
+        elif c == 'f':
+            return '\f'
+        elif c == 'n':
+            return '\n'
+        elif c == 'r':
+            return '\r'
+        elif c == 't':
+            return '\t'
+        elif c == 'u':
+            # Unicode escape \uXXXX
+            if self._pos + 4 <= self._len:
+                hex = slice(self._input, self._pos, self._pos + 4)
+                self._pos += 4
+                code = hex_to_int(hex)
+                return unicode_to_char(code)
+        
+        return '\0'
+    
+    def _parse_number(self) -> JsonValue:
+        start = self._pos
+        has_dot = false
+        has_exp = false
+        
+        if self._current() == '-':
+            self._advance()
+        
+        # Integer part
+        if self._current() == '0':
+            self._advance()
+        elif self._current() >= '1' and self._current() <= '9':
+            while self._pos < self._len and self._current() >= '0' and self._current() <= '9':
+                self._advance()
+        
+        # Decimal part
+        if self._current() == '.':
+            has_dot = true
+            self._advance()
+            while self._pos < self._len and self._current() >= '0' and self._current() <= '9':
+                self._advance()
+        
+        # Exponent part
+        if self._current() == 'e' or self._current() == 'E':
+            has_exp = true
+            self._advance()
+            if self._current() == '+' or self._current() == '-':
+                self._advance()
+            while self._pos < self._len and self._current() >= '0' and self._current() <= '9':
+                self._advance()
+        
+        num_str = slice(self._input, start, self._pos)
+        
+        if has_dot or has_exp:
+            return JsonValue.from_float(to_float(num_str))
+        else:
+            return JsonValue.from_int(to_int(num_str))
+    
+    def _parse_array(self) -> JsonValue:
+        if self._current() != '[':
+            return JsonValue.null()
+        
+        self._advance()  # Skip [
+        self._skip_whitespace()
+        
+        arr = []
+        
+        if self._current() == ']':
+            self._advance()
+            return JsonValue.from_array(arr)
+        
+        while true:
+            value = self._parse_value()
+            arr.append(value)
+            
+            self._skip_whitespace()
+            
+            if self._current() == ']':
+                self._advance()
+                break
+            
+            if self._current() != ',':
+                break
+            
+            self._advance()  # Skip ,
+            self._skip_whitespace()
+        
+        return JsonValue.from_array(arr)
+    
+    def _parse_object(self) -> JsonValue:
+        if self._current() != '{':
+            return JsonValue.null()
+        
+        self._advance()  # Skip {
+        self._skip_whitespace()
+        
+        obj = {}
+        
+        if self._current() == '}':
+            self._advance()
+            return JsonValue.from_object(obj)
+        
+        while true:
+            self._skip_whitespace()
+            
+            if self._current() != '"':
+                break
+            
+            key_val = self._parse_string()
+            key = key_val.as_string()
+            
+            self._skip_whitespace()
+            
+            if self._current() != ':':
+                break
+            
+            self._advance()  # Skip :
+            
+            value = self._parse_value()
+            obj[key] = value
+            
+            self._skip_whitespace()
+            
+            if self._current() == '}':
+                self._advance()
+                break
+            
+            if self._current() != ',':
+                break
+            
+            self._advance()  # Skip ,
+        
+        return JsonValue.from_object(obj)
+
+
+## JSON serializer
+class JsonSerializer:
+    def __init__(self, pretty: bool = false, indent: string = "  "):
+        self._pretty = pretty
+        self._indent = indent
+        self._level = 0
+    
+    ## Serialize JsonValue to string
+    def serialize(self, value: JsonValue) -> string:
+        self._level = 0
+        return self._serialize_value(value)
+    
+    def _serialize_value(self, value: JsonValue) -> string:
+        if value.is_null():
+            return "null"
+        elif value.is_bool():
+            return "true" if value.as_bool() else "false"
+        elif value.is_number():
+            f = value.as_float()
+            i = value.as_int()
+            if float(i) == f:
+                return str(i)
+            return str(f)
+        elif value.is_string():
+            return self._serialize_string(value.as_string())
+        elif value.is_array():
+            return self._serialize_array(value.as_array())
+        elif value.is_object():
+            return self._serialize_object(value.as_object())
+        return "null"
+    
+    def _serialize_string(self, s: string) -> string:
+        result = StringBuilder()
+        result.append_char('"')
+        
+        for c in chars(s):
+            if c == '"':
+                result.append('\\"')
+            elif c == '\\':
+                result.append('\\\\')
+            elif c == '\b':
+                result.append('\\b')
+            elif c == '\f':
+                result.append('\\f')
+            elif c == '\n':
+                result.append('\\n')
+            elif c == '\r':
+                result.append('\\r')
+            elif c == '\t':
+                result.append('\\t')
+            elif ord(c) < 32:
+                result.append(format('\\u{:04x}', ord(c)))
+            else:
+                result.append_char(c)
+        
+        result.append_char('"')
+        return result.build()
+    
+    def _serialize_array(self, arr: [JsonValue]) -> string:
+        if is_empty(arr):
+            return "[]"
+        
+        result = StringBuilder()
+        
+        if self._pretty:
+            result.append('[\n')
+            self._level += 1
+            
+            for i, value in enumerate(arr):
+                result.append(self._indent_str())
+                result.append(self._serialize_value(value))
+                if i < len(arr) - 1:
+                    result.append(',')
+                result.append('\n')
+            
+            self._level -= 1
+            result.append(self._indent_str())
+            result.append(']')
+        else:
+            result.append('[')
+            
+            for i, value in enumerate(arr):
+                if i > 0:
+                    result.append(',')
+                result.append(self._serialize_value(value))
+            
+            result.append(']')
+        
+        return result.build()
+    
+    def _serialize_object(self, obj: {string: JsonValue}) -> string:
+        if is_empty(obj):
+            return "{}"
+        
+        result = StringBuilder()
+        keys = list(obj.keys())
+        
+        if self._pretty:
+            result.append('{\n')
+            self._level += 1
+            
+            for i, key in enumerate(keys):
+                result.append(self._indent_str())
+                result.append(self._serialize_string(key))
+                result.append(': ')
+                result.append(self._serialize_value(obj[key]))
+                if i < len(keys) - 1:
+                    result.append(',')
+                result.append('\n')
+            
+            self._level -= 1
+            result.append(self._indent_str())
+            result.append('}')
+        else:
+            result.append('{')
+            
+            for i, key in enumerate(keys):
+                if i > 0:
+                    result.append(',')
+                result.append(self._serialize_string(key))
+                result.append(':')
+                result.append(self._serialize_value(obj[key]))
+            
+            result.append('}')
+        
+        return result.build()
+    
+    def _indent_str(self) -> string:
+        return repeat(self._indent, self._level)
+
+
+## Parsing functions
+
+## Parse JSON string into JsonValue
+def parse(json_str: string) -> JsonValue:
+    parser = JsonParser(json_str)
+    result = parser.parse()
+    return result.value
+
+## Parse JSON string with error handling
+def parse_safe(json_str: string) -> ParseResult:
+    parser = JsonParser(json_str)
+    return parser.parse()
+
+## Parse JSON file
+def parse_file(path: string) -> JsonValue:
+    content = read_file(path)
+    return parse(content)
+
+## Check if string is valid JSON
+def is_valid(json_str: string) -> bool:
+    result = parse_safe(json_str)
+    return result.is_ok()
+
+
+## Serialization functions
+
+## Serialize JsonValue to JSON string
+def stringify(value: JsonValue) -> string:
+    serializer = JsonSerializer()
+    return serializer.serialize(value)
+
+## Serialize JsonValue to pretty-printed JSON string
+def stringify_pretty(value: JsonValue, indent: string = "  ") -> string:
+    serializer = JsonSerializer(pretty=true, indent=indent)
+    return serializer.serialize(value)
+
+## Write JsonValue to file
+def write_file(path: string, value: JsonValue, pretty: bool = false):
+    content = stringify_pretty(value) if pretty else stringify(value)
+    write_file(path, content)
+
+
+## Builder pattern for constructing JSON
+
+class JsonBuilder:
+    def __init__(self):
+        self._value = JsonValue.null()
+    
+    ## Start building an object
+    def object(self) -> JsonBuilder:
+        self._value = JsonValue.from_object({})
+        return self
+    
+    ## Start building an array
+    def array(self) -> JsonBuilder:
+        self._value = JsonValue.from_array([])
+        return self
+    
+    ## Add key-value pair to object
+    def put(self, key: string, value: JsonValue) -> JsonBuilder:
+        if self._value.is_object():
+            self._value.set(key, value)
+        return self
+    
+    ## Add null value
+    def put_null(self, key: string) -> JsonBuilder:
+        return self.put(key, JsonValue.null())
+    
+    ## Add boolean value
+    def put_bool(self, key: string, value: bool) -> JsonBuilder:
+        return self.put(key, JsonValue.from_bool(value))
+    
+    ## Add int value
+    def put_int(self, key: string, value: int) -> JsonBuilder:
+        return self.put(key, JsonValue.from_int(value))
+    
+    ## Add float value
+    def put_float(self, key: string, value: float) -> JsonBuilder:
+        return self.put(key, JsonValue.from_float(value))
+    
+    ## Add string value
+    def put_string(self, key: string, value: string) -> JsonBuilder:
+        return self.put(key, JsonValue.from_string(value))
+    
+    ## Add nested object
+    def put_object(self, key: string) -> JsonBuilder:
+        nested = JsonBuilder().object()
+        self.put(key, nested.build())
+        return nested
+    
+    ## Add nested array
+    def put_array(self, key: string) -> JsonBuilder:
+        nested = JsonBuilder().array()
+        self.put(key, nested.build())
+        return nested
+    
+    ## Push value to array
+    def push(self, value: JsonValue) -> JsonBuilder:
+        if self._value.is_array():
+            self._value.push(value)
+        return self
+    
+    ## Push null to array
+    def push_null(self) -> JsonBuilder:
+        return self.push(JsonValue.null())
+    
+    ## Push bool to array
+    def push_bool(self, value: bool) -> JsonBuilder:
+        return self.push(JsonValue.from_bool(value))
+    
+    ## Push int to array
+    def push_int(self, value: int) -> JsonBuilder:
+        return self.push(JsonValue.from_int(value))
+    
+    ## Push float to array
+    def push_float(self, value: float) -> JsonBuilder:
+        return self.push(JsonValue.from_float(value))
+    
+    ## Push string to array
+    def push_string(self, value: string) -> JsonBuilder:
+        return self.push(JsonValue.from_string(value))
+    
+    ## Build final JsonValue
+    def build(self) -> JsonValue:
+        return self._value
+    
+    ## Build and serialize to string
+    def to_string(self) -> string:
+        return stringify(self._value)
+    
+    ## Build and serialize to pretty string
+    def to_pretty(self) -> string:
+        return stringify_pretty(self._value)
+
+
+## Path-based JSON querying
+
+## Get value at JSON path (e.g., "users.0.name")
+def get_path(value: JsonValue, path: string) -> JsonValue:
+    parts = split(path, '.')
+    current = value
+    
+    for part in parts:
+        if current.is_null():
+            return JsonValue.null()
+        
+        if is_numeric(part):
+            index = to_int(part)
+            if current.is_array():
+                current = current.get(index)
+            else:
+                return JsonValue.null()
+        else:
+            if current.is_object():
+                current = current.get(part)
+            else:
+                return JsonValue.null()
+    
+    return current
+
+## Set value at JSON path
+def set_path(value: JsonValue, path: string, new_val: JsonValue) -> bool:
+    parts = split(path, '.')
+    
+    if is_empty(parts):
+        return false
+    
+    # Navigate to parent
+    current = value
+    for i in range(len(parts) - 1):
+        part = parts[i]
+        if is_numeric(part):
+            index = to_int(part)
+            if current.is_array():
+                current = current.get(index)
+            else:
+                return false
+        else:
+            if current.is_object():
+                current = current.get(part)
+            else:
+                return false
+    
+    # Set final value
+    final_key = parts[-1]
+    if is_numeric(final_key):
+        index = to_int(final_key)
+        if current.is_array():
+            current.set(index, new_val)
+            return true
+    else:
+        if current.is_object():
+            current.set(final_key, new_val)
+            return true
+    
+    return false
+
+
+## JSON merging and transformation
+
+## Deep merge two JSON objects
+def merge(base: JsonValue, override: JsonValue) -> JsonValue:
+    if not base.is_object() or not override.is_object():
+        return override.clone()
+    
+    result = base.clone()
+    
+    for key, value in override.as_object():
+        if result.has(key):
+            base_val = result.get(key)
+            if base_val.is_object() and value.is_object():
+                result.set(key, merge(base_val, value))
+            else:
+                result.set(key, value.clone())
+        else:
+            result.set(key, value.clone())
+    
+    return result
+
+## Filter object keys by predicate
+def filter_keys(value: JsonValue, predicate: (string) -> bool) -> JsonValue:
+    if not value.is_object():
+        return JsonValue.null()
+    
+    result = {}
+    for key, val in value.as_object():
+        if predicate(key):
+            result[key] = val
+    
+    return JsonValue.from_object(result)
+
+## Map array values
+def map_array(value: JsonValue, mapper: (JsonValue) -> JsonValue) -> JsonValue:
+    if not value.is_array():
+        return JsonValue.null()
+    
+    result = []
+    for item in value.as_array():
+        result.append(mapper(item))
+    
+    return JsonValue.from_array(result)
+
+## Filter array values
+def filter_array(value: JsonValue, predicate: (JsonValue) -> bool) -> JsonValue:
+    if not value.is_array():
+        return JsonValue.null()
+    
+    result = []
+    for item in value.as_array():
+        if predicate(item):
+            result.append(item)
+    
+    return JsonValue.from_array(result)
+
+## Reduce array to single value
+def reduce_array(value: JsonValue, reducer: (JsonValue, JsonValue) -> JsonValue, initial: JsonValue) -> JsonValue:
+    if not value.is_array():
+        return initial
+    
+    acc = initial
+    for item in value.as_array():
+        acc = reducer(acc, item)
+    
+    return acc
+
+## Find in array
+def find_in_array(value: JsonValue, predicate: (JsonValue) -> bool) -> JsonValue:
+    if not value.is_array():
+        return JsonValue.null()
+    
+    for item in value.as_array():
+        if predicate(item):
+            return item
+    
+    return JsonValue.null()
+
+## Check if any array element matches
+def any_in_array(value: JsonValue, predicate: (JsonValue) -> bool) -> bool:
+    if not value.is_array():
+        return false
+    
+    for item in value.as_array():
+        if predicate(item):
+            return true
+    
+    return false
+
+## Check if all array elements match
+def all_in_array(value: JsonValue, predicate: (JsonValue) -> bool) -> bool:
+    if not value.is_array():
+        return false
+    
+    for item in value.as_array():
+        if not predicate(item):
+            return false
+    
+    return true
+
+## Flatten nested arrays
+def flatten(value: JsonValue) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    result = []
+    for item in value.as_array():
+        if item.is_array():
+            flat = flatten(item)
+            for sub in flat.as_array():
+                result.append(sub)
+        else:
+            result.append(item)
+    
+    return JsonValue.from_array(result)
+
+## Get unique values from array
+def unique(value: JsonValue) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    seen = []
+    result = []
+    
+    for item in value.as_array():
+        is_dup = false
+        for s in seen:
+            if s == item:
+                is_dup = true
+                break
+        
+        if not is_dup:
+            seen.append(item)
+            result.append(item)
+    
+    return JsonValue.from_array(result)
+
+## Sort array (requires comparator)
+def sort_array(value: JsonValue, comparator: (JsonValue, JsonValue) -> int) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    arr = value.as_array().copy()
+    arr.sort(comparator)
+    return JsonValue.from_array(arr)
+
+## Reverse array
+def reverse_array(value: JsonValue) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    arr = value.as_array().copy()
+    arr.reverse()
+    return JsonValue.from_array(arr)
+
+## Take first n elements
+def take(value: JsonValue, n: int) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    arr = value.as_array()
+    return JsonValue.from_array(arr[:n])
+
+## Skip first n elements
+def skip(value: JsonValue, n: int) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    arr = value.as_array()
+    return JsonValue.from_array(arr[n:])
+
+## Slice array
+def slice_array(value: JsonValue, start: int, end: int) -> JsonValue:
+    if not value.is_array():
+        return value
+    
+    arr = value.as_array()
+    return JsonValue.from_array(arr[start:end])
+
+
+## Conversion helpers
+
+## Convert array of JsonValue to string array
+def to_string_array(value: JsonValue) -> [string]:
+    if not value.is_array():
+        return []
+    
+    return [item.as_string() for item in value.as_array()]
+
+## Convert array of JsonValue to int array
+def to_int_array(value: JsonValue) -> [int]:
+    if not value.is_array():
+        return []
+    
+    return [item.as_int() for item in value.as_array()]
+
+## Convert array of JsonValue to float array
+def to_float_array(value: JsonValue) -> [float]:
+    if not value.is_array():
+        return []
+    
+    return [item.as_float() for item in value.as_array()]
+
+## Convert string array to JsonValue array
+def from_string_array(arr: [string]) -> JsonValue:
+    return JsonValue.from_array([JsonValue.from_string(s) for s in arr])
+
+## Convert int array to JsonValue array
+def from_int_array(arr: [int]) -> JsonValue:
+    return JsonValue.from_array([JsonValue.from_int(n) for n in arr])
+
+## Convert float array to JsonValue array
+def from_float_array(arr: [float]) -> JsonValue:
+    return JsonValue.from_array([JsonValue.from_float(n) for n in arr])

@@ -193,75 +193,92 @@ public class FSTest {
          # Automatic deallocation at region end
      ```
 
-## Recent Updates & Features (v0.2.0)
+## Recent Updates & Features (v0.3.0)
 
-### Compiler Optimizations
-- **Loop Unrolling & Strength Reduction**: Automatic transformation of loops for better performance
-- **SIMD Vectorization**: Auto-vectorization for AVX, AVX2, AVX-512, and NEON instruction sets
-- **Devirtualization**: Virtual call optimization for polymorphic code
-- **Escape Analysis**: Stack allocation optimization with scalar replacement
-
-### Effect System
-Track and verify side effects at compile time:
+### Standard Library Expansion
+Comprehensive standard library with essential modules:
 ```zari
-@effects[IO, State]
-def process_file(path: string) -> Result<Data, Error>:
-    content = read_file(path)
-    return parse(content)
+use std::string::{StringBuilder, format, split, join}
+use std::datetime::{Date, Time, DateTime, Duration, Stopwatch}
+use std::json::{JsonValue, parse, stringify, JsonBuilder}
+
+# String operations
+let sb = StringBuilder().append("Hello").append(" World")
+let parts = split("a,b,c", ",")
+
+# DateTime handling
+let now = DateTime.now()
+let formatted = now.format("%Y-%m-%d %H:%M:%S")
+let elapsed = Stopwatch().time(|| expensive_operation())
+
+# JSON processing
+let data = parse('{"name": "Alice", "age": 30}')
+let json = JsonBuilder().object().put_string("key", "value").to_string()
 ```
 
-### Dependent Types
-Type-level naturals for compile-time bounds checking:
-```zari
-def safe_index(arr: [T; N], i: Nat where i < N) -> T:
-    return arr[i]  # Compile-time verified safe access
+### Enhanced Error Diagnostics
+Intelligent suggestions for common errors:
+```
+error[E0001]: cannot find value `prnt` in this scope
+  = help: did you mean `print`?
+  = note: variables must be declared before use
 ```
 
-### Hardware Intrinsics
-Direct CPU/GPU intrinsics for maximum performance:
-```zari
-# SIMD operations
-let result = simd_add_f32x8(a, b)
-
-# GPU compute
-@gpu_kernel(block_size=256)
-def parallel_reduce(data: [f32]) -> f32
-
-# Atomic operations
-let old = atomic_compare_exchange(ptr, expected, new, AcqRel, Acquire)
-```
-
-### Deterministic Execution Scheduler
-Real-time scheduling with EDF (Earliest Deadline First) and Rate Monotonic policies:
-```zari
-@realtime(policy=EDF, deadline=10ms)
-def control_loop():
-    # Guaranteed to complete within deadline
-    actuator.update(sensor.read())
-```
-
-### Region-Based Memory Allocator
-Zero-cost memory safety without garbage collection:
-```zari
-region temp:
-    buffer = alloc(1024)
-    process(buffer)
-    # Automatic cleanup at region end
-```
-
-### Documentation Generator
-Auto-generate HTML/Markdown docs from source:
+### Profile-Guided Optimization (PGO)
+Runtime profile data for better optimizations:
 ```bash
-vezc doc src/ -o docs/api/
+# Build instrumented binary
+vezc build --profile-generate=profile.profdata
+
+# Run representative workload
+./my_program
+
+# Optimize with profile data
+vezc build --profile-use=profile.profdata --release
 ```
 
-### Documentation Generator
-Auto-generate HTML/Markdown docs from source:
+### Build Profiles System
+Predefined profiles for different scenarios:
 ```bash
-vezc doc src/ -o docs/api/
+vezc build --profile debug      # Fast compilation, full debug info
+vezc build --profile release    # Maximum optimization
+vezc build --profile profiling  # Optimized with debug info
+vezc build --profile min-size   # Optimize for binary size
 ```
 
-### Professional Testing Framework
+### FFI Improvements for C Interop
+Seamless C integration:
+```zari
+extern "C":
+    fn malloc(size: usize) -> *mut void
+    fn free(ptr: *mut void)
+    fn printf(fmt: *const char, ...) -> int
+
+# Generate C headers from VeZ code
+vezc ffi --export-header mylib.h
+```
+
+### Profiler Integration
+Built-in profiling support:
+```zari
+use std::profiler::{ProfilerSession, ProfilerConfig, ReportGenerator}
+
+let config = ProfilerConfig {
+    profiler_type: CpuSample,
+    sample_frequency: 99,
+    output_path: "profile.data",
+}
+
+let session = ProfilerSession(config)
+session.start()
+# ... run code ...
+session.stop()
+
+let analysis = session.analyze()
+println(ReportGenerator.generate_html(analysis))
+```
+
+### Professional Testing Framework (v0.2.1)
 Comprehensive testing infrastructure:
 ```zari
 # Assertions

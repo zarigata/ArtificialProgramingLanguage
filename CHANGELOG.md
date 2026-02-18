@@ -5,6 +5,87 @@ All notable changes to the VeZ Programming Language will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-02-18
+
+### Added
+
+#### Standard Library Expansion
+- **String Module** (`stdlib/string.zari`)
+  - StringBuilder class for efficient concatenation
+  - 50+ string manipulation functions
+  - trim, split, join, format, escape/unescape
+  - Levenshtein distance and similarity scoring
+  - Type conversions (to_int, to_float, to_bool)
+
+- **DateTime Module** (`stdlib/datetime.zari`)
+  - Duration type with time unit conversions
+  - Date struct with calendar operations
+  - Time struct for time of day
+  - DateTime struct combining date and time
+  - Stopwatch for measuring elapsed time
+  - Format strings (%Y, %m, %d, %H, %M, %S, etc.)
+  - Utility functions: age, is_leap_year, days_between
+
+- **JSON Module** (`stdlib/json.zari`)
+  - JsonValue class for any JSON type
+  - JSON parser with error handling
+  - JSON serialization (compact and pretty)
+  - JsonBuilder for constructing complex JSON
+  - Query and transform functions (map_array, filter_array)
+  - Path-based access (get_path)
+
+#### Enhanced Diagnostics
+- **Suggestion Engine** (`compiler/src/diagnostics/suggestions.rs`)
+  - Intelligent typo correction
+  - Type mismatch suggestions with common fixes
+  - Import suggestions for missing modules
+  - Spell checking using Levenshtein distance
+  - Common mistake pattern database
+
+#### Profile-Guided Optimization (PGO)
+- **PGO Support** (`compiler/src/pgo/mod.rs`)
+  - Profile data collection and storage
+  - Function/block execution counting
+  - Branch probability tracking
+  - Loop iteration profiling
+  - Value profiling for indirect calls
+  - PGO optimizer with hot/cold code detection
+  - Inlining recommendations based on profile data
+  - Profile data file I/O (Text and JSON formats)
+
+#### Build Profiles System
+- **Build Profiles** (`compiler/src/profiles/mod.rs`)
+  - Predefined profiles: debug, release, profiling, bench, min-size
+  - Optimization levels (O0, O1, O2, O3, Os, Oz)
+  - Debug info levels (none, line-tables, full, maximum)
+  - LTO modes (none, thin, full)
+  - Panic strategies (unwind, abort)
+  - Profile manager with load/save to TOML
+  - Build configuration with source/output directories
+
+#### FFI Improvements
+- **FFI Module** (`compiler/src/ffi/mod.rs`)
+  - C type representation (primitives, pointers, arrays, structs)
+  - Type size and alignment calculation
+  - VeZ type conversion
+  - FFI bindings generation
+  - C header file generation
+  - C header parser for automatic binding extraction
+
+#### Profiler Integration
+- **Profiler Module** (`compiler/src/profiler/mod.rs`)
+  - Multiple profiler types (CPU, memory, heap, lock, I/O, GPU)
+  - Profile session management
+  - Sample recording and statistics
+  - Hot function/path detection
+  - Memory allocation tracking
+  - Report generation (Text, JSON, HTML)
+  - Instrumentation helpers
+
+### Dependencies
+- Added `serde` and `serde_json` for serialization
+- Added `toml` for configuration files
+
 ## [0.2.1] - 2025-02-18
 
 ### Added
