@@ -5,6 +5,73 @@ All notable changes to the VeZ Programming Language will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-02-18
+
+### Added
+
+#### Professional Testing Framework
+- **Test Runner** (`compiler/src/testing/runner.rs`)
+  - Sequential and parallel test execution
+  - Test filtering by name and tags
+  - Fail-fast and timeout support
+  - Configurable thread pool
+
+- **Assertions Library** (`compiler/src/testing/assert.rs`)
+  - `assert_eq`, `assert_ne`, `assert_true`, `assert_false`
+  - `assert_gt`, `assert_lt`, `assert_ge`, `assert_le`
+  - `assert_near` for floating-point comparisons
+  - `assert_contains`, `assert_empty`, `assert_len`
+  - `assert_ok`, `assert_err`, `assert_some`, `assert_none`
+  - `assert_panics`, `assert_no_panic`
+  - Fluent assertion API with `expect(value).equal_to(expected)`
+
+- **Mock Objects** (`compiler/src/testing/mock.rs`)
+  - Expectation-based mocking
+  - Call count verification
+  - Mock registry for multiple mocks
+
+- **Test Fixtures** (`compiler/src/testing/fixture.rs`)
+  - Lifecycle hooks (setup/teardown)
+  - Temporary file and directory management
+  - Database, HTTP, and file fixtures
+
+- **Benchmarking** (`compiler/src/testing/bench.rs`)
+  - Statistical analysis (mean, median, std dev)
+  - Percentile reporting (p10, p25, p50, p75, p90, p95, p99)
+  - Benchmark comparison with significance testing
+  - Benchmark groups
+
+- **Test Reporting** (`compiler/src/testing/report.rs`)
+  - Multiple formats: Plain, Color, JSON, JUnit, TAP, HTML
+  - Summary statistics and success rate calculation
+
+#### Code Formatter (vezfmt)
+- **Formatter Core** (`compiler/src/formatter/format.rs`)
+  - Token-based formatting engine
+  - Automatic indentation
+  - Operator spacing
+  - Brace style options
+
+- **Formatter Configuration** (`compiler/src/formatter/config.rs`)
+  - Indent style (tabs or configurable spaces)
+  - Line width limits
+  - Brace style (same line, next line, always next line)
+  - Trailing comma handling
+  - Comment wrapping options
+
+- **Indent Management** (`compiler/src/formatter/indent.rs`)
+  - Hierarchical indentation tracking
+  - Indent/dedent utilities
+
+- **Comment Formatting** (`compiler/src/formatter/comment.rs`)
+  - Doc comment normalization
+  - Comment wrapping at configurable width
+
+### Dependencies
+- Added `crossbeam-channel` for parallel test execution
+- Added `num_cpus` for thread pool sizing
+- Added `uuid` for unique temp file names
+
 ## [0.2.0] - 2025-02-17
 
 ### Added

@@ -255,6 +255,52 @@ Auto-generate HTML/Markdown docs from source:
 vezc doc src/ -o docs/api/
 ```
 
+### Documentation Generator
+Auto-generate HTML/Markdown docs from source:
+```bash
+vezc doc src/ -o docs/api/
+```
+
+### Professional Testing Framework
+Comprehensive testing infrastructure:
+```zari
+# Assertions
+assert_eq(actual, expected)
+assert_near(1.0, 1.001, 0.01)  # Floating point comparison
+expect(value).to_be_greater_than(5)
+
+# Mocking
+mock.expect(vec!["arg1"], "result")
+let result = mock.call(vec!["arg1"])
+mock.verify()  # Verify expectations
+
+# Benchmarking
+bench "my_benchmark" {
+    code_to_benchmark()
+}
+```
+
+Test runner features:
+- Parallel test execution
+- Multiple report formats (JSON, JUnit, TAP, HTML)
+- Test fixtures with lifecycle hooks
+- Mock objects with expectations
+- Statistical benchmark analysis
+
+### Code Formatter (vezfmt)
+Automatic code formatting:
+```bash
+vezc fmt src/              # Format all files
+vezc fmt --check src/      # Check formatting
+vezc fmt --config .vezfmt  # Use config file
+```
+
+Configurable options:
+- Indent style (tabs/spaces)
+- Line width limits
+- Brace style
+- Comment wrapping
+
 ### Multi-Platform GPU Support
 - **CUDA**: NVIDIA GPU compute
 - **ROCm/HIP**: AMD GPU support
