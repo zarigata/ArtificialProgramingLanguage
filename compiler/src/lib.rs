@@ -32,6 +32,8 @@ pub mod intrinsics;
 pub mod scheduler;
 pub mod allocator;
 pub mod docgen;
+pub mod testing;
+pub mod formatter;
 
 /// Compiler version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
