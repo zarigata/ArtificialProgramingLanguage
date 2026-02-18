@@ -2,7 +2,7 @@
 
 use crate::error::{Result, Error, ErrorKind};
 use crate::codegen::target::TargetMachine;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::Command;
 
 /// Output type for linking

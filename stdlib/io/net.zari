@@ -1,0 +1,419 @@
+// VeZ Standard Library - Networking
+// Provides TCP and UDP networking primitives
+
+use std::io
+
+/// Socket address representation
+pub struct SocketAddr:
+    ip: [u8; 4]
+    port: u16
+
+impl SocketAddr:
+    /// Create a new socket address from IP octets and port
+    pub fn new(a: u8, b: u8, c: u8, d: u8, port: u16) -> Self:
+        return Self {
+            ip: [a, b, c, d],
+            port: port
+        }
+    
+    /// Create from IPv4 bytes and port
+    pub fn from_bytes(ip: [u8; 4], port: u16) -> Self:
+        return Self { ip: ip, port: port }
+    
+    /// Create localhost address with specified port
+    pub fn localhost(port: u16) -> Self:
+        return Self {
+            ip: [127, 0, 0, 1],
+            port: port
+        }
+    
+    /// Create address for all interfaces (0.0.0.0)
+    pub fn any(port: u16) -> Self:
+        return Self {
+            ip: [0, 0, 0, 0],
+            port: port
+        }
+    
+    /// Get the port number
+    pub fn port(&self) -> u16:
+        return self.port
+    
+    /// Get IP address as bytes
+    pub fn ip_bytes(&self) -> [u8; 4]:
+        return self.ip
+    
+    /// Convert to string representation "a.b.c.d:port"
+    pub fn to_string(&self) -> String:
+        return format("{}.{}.{}.{}:{}", 
+            self.ip[0], self.ip[1], self.ip[2], self.ip[3], self.port)
+
+
+/// IPv6 Socket address (future support)
+pub struct SocketAddrV6:
+    ip: [u16; 8]
+    port: u16
+    flowinfo: u32
+    scope_id: u32
+
+
+/// TCP Stream - represents an active TCP connection
+pub struct TcpStream:
+    fd: i32
+    addr: SocketAddr
+    nonblocking: bool
+
+impl TcpStream:
+    /// Connect to a remote address
+    pub fn connect(addr: SocketAddr) -> Result[Self, io::Error]:
+        let fd = @syscall(socket, AF_INET, SOCK_STREAM, 0)
+        if fd < 0:
+            return Err(io::Error.connection_failed("Failed to create socket"))
+        end
+        
+        let result = @syscall(connect, fd, &addr, sizeof(SocketAddr))
+        if result < 0:
+            @syscall(close, fd)
+            return Err(io::Error.connection_failed("Failed to connect"))
+        end
+        
+        return Ok(Self {
+            fd: fd,
+            addr: addr,
+            nonblocking: false
+        })
+    
+    /// Connect with timeout
+    pub fn connect_timeout(addr: SocketAddr, timeout_ms: u64) -> Result[Self, io::Error]:
+        let stream = Self.connect(addr)?
+        stream.set_nonblocking(true)
+        
+        let start = @syscall(clock_gettime)
+        let mut ready = false
+        
+        while not ready:
+            let elapsed = @syscall(clock_gettime) - start
+            if elapsed > timeout_ms * 1000000:
+                @syscall(close, stream.fd)
+                return Err(io::Error.timed_out("Connection timed out"))
+            end
+            
+            # Poll for writeability
+            ready = @syscall(poll, stream.fd, POLLOUT, 0) > 0
+            if not ready:
+                @syscall(usleep, 1000)
+        end
+        
+        stream.set_nonblocking(false)
+        return Ok(stream)
+    
+    /// Read bytes from the stream
+    pub fn read(&mut self, buf: &mut [u8]) -> Result[usize, io::Error]:
+        let n = @syscall(read, self.fd, buf.as_mut_ptr(), buf.len())
+        if n < 0:
+            if self.nonblocking and n == -EAGAIN:
+                return Ok(0)
+            end
+            return Err(io::Error.read_failed("Read error"))
+        end
+        return Ok(n as usize)
+    
+    /// Write bytes to the stream
+    pub fn write(&mut self, buf: &[u8]) -> Result[usize, io::Error]:
+        let n = @syscall(write, self.fd, buf.as_ptr(), buf.len())
+        if n < 0:
+            return Err(io::Error.write_failed("Write error"))
+        end
+        return Ok(n as usize)
+    
+    /// Set non-blocking mode
+    pub fn set_nonblocking(&self, mode: bool) -> Result[(), io::Error]:
+        let flags = @syscall(fcntl, self.fd, F_GETFL, 0)
+        if flags < 0:
+            return Err(io::Error.unknown("Failed to get flags"))
+        end
+        
+        let new_flags = if mode:
+            flags | O_NONBLOCK
+        else:
+            flags & ~O_NONBLOCK
+        
+        let result = @syscall(fcntl, self.fd, F_SETFL, new_flags)
+        if result < 0:
+            return Err(io::Error.unknown("Failed to set nonblocking"))
+        end
+        
+        self.nonblocking = mode
+        return Ok(())
+    
+    /// Get the peer (remote) address
+    pub fn peer_addr(&self) -> SocketAddr:
+        return self.addr
+    
+    /// Get the local address
+    pub fn local_addr(&self) -> Result[SocketAddr, io::Error]:
+        let mut addr: SocketAddr = SocketAddr.any(0)
+        let result = @syscall(getsockname, self.fd, &mut addr, sizeof(SocketAddr))
+        if result < 0:
+            return Err(io::Error.unknown("Failed to get local address"))
+        end
+        return Ok(addr)
+    
+    /// Shutdown the connection (read, write, or both)
+    pub fn shutdown(&self, how: Shutdown) -> Result[(), io::Error]:
+        let shut_how = match how:
+            Shutdown.Read => SHUT_RD
+            Shutdown.Write => SHUT_WR
+            Shutdown.Both => SHUT_RDWR
+        
+        let result = @syscall(shutdown, self.fd, shut_how)
+        if result < 0:
+            return Err(io::Error.unknown("Shutdown failed"))
+        end
+        return Ok(())
+    
+    /// Close the stream
+    pub fn close(self):
+        @syscall(close, self.fd)
+
+
+/// Shutdown type enumeration
+pub enum Shutdown:
+    Read
+    Write
+    Both
+
+
+/// TCP Listener - accepts incoming TCP connections
+pub struct TcpListener:
+    fd: i32
+    addr: SocketAddr
+
+impl TcpListener:
+    /// Bind to an address and start listening
+    pub fn bind(addr: SocketAddr) -> Result[Self, io::Error]:
+        let fd = @syscall(socket, AF_INET, SOCK_STREAM, 0)
+        if fd < 0:
+            return Err(io::Error.connection_failed("Failed to create socket"))
+        end
+        
+        # Set SO_REUSEADDR
+        let optval: i32 = 1
+        @syscall(setsockopt, fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(i32))
+        
+        let result = @syscall(bind, fd, &addr, sizeof(SocketAddr))
+        if result < 0:
+            @syscall(close, fd)
+            return Err(io::Error.connection_failed("Failed to bind"))
+        end
+        
+        # Listen with default backlog
+        let result = @syscall(listen, fd, 128)
+        if result < 0:
+            @syscall(close, fd)
+            return Err(io::Error.connection_failed("Failed to listen"))
+        end
+        
+        return Ok(Self {
+            fd: fd,
+            addr: addr
+        })
+    
+    /// Accept an incoming connection
+    pub fn accept(&self) -> Result[(TcpStream, SocketAddr), io::Error]:
+        let mut client_addr: SocketAddr = SocketAddr.any(0)
+        let mut addr_len: u32 = sizeof(SocketAddr)
+        
+        let client_fd = @syscall(accept, self.fd, &mut client_addr, &mut addr_len)
+        if client_fd < 0:
+            return Err(io::Error.connection_failed("Accept failed"))
+        end
+        
+        let stream = TcpStream {
+            fd: client_fd,
+            addr: client_addr,
+            nonblocking: false
+        }
+        
+        return Ok((stream, client_addr))
+    
+    /// Accept with timeout
+    pub fn accept_timeout(&self, timeout_ms: u64) -> Result[(TcpStream, SocketAddr), io::Error]:
+        # Use poll to wait for connection with timeout
+        let result = @syscall(poll, self.fd, POLLIN, timeout_ms)
+        if result == 0:
+            return Err(io::Error.timed_out("Accept timed out"))
+        elif result < 0:
+            return Err(io::Error.connection_failed("Poll error"))
+        end
+        
+        return self.accept()
+    
+    /// Set non-blocking mode
+    pub fn set_nonblocking(&self, mode: bool) -> Result[(), io::Error]:
+        let flags = @syscall(fcntl, self.fd, F_GETFL, 0)
+        if flags < 0:
+            return Err(io::Error.unknown("Failed to get flags"))
+        end
+        
+        let new_flags = if mode:
+            flags | O_NONBLOCK
+        else:
+            flags & ~O_NONBLOCK
+        
+        let result = @syscall(fcntl, self.fd, F_SETFL, new_flags)
+        if result < 0:
+            return Err(io::Error.unknown("Failed to set nonblocking"))
+        end
+        return Ok(())
+    
+    /// Get the local address
+    pub fn local_addr(&self) -> SocketAddr:
+        return self.addr
+    
+    /// Close the listener
+    pub fn close(self):
+        @syscall(close, self.fd)
+
+
+/// UDP Socket - for connectionless UDP communication
+pub struct UdpSocket:
+    fd: i32
+    addr: SocketAddr
+
+impl UdpSocket:
+    /// Bind to an address
+    pub fn bind(addr: SocketAddr) -> Result[Self, io::Error]:
+        let fd = @syscall(socket, AF_INET, SOCK_DGRAM, 0)
+        if fd < 0:
+            return Err(io::Error.connection_failed("Failed to create socket"))
+        end
+        
+        let result = @syscall(bind, fd, &addr, sizeof(SocketAddr))
+        if result < 0:
+            @syscall(close, fd)
+            return Err(io::Error.connection_failed("Failed to bind"))
+        end
+        
+        return Ok(Self {
+            fd: fd,
+            addr: addr
+        })
+    
+    /// Connect to a remote address (filters incoming packets)
+    pub fn connect(&self, addr: SocketAddr) -> Result[(), io::Error]:
+        let result = @syscall(connect, self.fd, &addr, sizeof(SocketAddr))
+        if result < 0:
+            return Err(io::Error.connection_failed("Connect failed"))
+        end
+        return Ok(())
+    
+    /// Send data to a specific address
+    pub fn send_to(&self, buf: &[u8], addr: SocketAddr) -> Result[usize, io::Error]:
+        let n = @syscall(sendto, self.fd, buf.as_ptr(), buf.len(), 0, &addr, sizeof(SocketAddr))
+        if n < 0:
+            return Err(io::Error.write_failed("Send failed"))
+        end
+        return Ok(n as usize)
+    
+    /// Receive data and the sender's address
+    pub fn recv_from(&self, buf: &mut [u8]) -> Result[(usize, SocketAddr), io::Error]:
+        let mut addr: SocketAddr = SocketAddr.any(0)
+        let mut addr_len: u32 = sizeof(SocketAddr)
+        
+        let n = @syscall(recvfrom, self.fd, buf.as_mut_ptr(), buf.len(), 0, &mut addr, &mut addr_len)
+        if n < 0:
+            return Err(io::Error.read_failed("Receive failed"))
+        end
+        
+        return Ok((n as usize, addr))
+    
+    /// Send data (after connect)
+    pub fn send(&self, buf: &[u8]) -> Result[usize, io::Error]:
+        let n = @syscall(send, self.fd, buf.as_ptr(), buf.len(), 0)
+        if n < 0:
+            return Err(io::Error.write_failed("Send failed"))
+        end
+        return Ok(n as usize)
+    
+    /// Receive data (after connect)
+    pub fn recv(&self, buf: &mut [u8]) -> Result[usize, io::Error]:
+        let n = @syscall(recv, self.fd, buf.as_mut_ptr(), buf.len(), 0)
+        if n < 0:
+            return Err(io::Error.read_failed("Receive failed"))
+        end
+        return Ok(n as usize)
+    
+    /// Set broadcast mode
+    pub fn set_broadcast(&self, mode: bool) -> Result[(), io::Error]:
+        let optval: i32 = if mode { 1 } else { 0 }
+        let result = @syscall(setsockopt, self.fd, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(i32))
+        if result < 0:
+            return Err(io::Error.unknown("Failed to set broadcast"))
+        end
+        return Ok(())
+    
+    /// Join multicast group
+    pub fn join_multicast(&self, group: [u8; 4]) -> Result[(), io::Error]:
+        let mreq = Mreq {
+            imr_multiaddr: group,
+            imr_interface: [0, 0, 0, 0]
+        }
+        let result = @syscall(setsockopt, self.fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(Mreq))
+        if result < 0:
+            return Err(io::Error.unknown("Failed to join multicast"))
+        end
+        return Ok(())
+    
+    /// Close the socket
+    pub fn close(self):
+        @syscall(close, self.fd)
+
+
+/// Multicast request structure
+struct Mreq:
+    imr_multiaddr: [u8; 4]
+    imr_interface: [u8; 4]
+
+
+/// Socket constants
+const AF_INET: i32 = 2
+const SOCK_STREAM: i32 = 1
+const SOCK_DGRAM: i32 = 2
+const IPPROTO_IP: i32 = 0
+
+const SOL_SOCKET: i32 = 1
+const SO_REUSEADDR: i32 = 2
+const SO_BROADCAST: i32 = 6
+const IP_ADD_MEMBERSHIP: i32 = 35
+
+const O_NONBLOCK: i32 = 2048
+const F_GETFL: i32 = 3
+const F_SETFL: i32 = 4
+
+const POLLIN: i16 = 1
+const POLLOUT: i16 = 4
+
+const SHUT_RD: i32 = 0
+const SHUT_WR: i32 = 1
+const SHUT_RDWR: i32 = 2
+
+const EAGAIN: i32 = 11
+
+
+/// Helper functions
+
+/// Create a TCP connection
+pub fn tcp_connect(host: &str, port: u16) -> Result[TcpStream, io::Error]:
+    # DNS resolution would go here
+    let addr = SocketAddr.localhost(port)  # Simplified
+    return TcpStream.connect(addr)
+
+/// Create a TCP listener
+pub fn tcp_listen(port: u16) -> Result[TcpListener, io::Error]:
+    let addr = SocketAddr.any(port)
+    return TcpListener.bind(addr)
+
+/// Create a UDP socket bound to a port
+pub fn udp_bind(port: u16) -> Result[UdpSocket, io::Error]:
+    let addr = SocketAddr.any(port)
+    return UdpSocket.bind(addr)

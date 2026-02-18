@@ -1,0 +1,346 @@
+// VeZ Standard Library - Mutex
+// Provides mutual exclusion locks for safe concurrent access
+
+use std::sync::atomic
+
+/// Mutex poisoning error
+pub struct PoisonError[T]:
+    guard: MutexGuard[T]
+
+impl PoisonError[T]:
+    /// Get a reference to the guard
+    pub fn get_ref(&self) -> &T:
+        return &self.guard.value
+    
+    /// Consume the error and recover the guard
+    pub fn into_inner(self) -> MutexGuard[T]:
+        return self.guard
+    
+    /// Consume and get the inner value
+    pub fn into_inner_value(self) -> T:
+        return self.guard.into_inner()
+
+
+/// Result type for mutex lock operations
+pub type LockResult[T] = Result[MutexGuard[T], PoisonError[T]]
+
+/// Result type for try_lock operations
+pub type TryLockResult[T] = Result[MutexGuard[T], TryLockError]
+
+
+/// Try lock error
+pub enum TryLockError:
+    WouldBlock
+    Poisoned(PoisonError[Unit])
+
+
+/// Mutex - mutual exclusion primitive
+/// Provides safe shared access to data across threads
+pub struct Mutex[T]:
+    value: UnsafeCell[T]
+    lock: atomic::AtomicBool
+    poisoned: atomic::AtomicBool
+    owner: atomic::AtomicUsize
+
+impl Mutex[T]:
+    /// Create a new mutex with the given value
+    pub fn new(value: T) -> Self:
+        return Self {
+            value: UnsafeCell.new(value),
+            lock: atomic::AtomicBool.new(false),
+            poisoned: atomic::AtomicBool.new(false),
+            owner: atomic::AtomicUsize.new(0)
+        }
+    
+    /// Acquire the lock, blocking until available
+    /// Returns a guard that releases the lock when dropped
+    pub fn lock(&self) -> LockResult[T]:
+        # Spin with exponential backoff
+        let mut backoff = 1
+        let max_backoff = 1024
+        
+        while not self.lock.compare_exchange_weak(
+            false, true, 
+            atomic::Ordering::Acquire, 
+            atomic::Ordering::Relaxed
+        ):
+            # Yield to scheduler if backoff is large
+            if backoff >= max_backoff:
+                @syscall(sched_yield)
+            else:
+                # Spin wait with pause instruction
+                for _ in range(backoff):
+                    @intrinsic("pause")
+            
+            backoff = min(backoff * 2, max_backoff)
+        end
+        
+        # Record owner thread
+        self.owner.store(@syscall(gettid), atomic::Ordering::Relaxed)
+        
+        # Check if mutex was poisoned
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            return Err(PoisonError {
+                guard: MutexGuard {
+                    mutex: self,
+                    value: unsafe { &mut *self.value.get() }
+                }
+            })
+        end
+        
+        return Ok(MutexGuard {
+            mutex: self,
+            value: unsafe { &mut *self.value.get() }
+        })
+    
+    /// Try to acquire the lock without blocking
+    /// Returns None if the lock is held
+    pub fn try_lock(&self) -> TryLockResult[T]:
+        if not self.lock.compare_exchange(
+            false, true,
+            atomic::Ordering::Acquire,
+            atomic::Ordering::Relaxed
+        ):
+            return Err(TryLockError.WouldBlock)
+        end
+        
+        self.owner.store(@syscall(gettid), atomic::Ordering::Relaxed)
+        
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            return Err(TryLockError.Poisoned(PoisonError {
+                guard: MutexGuard {
+                    mutex: self,
+                    value: unsafe { &mut *self.value.get() }
+                }
+            }))
+        end
+        
+        return Ok(MutexGuard {
+            mutex: self,
+            value: unsafe { &mut *self.value.get() }
+        })
+    
+    /// Check if the mutex is poisoned
+    pub fn is_poisoned(&self) -> bool:
+        return self.poisoned.load(atomic::Ordering::Relaxed)
+    
+    /// Clear the poisoned state
+    pub fn clear_poison(&self):
+        self.poisoned.store(false, atomic::Ordering::Relaxed)
+    
+    /// Get a mutable reference to the inner value
+    /// Only safe when no other references exist
+    pub fn get_mut(&mut self) -> &mut T:
+        return self.value.get_mut()
+    
+    /// Consume the mutex and return the inner value
+    pub fn into_inner(self) -> T:
+        return self.value.into_inner()
+    
+    /// Get a raw pointer to the inner value
+    /// Must not be used while mutex is locked
+    pub fn as_ptr(&self) -> *mut T:
+        return self.value.get()
+    
+    /// Internal: release the lock
+    fn unlock(&self):
+        self.owner.store(0, atomic::Ordering::Relaxed)
+        self.lock.store(false, atomic::Ordering::Release)
+    
+    /// Internal: mark as poisoned
+    fn poison(&self):
+        self.poisoned.store(true, atomic::Ordering::Relaxed)
+
+
+/// MutexGuard - RAII guard for mutex
+/// Automatically releases the lock when dropped
+pub struct MutexGuard[T]:
+    mutex: &Mutex[T]
+    value: &mut T
+
+impl MutexGuard[T]:
+    /// Get a reference to the guarded value
+    pub fn deref(&self) -> &T:
+        return self.value
+    
+    /// Get a mutable reference to the guarded value
+    pub fn deref_mut(&mut self) -> &mut T:
+        return self.value
+    
+    /// Consume the guard and return the inner value
+    /// This bypasses the poison check
+    pub fn into_inner(self) -> T:
+        let mutex = self.mutex
+        let value = unsafe { self.value.read() }
+        self.mutex = null  # Prevent double-unlock
+        return value
+    
+    /// Check if the mutex this guard protects is poisoned
+    pub fn is_poisoned(&self) -> bool:
+        return self.mutex.is_poisoned()
+
+
+impl Drop for MutexGuard[T]:
+    fn drop(&mut self):
+        if self.mutex != null:
+            # If the thread panicked while holding the lock, poison it
+            if @syscall(panicking):
+                self.mutex.poison()
+            end
+            
+            self.mutex.unlock()
+        end
+
+
+/// MappedMutexGuard - guard that allows mapping to a subset of data
+pub struct MappedMutexGuard[T, U]:
+    mutex: &Mutex[T]
+    value: &mut U
+
+impl MappedMutexGuard[T, U]:
+    /// Create a mapped guard from a mutex guard
+    pub fn map[V](guard: MutexGuard[T], f: fn(&mut T) -> &mut V) -> MappedMutexGuard[T, V]:
+        let mutex = guard.mutex
+        let value = f(guard.value)
+        guard.mutex = null  # Prevent original guard from unlocking
+        
+        return MappedMutexGuard {
+            mutex: mutex,
+            value: value
+        }
+    
+    /// Try to map to a value, returning None if the closure returns None
+    pub fn try_map[V](
+        guard: MutexGuard[T], 
+        f: fn(&mut T) -> Option[&mut V]
+    ) -> Option[MappedMutexGuard[T, V]]:
+        let mutex = guard.mutex
+        let value = f(guard.value)?
+        guard.mutex = null
+        
+        return Some(MappedMutexGuard {
+            mutex: mutex,
+            value: value
+        })
+
+
+impl Drop for MappedMutexGuard[T, U]:
+    fn drop(&mut self):
+        if self.mutex != null:
+            if @syscall(panicking):
+                self.mutex.poison()
+            end
+            self.mutex.unlock()
+        end
+
+
+/// ReentrantMutex - mutex that can be locked multiple times by the same thread
+pub struct ReentrantMutex[T]:
+    value: UnsafeCell[T]
+    lock: atomic::AtomicBool
+    owner: atomic::AtomicUsize
+    count: atomic::AtomicUsize
+
+impl ReentrantMutex[T]:
+    /// Create a new reentrant mutex
+    pub fn new(value: T) -> Self:
+        return Self {
+            value: UnsafeCell.new(value),
+            lock: atomic::AtomicBool.new(false),
+            owner: atomic::AtomicUsize.new(0),
+            count: atomic::AtomicUsize.new(0)
+        }
+    
+    /// Lock the mutex (reentrant)
+    pub fn lock(&self) -> ReentrantMutexGuard[T]:
+        let tid = @syscall(gettid)
+        
+        # If we already own it, increment count
+        if self.owner.load(atomic::Ordering::Relaxed) == tid:
+            self.count.fetch_add(1, atomic::Ordering::Relaxed)
+        else:
+            # Acquire the lock
+            while not self.lock.compare_exchange_weak(
+                false, true,
+                atomic::Ordering::Acquire,
+                atomic::Ordering::Relaxed
+            ):
+                @syscall(sched_yield)
+            
+            self.owner.store(tid, atomic::Ordering::Relaxed)
+            self.count.store(1, atomic::Ordering::Relaxed)
+        end
+        
+        return ReentrantMutexGuard {
+            mutex: self,
+            value: unsafe { &mut *self.value.get() }
+        }
+
+
+/// ReentrantMutexGuard - guard for reentrant mutex
+pub struct ReentrantMutexGuard[T]:
+    mutex: &ReentrantMutex[T]
+    value: &mut T
+
+impl Drop for ReentrantMutexGuard[T]:
+    fn drop(&mut self):
+        let count = self.mutex.count.fetch_sub(1, atomic::Ordering::Relaxed)
+        if count == 1:
+            self.mutex.owner.store(0, atomic::Ordering::Relaxed)
+            self.mutex.lock.store(false, atomic::Ordering::Release)
+        end
+
+
+/// SpinLock - simple spinning mutex for short critical sections
+pub struct SpinLock[T]:
+    value: UnsafeCell[T]
+    lock: atomic::AtomicBool
+
+impl SpinLock[T]:
+    /// Create a new spin lock
+    pub fn new(value: T) -> Self:
+        return Self {
+            value: UnsafeCell.new(value),
+            lock: atomic::AtomicBool.new(false)
+        }
+    
+    /// Lock, spinning until available
+    pub fn lock(&self) -> SpinLockGuard[T]:
+        while self.lock.swap(true, atomic::Ordering::Acquire):
+            # Spin with pause to reduce contention
+            while self.lock.load(atomic::Ordering::Relaxed):
+                @intrinsic("pause")
+        
+        return SpinLockGuard {
+            spinlock: self,
+            value: unsafe { &mut *self.value.get() }
+        }
+    
+    /// Try to lock without spinning
+    pub fn try_lock(&self) -> Option[SpinLockGuard[T]]:
+        if not self.lock.swap(true, atomic::Ordering::Acquire):
+            return Some(SpinLockGuard {
+                spinlock: self,
+                value: unsafe { &mut *self.value.get() }
+            })
+        end
+        return None
+
+
+/// SpinLockGuard - guard for spin lock
+pub struct SpinLockGuard[T]:
+    spinlock: &SpinLock[T]
+    value: &mut T
+
+impl Drop for SpinLockGuard[T]:
+    fn drop(&mut self):
+        self.spinlock.lock.store(false, atomic::Ordering::Release)
+
+
+/// Helper function: wrap a value in a mutex
+pub fn mutex[T](value: T) -> Mutex[T]:
+    return Mutex.new(value)
+
+/// Helper function: wrap a value in a spin lock
+pub fn spinlock[T](value: T) -> SpinLock[T]:
+    return SpinLock.new(value)

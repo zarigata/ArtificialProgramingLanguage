@@ -1,9 +1,4 @@
-
-use std::collections::HashMap;
 use std::fmt;
-
-use crate::parser::ast;
-use crate::span::Span;
 
 /// A type in the VeZ language
 #[derive(Clone, PartialEq, Eq, Hash)]

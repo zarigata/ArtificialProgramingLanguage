@@ -1,0 +1,253 @@
+{
+  "name": "vez",
+  "displayName": "VeZ Language Support",
+  "description": "Language support for the VeZ programming language",
+  "version": "1.0.0",
+  "publisher": "vez-lang",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Debuggers",
+    "Snippets"
+  ],
+  "keywords": [
+    "vez",
+    "zari",
+    "ai-native",
+    "systems programming"
+  ],
+  "activationEvents": [
+    "onLanguage:vez",
+    "onLanguage:zari",
+    "workspaceContains:**/*.zari",
+    "workspaceContains:**/VeZ.toml"
+  ],
+  "main": "./out/extension.js",
+  "icon": "images/vez-logo.png",
+  "contributes": {
+    "languages": [
+      {
+        "id": "vez",
+        "aliases": ["VeZ", "vez", "zari"],
+        "extensions": [".zari", ".vez"],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/vez-icon-light.png",
+          "dark": "./images/vez-icon-dark.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "vez",
+        "scopeName": "source.vez",
+        "path": "./syntaxes/vez.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "vez.compile",
+        "title": "VeZ: Compile Current File",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "vez.run",
+        "title": "VeZ: Run Current File",
+        "icon": "$(play)"
+      },
+      {
+        "command": "vez.newProject",
+        "title": "VeZ: Create New Project"
+      },
+      {
+        "command": "vez.showAst",
+        "title": "VeZ: Show AST"
+      },
+      {
+        "command": "vez.format",
+        "title": "VeZ: Format Document"
+      },
+      {
+        "command": "vez.restartLsp",
+        "title": "VeZ: Restart Language Server"
+      },
+      {
+        "command": "vez.aiContext",
+        "title": "VeZ: Extract AI Context"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "vez.compile",
+          "when": "editorLangId == vez",
+          "group": "vez@1"
+        },
+        {
+          "command": "vez.run",
+          "when": "editorLangId == vez",
+          "group": "vez@2"
+        },
+        {
+          "command": "vez.showAst",
+          "when": "editorLangId == vez",
+          "group": "vez@3"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "vez.run",
+          "when": "editorLangId == vez",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "vez.compile",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorLangId == vez"
+      },
+      {
+        "command": "vez.run",
+        "key": "f5",
+        "mac": "f5",
+        "when": "editorLangId == vez"
+      },
+      {
+        "command": "vez.format",
+        "key": "shift+alt+f",
+        "mac": "shift+option+f",
+        "when": "editorLangId == vez"
+      }
+    ],
+    "configuration": {
+      "title": "VeZ",
+      "properties": {
+        "vez.compilerPath": {
+          "type": "string",
+          "default": "vezc",
+          "description": "Path to the VeZ compiler (vezc)"
+        },
+        "vez.lspPath": {
+          "type": "string",
+          "default": "vez-lsp",
+          "description": "Path to the VeZ language server"
+        },
+        "vez.packageManagerPath": {
+          "type": "string",
+          "default": "vpm",
+          "description": "Path to the VeZ package manager (vpm)"
+        },
+        "vez.enableLsp": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the VeZ language server"
+        },
+        "vez.formatOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Format VeZ files on save"
+        },
+        "vez.showInlineErrors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline error messages"
+        },
+        "vez.aiContextEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI context extraction features"
+        },
+        "vez.optimizationLevel": {
+          "type": "string",
+          "default": "O2",
+          "enum": ["O0", "O1", "O2", "O3", "Os", "Oz"],
+          "description": "Default optimization level for compilation"
+        },
+        "vez.target": {
+          "type": "string",
+          "default": "native",
+          "description": "Default compilation target"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "vez",
+        "path": "./snippets/vez.json"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "vez",
+        "label": "VeZ Debugger",
+        "program": "./out/debugAdapter.js",
+        "runtime": "node",
+        "languages": ["vez"],
+        "configurationSnippets": [
+          {
+            "label": "VeZ: Launch",
+            "description": "Launch a VeZ program for debugging",
+            "body": {
+              "type": "vez",
+              "request": "launch",
+              "name": "Debug VeZ Program",
+              "program": "^\"\\${file}\"",
+              "stopOnEntry": true
+            }
+          }
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Path to the VeZ program to debug"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Stop on program entry",
+                "default": true
+              },
+              "args": {
+                "type": "array",
+                "description": "Program arguments",
+                "items": { "type": "string" },
+                "default": []
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0",
+    "@vscode/test-electron": "^2.3.0",
+    "@vscode/vsce": "^2.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vez-lang/vez-vscode"
+  },
+  "license": "MIT"
+}

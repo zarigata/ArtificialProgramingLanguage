@@ -4,6 +4,8 @@ members = [
     "tools/vpm",
     "tools/lsp",
     "tools/testing",
+    "tools/repl",
+    "benchmarks",
 ]
 resolver = "2"
 

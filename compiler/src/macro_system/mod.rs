@@ -5,8 +5,8 @@ pub mod expander;
 pub mod hygiene;
 pub mod parser;
 pub mod builtin;
+pub mod reflection;
 
-use crate::parser::ast::*;
 use crate::span::Span;
 use std::collections::HashMap;
 

@@ -3,7 +3,7 @@
 use crate::ir::ssa::{Module, Function as IrFunction, BasicBlock, ValueId, Value, Constant};
 use crate::ir::instructions::{Instruction, BinaryOp, UnaryOp};
 use crate::ir::types::IrType;
-use crate::error::{Result, Error, ErrorKind};
+use crate::error::Result;
 use std::collections::HashMap;
 
 /// LLVM code generator
@@ -68,6 +68,8 @@ impl LLVMCodegen {
             IrType::U32 => "i32".to_string(),
             IrType::U64 => "i64".to_string(),
             IrType::U128 => "i128".to_string(),
+            IrType::F16 => "half".to_string(),
+            IrType::BF16 => "bfloat".to_string(),
             IrType::F32 => "float".to_string(),
             IrType::F64 => "double".to_string(),
             IrType::Pointer(inner) => format!("{}*", self.type_to_llvm(inner)),
@@ -84,6 +86,11 @@ impl LLVMCodegen {
                     .collect();
                 format!("{} ({})", self.type_to_llvm(ret), param_types.join(", "))
             }
+            IrType::Vec2(inner) => format!("<2 x {}>", self.type_to_llvm(inner)),
+            IrType::Vec4(inner) => format!("<4 x {}>", self.type_to_llvm(inner)),
+            IrType::Vec8(inner) => format!("<8 x {}>", self.type_to_llvm(inner)),
+            IrType::Vec16(inner) => format!("<16 x {}>", self.type_to_llvm(inner)),
+            IrType::Vector(inner, count) => format!("<{} x {}>", count, self.type_to_llvm(inner)),
         }
     }
     

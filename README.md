@@ -193,6 +193,74 @@ public class FSTest {
          # Automatic deallocation at region end
      ```
 
+## Recent Updates & Features (v0.2.0)
+
+### Compiler Optimizations
+- **Loop Unrolling & Strength Reduction**: Automatic transformation of loops for better performance
+- **SIMD Vectorization**: Auto-vectorization for AVX, AVX2, AVX-512, and NEON instruction sets
+- **Devirtualization**: Virtual call optimization for polymorphic code
+- **Escape Analysis**: Stack allocation optimization with scalar replacement
+
+### Effect System
+Track and verify side effects at compile time:
+```zari
+@effects[IO, State]
+def process_file(path: string) -> Result<Data, Error>:
+    content = read_file(path)
+    return parse(content)
+```
+
+### Dependent Types
+Type-level naturals for compile-time bounds checking:
+```zari
+def safe_index(arr: [T; N], i: Nat where i < N) -> T:
+    return arr[i]  # Compile-time verified safe access
+```
+
+### Hardware Intrinsics
+Direct CPU/GPU intrinsics for maximum performance:
+```zari
+# SIMD operations
+let result = simd_add_f32x8(a, b)
+
+# GPU compute
+@gpu_kernel(block_size=256)
+def parallel_reduce(data: [f32]) -> f32
+
+# Atomic operations
+let old = atomic_compare_exchange(ptr, expected, new, AcqRel, Acquire)
+```
+
+### Deterministic Execution Scheduler
+Real-time scheduling with EDF (Earliest Deadline First) and Rate Monotonic policies:
+```zari
+@realtime(policy=EDF, deadline=10ms)
+def control_loop():
+    # Guaranteed to complete within deadline
+    actuator.update(sensor.read())
+```
+
+### Region-Based Memory Allocator
+Zero-cost memory safety without garbage collection:
+```zari
+region temp:
+    buffer = alloc(1024)
+    process(buffer)
+    # Automatic cleanup at region end
+```
+
+### Documentation Generator
+Auto-generate HTML/Markdown docs from source:
+```bash
+vezc doc src/ -o docs/api/
+```
+
+### Multi-Platform GPU Support
+- **CUDA**: NVIDIA GPU compute
+- **ROCm/HIP**: AMD GPU support
+- **Metal**: Apple Silicon GPU acceleration
+- **Vulkan**: Cross-platform GPU compute
+
 ## Project Status
 
 **Language**: VeZ (`.zari`)  

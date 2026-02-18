@@ -1,0 +1,387 @@
+// VeZ Standard Library - RwLock
+// Provides read-write locks allowing multiple readers or single writer
+
+use std::sync::atomic
+
+/// RwLock poisoning error
+pub struct RwLockPoisonError:
+    message: String
+
+impl RwLockPoisonError:
+    pub fn new(msg: &str) -> Self:
+        return Self { message: String.from(msg) }
+    
+    pub fn message(&self) -> &str:
+        return &self.message
+
+
+/// Result type for RwLock read operations
+pub type RwLockReadResult[T] = Result[RwLockReadGuard[T], RwLockPoisonError]
+
+/// Result type for RwLock write operations
+pub type RwLockWriteResult[T] = Result[RwLockWriteGuard[T], RwLockPoisonError]
+
+
+/// RwLock - read-write lock primitive
+/// Allows multiple concurrent readers or exclusive writer
+pub struct RwLock[T]:
+    value: UnsafeCell[T]
+    readers: atomic::AtomicIsize
+    writer_waiting: atomic::AtomicIsize
+    writer: atomic::AtomicBool
+    poisoned: atomic::AtomicBool
+
+impl RwLock[T]:
+    /// Create a new RwLock with the given value
+    pub fn new(value: T) -> Self:
+        return Self {
+            value: UnsafeCell.new(value),
+            readers: atomic::AtomicIsize.new(0),
+            writer_waiting: atomic::AtomicIsize.new(0),
+            writer: atomic::AtomicBool.new(false),
+            poisoned: atomic::AtomicBool.new(false)
+        }
+    
+    /// Acquire a read lock (shared access)
+    /// Multiple readers can hold the lock simultaneously
+    pub fn read(&self) -> RwLockReadResult[T]:
+        loop:
+            # Wait if a writer is active or waiting (writer preference)
+            while self.writer.load(atomic::Ordering::Relaxed) or 
+                  self.writer_waiting.load(atomic::Ordering::Relaxed) > 0:
+                @intrinsic("pause")
+            
+            # Try to increment reader count
+            let readers = self.readers.load(atomic::Ordering::Relaxed)
+            if readers < 0:
+                # Writer holds the lock, retry
+                continue
+            end
+            
+            if self.readers.compare_exchange_weak(
+                readers, readers + 1,
+                atomic::Ordering::Acquire,
+                atomic::Ordering::Relaxed
+            ):
+                break
+        end
+        
+        # Check poison status
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.readers.fetch_sub(1, atomic::Ordering::Release)
+            return Err(RwLockPoisonError.new("RwLock is poisoned"))
+        end
+        
+        return Ok(RwLockReadGuard {
+            rwlock: self,
+            value: unsafe { &*self.value.get() }
+        })
+    
+    /// Try to acquire a read lock without blocking
+    pub fn try_read(&self) -> Option[RwLockReadGuard[T]]:
+        # Check if writer is active or waiting
+        if self.writer.load(atomic::Ordering::Relaxed) or
+           self.writer_waiting.load(atomic::Ordering::Relaxed) > 0:
+            return None
+        end
+        
+        # Try to increment reader count
+        let readers = self.readers.load(atomic::Ordering::Relaxed)
+        if readers < 0:
+            return None
+        end
+        
+        if not self.readers.compare_exchange(
+            readers, readers + 1,
+            atomic::Ordering::Acquire,
+            atomic::Ordering::Relaxed
+        ):
+            return None
+        end
+        
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.readers.fetch_sub(1, atomic::Ordering::Release)
+            return None
+        end
+        
+        return Some(RwLockReadGuard {
+            rwlock: self,
+            value: unsafe { &*self.value.get() }
+        })
+    
+    /// Acquire a write lock (exclusive access)
+    /// Blocks until all readers and writers release
+    pub fn write(&self) -> RwLockWriteResult[T]:
+        # Indicate writer is waiting
+        self.writer_waiting.fetch_add(1, atomic::Ordering::Relaxed)
+        
+        loop:
+            # Wait for no readers and no active writer
+            while self.readers.load(atomic::Ordering::Relaxed) != 0 or
+                  self.writer.load(atomic::Ordering::Relaxed):
+                @intrinsic("pause")
+            
+            # Try to set writer flag
+            if self.writer.compare_exchange(
+                false, true,
+                atomic::Ordering::Acquire,
+                atomic::Ordering::Relaxed
+            ):
+                break
+        end
+        
+        self.writer_waiting.fetch_sub(1, atomic::Ordering::Relaxed)
+        
+        # Check poison status
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.writer.store(false, atomic::Ordering::Release)
+            return Err(RwLockPoisonError.new("RwLock is poisoned"))
+        end
+        
+        return Ok(RwLockWriteGuard {
+            rwlock: self,
+            value: unsafe { &mut *self.value.get() }
+        })
+    
+    /// Try to acquire a write lock without blocking
+    pub fn try_write(&self) -> Option[RwLockWriteGuard[T]]:
+        # Check if any readers or writer is active
+        if self.readers.load(atomic::Ordering::Relaxed) != 0 or
+           self.writer.load(atomic::Ordering::Relaxed):
+            return None
+        end
+        
+        if not self.writer.compare_exchange(
+            false, true,
+            atomic::Ordering::Acquire,
+            atomic::Ordering::Relaxed
+        ):
+            return None
+        end
+        
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.writer.store(false, atomic::Ordering::Release)
+            return None
+        end
+        
+        return Some(RwLockWriteGuard {
+            rwlock: self,
+            value: unsafe { &mut *self.value.get() }
+        })
+    
+    /// Check if the lock is poisoned
+    pub fn is_poisoned(&self) -> bool:
+        return self.poisoned.load(atomic::Ordering::Relaxed)
+    
+    /// Clear the poisoned state
+    pub fn clear_poison(&self):
+        self.poisoned.store(false, atomic::Ordering::Relaxed)
+    
+    /// Get mutable reference (requires exclusive ownership)
+    pub fn get_mut(&mut self) -> &mut T:
+        return self.value.get_mut()
+    
+    /// Consume and return inner value
+    pub fn into_inner(self) -> T:
+        return self.value.into_inner()
+    
+    /// Internal: release read lock
+    fn release_read(&self):
+        self.readers.fetch_sub(1, atomic::Ordering::Release)
+    
+    /// Internal: release write lock
+    fn release_write(&self):
+        self.writer.store(false, atomic::Ordering::Release)
+    
+    /// Internal: mark as poisoned
+    fn poison(&self):
+        self.poisoned.store(true, atomic::Ordering::Relaxed)
+
+
+/// RwLockReadGuard - guard for read access
+/// Allows shared immutable access to the value
+pub struct RwLockReadGuard[T]:
+    rwlock: &RwLock[T]
+    value: &T
+
+impl RwLockReadGuard[T]:
+    /// Get a reference to the guarded value
+    pub fn deref(&self) -> &T:
+        return self.value
+    
+    /// Map to a sub-field
+    pub fn map[U](guard: Self, f: fn(&T) -> &U) -> MappedRwLockReadGuard[T, U]:
+        let rwlock = guard.rwlock
+        let value = f(guard.value)
+        guard.rwlock = null  # Prevent double-unlock
+        
+        return MappedRwLockReadGuard {
+            rwlock: rwlock,
+            value: value
+        }
+
+
+impl Drop for RwLockReadGuard[T]:
+    fn drop(&mut self):
+        if self.rwlock != null:
+            self.rwlock.release_read()
+
+
+/// RwLockWriteGuard - guard for write access
+/// Provides exclusive mutable access to the value
+pub struct RwLockWriteGuard[T]:
+    rwlock: &RwLock[T]
+    value: &mut T
+
+impl RwLockWriteGuard[T]:
+    /// Get a reference to the guarded value
+    pub fn deref(&self) -> &T:
+        return self.value
+    
+    /// Get a mutable reference to the guarded value
+    pub fn deref_mut(&mut self) -> &mut T:
+        return self.value
+    
+    /// Downgrade to a read guard
+    /// More efficient than releasing and re-acquiring
+    pub fn downgrade(self) -> RwLockReadGuard[T]:
+        let rwlock = self.rwlock
+        let value = self.value as &T
+        
+        # Increment reader count before releasing writer flag
+        rwlock.readers.fetch_add(1, atomic::Ordering::Relaxed)
+        rwlock.release_write()
+        
+        self.rwlock = null  # Prevent drop from releasing again
+        
+        return RwLockReadGuard {
+            rwlock: rwlock,
+            value: value
+        }
+    
+    /// Map to a sub-field
+    pub fn map[U](guard: Self, f: fn(&mut T) -> &mut U) -> MappedRwLockWriteGuard[T, U]:
+        let rwlock = guard.rwlock
+        let value = f(guard.value)
+        guard.rwlock = null
+        
+        return MappedRwLockWriteGuard {
+            rwlock: rwlock,
+            value: value
+        }
+
+
+impl Drop for RwLockWriteGuard[T]:
+    fn drop(&mut self):
+        if self.rwlock != null:
+            # Poison if panicking
+            if @syscall(panicking):
+                self.rwlock.poison()
+            end
+            self.rwlock.release_write()
+
+
+/// MappedRwLockReadGuard - mapped read guard
+pub struct MappedRwLockReadGuard[T, U]:
+    rwlock: &RwLock[T]
+    value: &U
+
+impl Drop for MappedRwLockReadGuard[T, U]:
+    fn drop(&mut self):
+        if self.rwlock != null:
+            self.rwlock.release_read()
+
+
+/// MappedRwLockWriteGuard - mapped write guard
+pub struct MappedRwLockWriteGuard[T, U]:
+    rwlock: &RwLock[T]
+    value: &mut U
+
+impl Drop for MappedRwLockWriteGuard[T, U]:
+    fn drop(&mut self):
+        if self.rwlock != null:
+            if @syscall(panicking):
+                self.rwlock.poison()
+            end
+            self.rwlock.release_write()
+
+
+/// FairRwLock - rwlock with reader-writer fairness
+/// Alternates between readers and writers to prevent starvation
+pub struct FairRwLock[T]:
+    value: UnsafeCell[T]
+    readers: atomic::AtomicIsize
+    writer: atomic::AtomicBool
+    turn: atomic::AtomicI32  # Positive = readers' turn, Negative = writers' turn
+    poisoned: atomic::AtomicBool
+
+impl FairRwLock[T]:
+    /// Create a new fair rwlock
+    pub fn new(value: T) -> Self:
+        return Self {
+            value: UnsafeCell.new(value),
+            readers: atomic::AtomicIsize.new(0),
+            writer: atomic::AtomicBool.new(false),
+            turn: atomic::AtomicI32.new(1),  # Start with readers
+            poisoned: atomic::AtomicBool.new(false)
+        }
+    
+    /// Acquire read lock with fairness
+    pub fn read(&self) -> RwLockReadResult[T]:
+        # Wait for our turn (positive turn value)
+        while self.turn.load(atomic::Ordering::Relaxed) < 0:
+            @intrinsic("pause")
+        
+        # Increment readers
+        self.readers.fetch_add(1, atomic::Ordering::Acquire)
+        
+        # Wait for any active writer
+        while self.writer.load(atomic::Ordering::Relaxed):
+            @intrinsic("pause")
+        
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.readers.fetch_sub(1, atomic::Ordering::Release)
+            return Err(RwLockPoisonError.new("FairRwLock is poisoned"))
+        end
+        
+        return Ok(RwLockReadGuard {
+            rwlock: self as &RwLock[T],  # Reuse guard type
+            value: unsafe { &*self.value.get() }
+        })
+    
+    /// Acquire write lock with fairness
+    pub fn write(&self) -> RwLockWriteResult[T]:
+        # Set turn to negative (writers' turn)
+        let old_turn = self.turn.swap(-1, atomic::Ordering::Acquire)
+        
+        # Wait for readers to drain
+        while self.readers.load(atomic::Ordering::Relaxed) > 0:
+            @intrinsic("pause")
+        
+        # Try to become writer
+        while not self.writer.compare_exchange(
+            false, true,
+            atomic::Ordering::Acquire,
+            atomic::Ordering::Relaxed
+        ):
+            @intrinsic("pause")
+        
+        if self.poisoned.load(atomic::Ordering::Relaxed):
+            self.writer.store(false, atomic::Ordering::Release)
+            self.turn.store(1, atomic::Ordering::Release)  # Give turn to readers
+            return Err(RwLockPoisonError.new("FairRwLock is poisoned"))
+        end
+        
+        return Ok(RwLockWriteGuard {
+            rwlock: self as &RwLock[T],
+            value: unsafe { &mut *self.value.get() }
+        })
+
+
+/// Helper function: wrap a value in an RwLock
+pub fn rwlock[T](value: T) -> RwLock[T]:
+    return RwLock.new(value)
+
+/// Helper function: wrap a value in a FairRwLock
+pub fn fair_rwlock[T](value: T) -> FairRwLock[T]:
+    return FairRwLock.new(value)

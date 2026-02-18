@@ -1,0 +1,265 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "VeZ",
+  "scopeName": "source.vez",
+  "fileTypes": [".zari", ".vez"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#annotations" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#types" },
+    { "include": "#functions" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.vez",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.vez",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "meta.annotation.vez",
+          "match": "@[a-zA-Z_][a-zA-Z0-9_]*",
+          "captures": {
+            "0": { "name": "storage.type.annotation.vez" }
+          }
+        },
+        {
+          "name": "meta.annotation.parameters.vez",
+          "begin": "(@[a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+          "end": "\\)",
+          "beginCaptures": {
+            "1": { "name": "storage.type.annotation.vez" }
+          },
+          "patterns": [
+            { "include": "#strings" },
+            { "include": "#numbers" },
+            { "include": "#types" }
+          ]
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.vez",
+          "match": "\\b(if|else|elif|for|while|loop|break|continue|return|yield|match|case|default)\\b"
+        },
+        {
+          "name": "keyword.declaration.vez",
+          "match": "\\b(fn|def|let|var|const|struct|enum|trait|impl|type|alias|mod|use|import|pub|async|await)\\b"
+        },
+        {
+          "name": "keyword.other.vez",
+          "match": "\\b(self|super|where|as|in|is|not|and|or|xor|sizeof|alignof|typeof)\\b"
+        },
+        {
+          "name": "keyword.operator.vez",
+          "match": "\\b(unsafe|ref|mut|move|copy|clone|drop|deref|deref_mut)\\b"
+        },
+        {
+          "name": "constant.language.vez",
+          "match": "\\b(true|false|null|None|Some|Ok|Err)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.vez",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.vez",
+              "match": "\\\\[nrt\\\"'0]"
+            },
+            {
+              "name": "constant.character.escape.unicode.vez",
+              "match": "\\\\u\\{[0-9a-fA-F]+\\}"
+            },
+            {
+              "name": "constant.character.escape.hex.vez",
+              "match": "\\\\x[0-9a-fA-F]{2}"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.vez",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.vez",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.triple.vez",
+          "begin": "\"\"\"",
+          "end": "\"\"\""
+        },
+        {
+          "name": "string.raw.vez",
+          "begin": "r\"",
+          "end": "\""
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.vez",
+          "match": "\\b0[xX][0-9a-fA-F_]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.vez",
+          "match": "\\b0[bB][01_]+\\b"
+        },
+        {
+          "name": "constant.numeric.octal.vez",
+          "match": "\\b0[oO][0-7_]+\\b"
+        },
+        {
+          "name": "constant.numeric.float.vez",
+          "match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9_]+)?([fF](32|64))?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.vez",
+          "match": "\\b[0-9][0-9_]*([iIuU](8|16|32|64|128|size))?\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.primitive.vez",
+          "match": "\\b(i8|i16|i32|i64|i128|isize|u8|u16|u32|u64|u128|usize|f32|f64|bool|char|str|byte)\\b"
+        },
+        {
+          "name": "support.type.builtin.vez",
+          "match": "\\b(String|Vec|HashMap|HashSet|BTreeMap|LinkedList|VecDeque|Option|Result|Box|Rc|Arc|Cell|RefCell|Mutex|RwLock|Channel)\\b"
+        },
+        {
+          "name": "entity.name.type.vez",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "meta.function.definition.vez",
+          "begin": "\\b(fn|def)\\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+          "beginCaptures": {
+            "1": { "name": "keyword.declaration.vez" },
+            "2": { "name": "entity.name.function.vez" }
+          },
+          "end": "(?=\\{|:)",
+          "patterns": [
+            { "include": "#parameters" },
+            { "include": "#types" }
+          ]
+        },
+        {
+          "name": "meta.function.call.vez",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "entity.name.function.vez" }
+          }
+        }
+      ]
+    },
+    "parameters": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "end": "\\)",
+          "patterns": [
+            {
+              "match": "([a-zA-Z_][a-zA-Z0-9_]*)\\s*:\\s*([a-zA-Z_][a-zA-Z0-9_<>, \\[\\]]*)",
+              "captures": {
+                "1": { "name": "variable.parameter.vez" },
+                "2": { "name": "support.type.vez" }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arithmetic.vez",
+          "match": "[+\\-*/%]"
+        },
+        {
+          "name": "keyword.operator.comparison.vez",
+          "match": "(==|!=|<=|>=|<|>)"
+        },
+        {
+          "name": "keyword.operator.logical.vez",
+          "match": "(\\|\\||&&|!)"
+        },
+        {
+          "name": "keyword.operator.bitwise.vez",
+          "match": "(\\||&|\\^|~|<<|>>)"
+        },
+        {
+          "name": "keyword.operator.assignment.vez",
+          "match": "(=|\\+=|-=|\\*=|/=|%=|\\|=|&=|\\^=|<<=|>>=)"
+        },
+        {
+          "name": "keyword.operator.arrow.vez",
+          "match": "(->|=>|::|\\.)"
+        },
+        {
+          "name": "keyword.operator.range.vez",
+          "match": "(\\.\\.|\\.\\.\\.)"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.bracket.round.vez",
+          "match": "[()]"
+        },
+        {
+          "name": "punctuation.bracket.square.vez",
+          "match": "[\\[\\]]"
+        },
+        {
+          "name": "punctuation.bracket.curly.vez",
+          "match": "[{}]"
+        },
+        {
+          "name": "punctuation.separator.comma.vez",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.colon.vez",
+          "match": ":"
+        },
+        {
+          "name": "punctuation.separator.semicolon.vez",
+          "match": ";"
+        }
+      ]
+    }
+  }
+}

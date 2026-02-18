@@ -1,0 +1,676 @@
+// VeZ Standard Library - Atomic Types
+// Provides atomic operations for lock-free concurrent programming
+
+/// Memory ordering constraints
+pub enum Ordering:
+    Relaxed     # No ordering constraints
+    Acquire     # Prevents reordering of reads before this
+    Release     # Prevents reordering of writes after this
+    AcqRel      # Acquire + Release
+    SeqCst      # Sequentially consistent (strongest)
+
+
+/// AtomicBool - atomic boolean
+pub struct AtomicBool:
+    value: u8  # 0 = false, 1 = true
+
+impl AtomicBool:
+    /// Create a new atomic boolean
+    pub fn new(value: bool) -> Self:
+        return Self {
+            value: if value { 1 } else { 0 }
+        }
+    
+    /// Load the value atomically
+    pub fn load(&self, order: Ordering) -> bool:
+        return @atomic_load(&self.value, order) != 0
+    
+    /// Store a value atomically
+    pub fn store(&self, value: bool, order: Ordering):
+        @atomic_store(&self.value, if value { 1 } else { 0 }, order)
+    
+    /// Swap with a new value, returning the old
+    pub fn swap(&self, value: bool, order: Ordering) -> bool:
+        return @atomic_swap(&self.value, if value { 1 } else { 0 }, order) != 0
+    
+    /// Compare and swap (strong version)
+    /// Returns Ok(new) on success, Err(current) on failure
+    pub fn compare_exchange(
+        &self, 
+        expected: bool, 
+        new: bool,
+        success_order: Ordering,
+        failure_order: Ordering
+    ) -> Result[bool, bool]:
+        let expected_val = if expected { 1u8 } else { 0u8 }
+        let new_val = if new { 1u8 } else { 0u8 }
+        
+        let result = @atomic_cas(
+            &self.value, 
+            expected_val, 
+            new_val,
+            success_order,
+            failure_order
+        )
+        
+        if result == expected_val:
+            return Ok(new)
+        else:
+            return Err(result != 0)
+    
+    /// Compare and swap (weak version, may spuriously fail)
+    pub fn compare_exchange_weak(
+        &self,
+        expected: bool,
+        new: bool,
+        success_order: Ordering,
+        failure_order: Ordering
+    ) -> Result[bool, bool]:
+        return self.compare_exchange(expected, new, success_order, failure_order)
+    
+    /// Set to true and return previous value
+    pub fn fetch_or(&self, value: bool, order: Ordering) -> bool:
+        if value:
+            return @atomic_fetch_or(&self.value, 1, order) != 0
+        else:
+            return self.load(order)
+    
+    /// Set to false and return previous value
+    pub fn fetch_and(&self, value: bool, order: Ordering) -> bool:
+        if not value:
+            return @atomic_fetch_and(&self.value, 0, order) != 0
+        else:
+            return self.load(order)
+    
+    /// Toggle and return previous value
+    pub fn fetch_nand(&self, order: Ordering) -> bool:
+        let old = self.load(order)
+        self.store(not old, order)
+        return old
+    
+    /// Fetch update with closure
+    pub fn fetch_update<F>(&self, f: F, order: Ordering) -> bool where F: Fn(bool) -> bool:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = f(old)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+
+
+/// AtomicI8 - atomic signed 8-bit integer
+pub struct AtomicI8:
+    value: i8
+
+impl AtomicI8:
+    pub fn new(value: i8) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> i8:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: i8, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: i8, order: Ordering) -> i8:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: i8,
+        new: i8,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[i8, i8]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: i8, order: Ordering) -> i8:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: i8, order: Ordering) -> i8:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: i8, order: Ordering) -> i8:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: i8, order: Ordering) -> i8:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: i8, order: Ordering) -> i8:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: i8, order: Ordering) -> i8:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = max(old, val)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+    
+    pub fn fetch_min(&self, val: i8, order: Ordering) -> i8:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = min(old, val)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+
+
+/// AtomicU8 - atomic unsigned 8-bit integer
+pub struct AtomicU8:
+    value: u8
+
+impl AtomicU8:
+    pub fn new(value: u8) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> u8:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: u8, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: u8, order: Ordering) -> u8:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: u8,
+        new: u8,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[u8, u8]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: u8, order: Ordering) -> u8:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: u8, order: Ordering) -> u8:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: u8, order: Ordering) -> u8:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: u8, order: Ordering) -> u8:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: u8, order: Ordering) -> u8:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: u8, order: Ordering) -> u8:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = max(old, val)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+    
+    pub fn fetch_min(&self, val: u8, order: Ordering) -> u8:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = min(old, val)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+
+
+/// AtomicI32 - atomic signed 32-bit integer
+pub struct AtomicI32:
+    value: i32
+
+impl AtomicI32:
+    pub fn new(value: i32) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> i32:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: i32, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: i32, order: Ordering) -> i32:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: i32,
+        new: i32,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[i32, i32]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn compare_exchange_weak(
+        &self,
+        expected: i32,
+        new: i32,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[i32, i32]:
+        return self.compare_exchange(expected, new, success, failure)
+    
+    pub fn fetch_add(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_nand(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_nand(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_max(&self.value, val, order)
+    
+    pub fn fetch_min(&self, val: i32, order: Ordering) -> i32:
+        return @atomic_fetch_min(&self.value, val, order)
+    
+    pub fn fetch_update<F>(&self, f: F, order: Ordering) -> i32 where F: Fn(i32) -> i32:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = f(old)
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+
+
+/// AtomicU32 - atomic unsigned 32-bit integer
+pub struct AtomicU32:
+    value: u32
+
+impl AtomicU32:
+    pub fn new(value: u32) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> u32:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: u32, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: u32, order: Ordering) -> u32:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: u32,
+        new: u32,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[u32, u32]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_max(&self.value, val, order)
+    
+    pub fn fetch_min(&self, val: u32, order: Ordering) -> u32:
+        return @atomic_fetch_min(&self.value, val, order)
+
+
+/// AtomicI64 - atomic signed 64-bit integer
+pub struct AtomicI64:
+    value: i64
+
+impl AtomicI64:
+    pub fn new(value: i64) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> i64:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: i64, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: i64, order: Ordering) -> i64:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: i64,
+        new: i64,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[i64, i64]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_max(&self.value, val, order)
+    
+    pub fn fetch_min(&self, val: i64, order: Ordering) -> i64:
+        return @atomic_fetch_min(&self.value, val, order)
+
+
+/// AtomicU64 - atomic unsigned 64-bit integer
+pub struct AtomicU64:
+    value: u64
+
+impl AtomicU64:
+    pub fn new(value: u64) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> u64:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: u64, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: u64, order: Ordering) -> u64:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: u64,
+        new: u64,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[u64, u64]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_max(&self.value, val, order)
+    
+    pub fn fetch_min(&self, val: u64, order: Ordering) -> u64:
+        return @atomic_fetch_min(&self.value, val, order)
+
+
+/// AtomicUsize - atomic pointer-sized integer
+pub struct AtomicUsize:
+    value: usize
+
+impl AtomicUsize:
+    pub fn new(value: usize) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> usize:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: usize, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: usize, order: Ordering) -> usize:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: usize,
+        new: usize,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[usize, usize]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn compare_exchange_weak(
+        &self,
+        expected: usize,
+        new: usize,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[usize, usize]:
+        return self.compare_exchange(expected, new, success, failure)
+    
+    pub fn fetch_add(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_sub(&self.value, val, order)
+    
+    pub fn fetch_and(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_and(&self.value, val, order)
+    
+    pub fn fetch_or(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_or(&self.value, val, order)
+    
+    pub fn fetch_xor(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_xor(&self.value, val, order)
+    
+    pub fn fetch_max(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_max(&self.value, val, order)
+    
+    pub fn fetch_min(&self, val: usize, order: Ordering) -> usize:
+        return @atomic_fetch_min(&self.value, val, order)
+    
+    /// Bitwise update with mask
+    pub fn fetch_update<F>(&self, f: F, order: Ordering) -> usize where F: Fn(usize) -> usize:
+        loop:
+            let old = self.load(Ordering::Relaxed)
+            let new = f(old)
+            if new == old:
+                return old
+            end
+            match self.compare_exchange_weak(old, new, order, Ordering::Relaxed):
+                Ok(_) => return old
+                Err(_) => continue
+
+
+/// AtomicIsize - atomic signed pointer-sized integer
+pub struct AtomicIsize:
+    value: isize
+
+impl AtomicIsize:
+    pub fn new(value: isize) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> isize:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: isize, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: isize, order: Ordering) -> isize:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: isize,
+        new: isize,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[isize, isize]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+    
+    pub fn fetch_add(&self, val: isize, order: Ordering) -> isize:
+        return @atomic_fetch_add(&self.value, val, order)
+    
+    pub fn fetch_sub(&self, val: isize, order: Ordering) -> isize:
+        return @atomic_fetch_sub(&self.value, val, order)
+
+
+/// AtomicPtr - atomic raw pointer
+pub struct AtomicPtr[T]:
+    value: *mut T
+
+impl AtomicPtr[T]:
+    pub fn new(value: *mut T) -> Self:
+        return Self { value: value }
+    
+    pub fn load(&self, order: Ordering) -> *mut T:
+        return @atomic_load(&self.value, order)
+    
+    pub fn store(&self, value: *mut T, order: Ordering):
+        @atomic_store(&self.value, value, order)
+    
+    pub fn swap(&self, value: *mut T, order: Ordering) -> *mut T:
+        return @atomic_swap(&self.value, value, order)
+    
+    pub fn compare_exchange(
+        &self,
+        expected: *mut T,
+        new: *mut T,
+        success: Ordering,
+        failure: Ordering
+    ) -> Result[*mut T, *mut T]:
+        let result = @atomic_cas(&self.value, expected, new, success, failure)
+        if result == expected:
+            return Ok(new)
+        else:
+            return Err(result)
+
+
+// =====================
+// Fence Operations
+// =====================
+
+/// Compiler fence - prevents compiler reordering only
+pub fn compiler_fence(order: Ordering):
+    @atomic_compiler_fence(order)
+
+/// Memory fence - prevents CPU and compiler reordering
+pub fn fence(order: Ordering):
+    @atomic_fence(order)
+
+/// Sequentially consistent fence
+pub fn seq_cst_fence():
+    fence(Ordering::SeqCst)
+
+
+// =====================
+// Spin Loop Helpers
+// =====================
+
+/// Hint that the CPU is in a spin loop
+pub fn hint_spin_loop():
+    @intrinsic("pause")
+
+/// Spin until a condition is true
+pub fn spin_until(condition: &AtomicBool):
+    while not condition.load(Ordering::Relaxed):
+        hint_spin_loop()
+
+/// Spin with exponential backoff
+pub fn spin_with_backoff[F](condition: F) where F: Fn() -> bool:
+    let mut backoff = 1
+    let max_backoff = 1024
+    
+    while not condition():
+        for _ in range(backoff):
+            hint_spin_loop()
+        backoff = min(backoff * 2, max_backoff)
+
+
+// =====================
+// Atomic Float (Experimental)
+// =====================
+
+/// AtomicF32 - atomic 32-bit float (using integer representation)
+pub struct AtomicF32:
+    bits: AtomicU32
+
+impl AtomicF32:
+    pub fn new(value: f32) -> Self:
+        return Self {
+            bits: AtomicU32.new(value.to_bits())
+        }
+    
+    pub fn load(&self, order: Ordering) -> f32:
+        return f32.from_bits(self.bits.load(order))
+    
+    pub fn store(&self, value: f32, order: Ordering):
+        self.bits.store(value.to_bits(), order)
+    
+    pub fn swap(&self, value: f32, order: Ordering) -> f32:
+        return f32.from_bits(self.bits.swap(value.to_bits(), order))
+
+
+/// AtomicF64 - atomic 64-bit float (using integer representation)
+pub struct AtomicF64:
+    bits: AtomicU64
+
+impl AtomicF64:
+    pub fn new(value: f64) -> Self:
+        return Self {
+            bits: AtomicU64.new(value.to_bits())
+        }
+    
+    pub fn load(&self, order: Ordering) -> f64:
+        return f64.from_bits(self.bits.load(order))
+    
+    pub fn store(&self, value: f64, order: Ordering):
+        self.bits.store(value.to_bits(), order)
+    
+    pub fn swap(&self, value: f64, order: Ordering) -> f64:
+        return f64.from_bits(self.bits.swap(value.to_bits(), order))

@@ -1,10 +1,12 @@
 // VeZ GPU Compute Backend
-// Supports CUDA, Metal, and Vulkan compute shaders
+// Supports CUDA, ROCm/HIP, Metal, and Vulkan compute shaders
 
 pub mod cuda;
 pub mod metal;
 pub mod vulkan;
 pub mod kernel;
+pub mod rocm;
+pub mod amd_optimize;
 
 use crate::parser::ast::{self as ast, Stmt, Expr, Literal};
 use crate::ir::ssa::{self as ir, Function, BasicBlock, ValueId, Value, Constant};
@@ -16,6 +18,7 @@ use crate::ir::instructions::BinaryOp;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GpuBackend {
     CUDA,
+    ROCm,
     Metal,
     Vulkan,
     OpenCL,
@@ -80,6 +83,7 @@ impl GpuCodegen {
     pub fn generate_kernel(&self, func: &ir::Function) -> Result<String> {
         match self.backend {
             GpuBackend::CUDA => self.generate_cuda_kernel(func),
+            GpuBackend::ROCm => self.generate_rocm_kernel(func),
             GpuBackend::Metal => self.generate_metal_kernel(func),
             GpuBackend::Vulkan => self.generate_vulkan_kernel(func),
             GpuBackend::OpenCL => self.generate_opencl_kernel(func),
@@ -117,6 +121,18 @@ impl GpuCodegen {
         code.push_str("}\n");
         
         Ok(code)
+    }
+    
+    fn generate_rocm_kernel(&self, func: &ir::Function) -> Result<String> {
+        use rocm::{HipCodegen, RocmKernelConfig, AmdGpuArch};
+        
+        let config = RocmKernelConfig::new(AmdGpuArch::Rdna3)
+            .with_workgroup(self.config.block_dim.0, self.config.block_dim.1, self.config.block_dim.2)
+            .with_grid(self.config.grid_dim.0, self.config.grid_dim.1, self.config.grid_dim.2)
+            .with_shared_memory(self.config.shared_memory);
+        
+        let mut codegen = HipCodegen::new(config);
+        codegen.generate_kernel(func)
     }
     
     fn generate_metal_kernel(&self, func: &ir::Function) -> Result<String> {
@@ -371,6 +387,7 @@ impl GpuMemory {
         // Platform-specific allocation
         let ptr = match self.backend {
             GpuBackend::CUDA => self.cuda_malloc(size)?,
+            GpuBackend::ROCm => self.rocm_malloc(size)?,
             GpuBackend::Metal => self.metal_alloc(size)?,
             GpuBackend::Vulkan => self.vulkan_alloc(size)?,
             GpuBackend::OpenCL => self.opencl_alloc(size)?,
@@ -389,6 +406,7 @@ impl GpuMemory {
     pub fn deallocate(&mut self, alloc: &GpuAllocation) -> Result<()> {
         match self.backend {
             GpuBackend::CUDA => self.cuda_free(alloc.ptr)?,
+            GpuBackend::ROCm => self.rocm_free(alloc.ptr)?,
             GpuBackend::Metal => self.metal_free(alloc.ptr)?,
             GpuBackend::Vulkan => self.vulkan_free(alloc.ptr)?,
             GpuBackend::OpenCL => self.opencl_free(alloc.ptr)?,
@@ -399,17 +417,22 @@ impl GpuMemory {
     }
     
     fn cuda_malloc(&self, _size: usize) -> Result<u64> {
-        // Call cudaMalloc via FFI
         Ok(0)
     }
     
     fn cuda_free(&self, _ptr: u64) -> Result<()> {
-        // Call cudaFree via FFI
+        Ok(())
+    }
+    
+    fn rocm_malloc(&self, _size: usize) -> Result<u64> {
+        Ok(0)
+    }
+    
+    fn rocm_free(&self, _ptr: u64) -> Result<()> {
         Ok(())
     }
     
     fn metal_alloc(&self, _size: usize) -> Result<u64> {
-        // Metal buffer allocation
         Ok(0)
     }
     
@@ -418,7 +441,6 @@ impl GpuMemory {
     }
     
     fn vulkan_alloc(&self, _size: usize) -> Result<u64> {
-        // Vulkan memory allocation
         Ok(0)
     }
     
@@ -427,7 +449,6 @@ impl GpuMemory {
     }
     
     fn opencl_alloc(&self, _size: usize) -> Result<u64> {
-        // OpenCL buffer allocation
         Ok(0)
     }
     
@@ -454,5 +475,11 @@ mod tests {
     fn test_gpu_codegen() {
         let codegen = GpuCodegen::new(GpuBackend::CUDA);
         assert_eq!(codegen.backend, GpuBackend::CUDA);
+    }
+    
+    #[test]
+    fn test_rocm_codegen() {
+        let codegen = GpuCodegen::new(GpuBackend::ROCm);
+        assert_eq!(codegen.backend, GpuBackend::ROCm);
     }
 }

@@ -2,7 +2,7 @@
 
 use crate::parser::*;
 use crate::error::{Error, ErrorKind, Result};
-use super::ssa::{Function as IrFunction, BasicBlock, Value, ValueId, Constant, Module};
+use super::ssa::{Function as IrFunction, Value, ValueId, Constant, Module};
 use super::types::IrType;
 use super::instructions::{Instruction, BinaryOp, UnaryOp};
 use std::collections::HashMap;

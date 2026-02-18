@@ -25,6 +25,13 @@ pub mod gpu;
 pub mod consteval;
 pub mod plugin;
 pub mod style_adapters;
+pub mod ai;
+pub mod effects;
+pub mod dependent_types;
+pub mod intrinsics;
+pub mod scheduler;
+pub mod allocator;
+pub mod docgen;
 
 /// Compiler version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

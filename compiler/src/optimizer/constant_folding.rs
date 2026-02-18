@@ -2,7 +2,6 @@
 
 use crate::ir::ssa::{Module, Function as IrFunction, Value, Constant};
 use crate::ir::instructions::{Instruction, BinaryOp, UnaryOp};
-use crate::ir::types::IrType;
 use crate::error::Result;
 use super::pass_manager::OptimizationPass;
 

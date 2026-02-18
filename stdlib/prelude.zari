@@ -8,6 +8,11 @@ pub use core::result::{Result, Result::Ok, Result::Err};
 // Collections
 pub use collections::vec::Vec;
 pub use collections::string::String;
+pub use collections::hashmap::HashMap;
+pub use collections::hashset::HashSet;
+pub use collections::btreemap::BTreeMap;
+pub use collections::linkedlist::LinkedList;
+pub use collections::vecdeque::VecDeque;
 
 // Smart pointers
 pub use mem::allocator::{Box, Rc};
@@ -32,6 +37,26 @@ pub use core::convert::{AsRef, AsMut};
 pub use io::stdio::{stdin, stdout, stderr};
 pub use io::stdio::{Stdin, Stdout, Stderr};
 pub use io::file::File;
+
+// Buffered I/O
+pub use io::buffered::{BufferedReader, BufferedWriter, BufReader, BufWriter};
+
+// Networking
+pub use io::net::{SocketAddr, TcpStream, TcpListener, UdpSocket, Shutdown};
+
+// Filesystem
+pub use io::fs::{Metadata, Permissions, DirEntry, FileType, OpenOptions, SeekFrom};
+pub use io::fs::{read_to_string, read, write_string, write, append};
+pub use io::fs::{read_dir, create_dir, create_dir_all, remove_file, remove_dir, remove_dir_all};
+pub use io::fs::{rename, copy, exists, is_file, is_dir};
+pub use io::fs::{current_dir, set_current_dir, canonicalize};
+
+// Synchronization
+pub use sync::mutex::{Mutex, MutexGuard, SpinLock};
+pub use sync::rwlock::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+pub use sync::channel::{channel, sync_channel, Sender, Receiver};
+pub use sync::atomic::{Ordering, AtomicBool, AtomicI32, AtomicU32, AtomicUsize};
+pub use sync::atomic::{AtomicI64, AtomicU64, AtomicPtr, fence};
 
 // Macros (automatically available)
 // - print!

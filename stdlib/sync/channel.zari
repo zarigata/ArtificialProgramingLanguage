@@ -1,0 +1,478 @@
+// VeZ Standard Library - Channel
+// Provides multi-producer, multi-consumer channels for message passing
+
+use std::sync::atomic
+use std::sync::mutex
+
+/// Channel send error
+pub struct SendError[T]:
+    value: T
+
+impl SendError[T]:
+    /// Get the value that failed to send
+    pub fn into_inner(self) -> T:
+        return self.value
+
+
+/// Channel receive error
+pub enum RecvError:
+    Disconnected  # Channel has been closed
+    Empty         # No message available (for try_recv)
+
+
+/// Result of a send operation
+pub type SendResult[T] = Result[Unit, SendError[T]]
+
+/// Result of a receive operation  
+pub type RecvResult[T] = Result[T, RecvError]
+
+
+/// Receiver iterator - iterate over received messages
+pub struct IntoIter[T]:
+    receiver: Receiver[T]
+
+impl IntoIter[T]:
+    pub fn next(&mut self) -> Option[T]:
+        return match self.receiver.recv():
+            Ok(value) => Some(value)
+            Err(RecvError.Disconnected) => None
+            Err(RecvError.Empty) => None
+
+
+// =====================
+// Unbounded Channel
+// =====================
+
+/// Unbounded channel - no limit on queued messages
+pub fn channel[T]() -> (Sender[T], Receiver[T]):
+    let inner = ChannelInner[T].new()
+    let sender = Sender { inner: &inner }
+    let receiver = Receiver { inner: &inner }
+    return (sender, receiver)
+
+
+/// Internal channel state
+struct ChannelInner[T]:
+    queue: Mutex[Vec[T]]
+    available: atomic::AtomicBool
+    closed: atomic::AtomicBool
+    waiters: atomic::AtomicUsize
+
+impl ChannelInner[T]:
+    fn new() -> Self:
+        return Self {
+            queue: Mutex.new(Vec[T].new()),
+            available: atomic::AtomicBool.new(false),
+            closed: atomic::AtomicBool.new(false),
+            waiters: atomic::AtomicUsize.new(0)
+        }
+    
+    fn send(&self, value: T) -> SendResult[T]:
+        if self.closed.load(atomic::Ordering::Relaxed):
+            return Err(SendError { value: value })
+        end
+        
+        let mut queue = self.queue.lock().unwrap()
+        queue.push(value)
+        
+        self.available.store(true, atomic::Ordering::Release)
+        
+        # Wake up a waiting receiver
+        if self.waiters.load(atomic::Ordering::Relaxed) > 0:
+            @syscall(futex_wake, &self.available, 1)
+        end
+        
+        return Ok(())
+    
+    fn recv(&self) -> RecvResult[T]:
+        loop:
+            # Check if closed and empty
+            if self.closed.load(atomic::Ordering::Relaxed):
+                let queue = self.queue.lock().unwrap()
+                if queue.is_empty():
+                    return Err(RecvError.Disconnected)
+                end
+            end
+            
+            # Wait for data
+            while not self.available.load(atomic::Ordering::Acquire):
+                if self.closed.load(atomic::Ordering::Relaxed):
+                    break
+                end
+                
+                self.waiters.fetch_add(1, atomic::Ordering::Relaxed)
+                @syscall(futex_wait, &self.available, 0, -1)  # -1 = infinite timeout
+                self.waiters.fetch_sub(1, atomic::Ordering::Relaxed)
+            end
+            
+            # Try to get a message
+            let mut queue = self.queue.lock().unwrap()
+            if not queue.is_empty():
+                let value = queue.remove(0)
+                let has_more = not queue.is_empty()
+                if not has_more:
+                    self.available.store(false, atomic::Ordering::Relaxed)
+                end
+                return Ok(value)
+            end
+        end
+    end
+    
+    fn try_recv(&self) -> RecvResult[T]:
+        let mut queue = self.queue.lock().unwrap()
+        
+        if queue.is_empty():
+            if self.closed.load(atomic::Ordering::Relaxed):
+                return Err(RecvError.Disconnected)
+            end
+            return Err(RecvError.Empty)
+        end
+        
+        let value = queue.remove(0)
+        let has_more = not queue.is_empty()
+        if not has_more:
+            self.available.store(false, atomic::Ordering::Relaxed)
+        end
+        return Ok(value)
+    end
+    
+    fn close(&self):
+        self.closed.store(true, atomic::Ordering::Release)
+        # Wake all waiters
+        @syscall(futex_wake, &self.available, u32::MAX)
+    end
+    
+    fn is_closed(&self) -> bool:
+        return self.closed.load(atomic::Ordering::Relaxed)
+
+
+/// Sender - sends messages to the channel
+pub struct Sender[T]:
+    inner: &ChannelInner[T]
+
+impl Sender[T]:
+    /// Send a value through the channel
+    pub fn send(&self, value: T) -> SendResult[T]:
+        return self.inner.send(value)
+    
+    /// Check if the channel is closed
+    pub fn is_closed(&self) -> bool:
+        return self.inner.is_closed()
+
+
+impl Clone for Sender[T]:
+    fn clone(&self) -> Self:
+        return Self { inner: self.inner }
+
+
+impl Drop for Sender[T]:
+    fn drop(&mut self):
+        # When last sender is dropped, close the channel
+        # (Simplified - in reality need ref counting)
+        pass
+
+
+/// Receiver - receives messages from the channel
+pub struct Receiver[T]:
+    inner: &ChannelInner[T]
+
+impl Receiver[T]:
+    /// Receive a value, blocking until available
+    pub fn recv(&self) -> RecvResult[T]:
+        return self.inner.recv()
+    
+    /// Try to receive without blocking
+    pub fn try_recv(&self) -> RecvResult[T]:
+        return self.inner.try_recv()
+    
+    /// Receive with timeout
+    pub fn recv_timeout(&self, timeout_ms: u64) -> RecvResult[T]:
+        let start = @syscall(clock_gettime)
+        
+        loop:
+            let result = self.try_recv()
+            if result.is_ok():
+                return result
+            end
+            
+            match result.unwrap_err():
+                RecvError.Disconnected => return Err(RecvError.Disconnected)
+                RecvError.Empty => pass
+            
+            let elapsed = (@syscall(clock_gettime) - start) / 1000000
+            if elapsed >= timeout_ms:
+                return Err(RecvError.Empty)
+            end
+            
+            # Wait with remaining timeout
+            let remaining = timeout_ms - elapsed
+            self.inner.waiters.fetch_add(1, atomic::Ordering::Relaxed)
+            @syscall(futex_wait, &self.inner.available, 0, remaining)
+            self.inner.waiters.fetch_sub(1, atomic::Ordering::Relaxed)
+        end
+    end
+    
+    /// Close the channel
+    pub fn close(&self):
+        self.inner.close()
+    
+    /// Check if the channel is closed and empty
+    pub fn is_closed(&self) -> bool:
+        return self.inner.is_closed()
+    
+    /// Create an iterator over received messages
+    pub fn iter(self) -> IntoIter[T]:
+        return IntoIter { receiver: self }
+
+
+impl Iterator for Receiver[T]:
+    type Item = T
+    
+    fn next(&mut self) -> Option[T]:
+        return match self.recv():
+            Ok(value) => Some(value)
+            Err(_) => None
+
+
+// =====================
+// Bounded Channel
+// =====================
+
+/// Bounded channel - limited capacity
+pub fn sync_channel[T](capacity: usize) -> (SyncSender[T], Receiver[T]):
+    let inner = BoundedChannelInner[T].new(capacity)
+    let sender = SyncSender { inner: &inner }
+    let receiver = Receiver { inner: &inner as &ChannelInner[T] }
+    return (sender, receiver)
+
+
+/// Internal bounded channel state
+struct BoundedChannelInner[T]:
+    queue: Mutex[Vec[T]]
+    capacity: usize
+    available: atomic::AtomicBool
+    has_space: atomic::AtomicBool
+    closed: atomic::AtomicBool
+    send_waiters: atomic::AtomicUsize
+    recv_waiters: atomic::AtomicUsize
+
+impl BoundedChannelInner[T]:
+    fn new(capacity: usize) -> Self:
+        return Self {
+            queue: Mutex.new(Vec[T].with_capacity(capacity)),
+            capacity: capacity,
+            available: atomic::AtomicBool.new(false),
+            has_space: atomic::AtomicBool.new(true),
+            closed: atomic::AtomicBool.new(false),
+            send_waiters: atomic::AtomicUsize.new(0),
+            recv_waiters: atomic::AtomicUsize.new(0)
+        }
+    
+    fn send(&self, value: T) -> SendResult[T]:
+        # Wait for space
+        while not self.has_space.load(atomic::Ordering::Acquire):
+            if self.closed.load(atomic::Ordering::Relaxed):
+                return Err(SendError { value: value })
+            end
+            
+            self.send_waiters.fetch_add(1, atomic::Ordering::Relaxed)
+            @syscall(futex_wait, &self.has_space, 0, -1)
+            self.send_waiters.fetch_sub(1, atomic::Ordering::Relaxed)
+        end
+        
+        if self.closed.load(atomic::Ordering::Relaxed):
+            return Err(SendError { value: value })
+        end
+        
+        let mut queue = self.queue.lock().unwrap()
+        queue.push(value)
+        
+        if queue.len() >= self.capacity:
+            self.has_space.store(false, atomic::Ordering::Relaxed)
+        end
+        
+        self.available.store(true, atomic::Ordering::Release)
+        
+        # Wake a receiver
+        if self.recv_waiters.load(atomic::Ordering::Relaxed) > 0:
+            @syscall(futex_wake, &self.available, 1)
+        end
+        
+        return Ok(())
+    end
+    
+    fn try_send(&self, value: T) -> SendResult[T]:
+        if not self.has_space.load(atomic::Ordering::Acquire):
+            return Err(SendError { value: value })
+        end
+        
+        if self.closed.load(atomic::Ordering::Relaxed):
+            return Err(SendError { value: value })
+        end
+        
+        let mut queue = self.queue.lock().unwrap()
+        queue.push(value)
+        
+        if queue.len() >= self.capacity:
+            self.has_space.store(false, atomic::Ordering::Relaxed)
+        end
+        
+        self.available.store(true, atomic::Ordering::Release)
+        return Ok(())
+    end
+
+
+/// SyncSender - sender for bounded channel
+pub struct SyncSender[T]:
+    inner: &BoundedChannelInner[T]
+
+impl SyncSender[T]:
+    /// Send, blocking if channel is full
+    pub fn send(&self, value: T) -> SendResult[T]:
+        return self.inner.send(value)
+    
+    /// Try to send without blocking
+    pub fn try_send(&self, value: T) -> SendResult[T]:
+        return self.inner.try_send(value)
+    
+    /// Check if channel is closed
+    pub fn is_closed(&self) -> bool:
+        return self.inner.closed.load(atomic::Ordering::Relaxed)
+
+
+// =====================
+// Oneshot Channel
+// =====================
+
+/// Oneshot channel - single message channel
+pub fn oneshot[T]() -> (OneshotSender[T], OneshotReceiver[T]):
+    let inner = OneshotInner[T].new()
+    return (
+        OneshotSender { inner: &inner },
+        OneshotReceiver { inner: &inner }
+    )
+
+
+struct OneshotInner[T]:
+    value: atomic::AtomicPtr[T]
+    consumed: atomic::AtomicBool
+    ready: atomic::AtomicBool
+
+impl OneshotInner[T]:
+    fn new() -> Self:
+        return Self {
+            value: atomic::AtomicPtr.new(null),
+            consumed: atomic::AtomicBool.new(false),
+            ready: atomic::AtomicBool.new(false)
+        }
+    
+    fn send(&self, value: T) -> SendResult[T]:
+        let ptr = @alloc(sizeof(T))
+        unsafe { ptr.write(value) }
+        
+        if not self.value.compare_exchange(
+            null, ptr,
+            atomic::Ordering::Release,
+            atomic::Ordering::Relaxed
+        ):
+            # Already sent
+            @free(ptr)
+            return Err(SendError { value: unsafe { ptr.read() } })
+        end
+        
+        self.ready.store(true, atomic::Ordering::Release)
+        @syscall(futex_wake, &self.ready, 1)
+        return Ok(())
+    
+    fn recv(&self) -> RecvResult[T]:
+        while not self.ready.load(atomic::Ordering::Acquire):
+            @syscall(futex_wait, &self.ready, 0, -1)
+        end
+        
+        if self.consumed.swap(true, atomic::Ordering::Acquire):
+            return Err(RecvError.Disconnected)
+        end
+        
+        let ptr = self.value.load(atomic::Ordering::Acquire)
+        let value = unsafe { ptr.read() }
+        @free(ptr)
+        return Ok(value)
+    end
+    
+    fn try_recv(&self) -> RecvResult[T]:
+        if not self.ready.load(atomic::Ordering::Acquire):
+            return Err(RecvError.Empty)
+        end
+        
+        if self.consumed.swap(true, atomic::Ordering::Acquire):
+            return Err(RecvError.Disconnected)
+        end
+        
+        let ptr = self.value.load(atomic::Ordering::Acquire)
+        let value = unsafe { ptr.read() }
+        @free(ptr)
+        return Ok(value)
+    end
+
+
+pub struct OneshotSender[T]:
+    inner: &OneshotInner[T]
+
+impl OneshotSender[T]:
+    pub fn send(self, value: T) -> SendResult[T]:
+        return self.inner.send(value)
+
+
+pub struct OneshotReceiver[T]:
+    inner: &OneshotInner[T]
+
+impl OneshotReceiver[T]:
+    pub fn recv(self) -> RecvResult[T]:
+        return self.inner.recv()
+    
+    pub fn try_recv(self) -> RecvResult[T]:
+        return self.inner.try_recv()
+
+
+// =====================
+// Select/Multiplexing
+// =====================
+
+/// Select over multiple channels
+/// Returns the index of the channel that received first
+pub fn select[T](receivers: &[&Receiver[T]]) -> Result[(usize, T), RecvError]:
+    loop:
+        for i, recv in receivers.enumerate():
+            match recv.try_recv():
+                Ok(value) => return Ok((i, value))
+                Err(RecvError.Empty) => continue
+                Err(RecvError.Disconnected) => return Err(RecvError.Disconnected)
+        end
+        
+        # Brief yield before retrying
+        @syscall(sched_yield)
+    end
+
+
+/// Select with timeout
+pub fn select_timeout[T](
+    receivers: &[&Receiver[T]], 
+    timeout_ms: u64
+) -> Result[(usize, T), RecvError]:
+    let start = @syscall(clock_gettime)
+    
+    loop:
+        for i, recv in receivers.enumerate():
+            match recv.try_recv():
+                Ok(value) => return Ok((i, value))
+                Err(RecvError.Empty) => continue
+                Err(RecvError.Disconnected) => return Err(RecvError.Disconnected)
+        end
+        
+        let elapsed = (@syscall(clock_gettime) - start) / 1000000
+        if elapsed >= timeout_ms:
+            return Err(RecvError.Empty)
+        end
+        
+        @syscall(sched_yield)
+    end

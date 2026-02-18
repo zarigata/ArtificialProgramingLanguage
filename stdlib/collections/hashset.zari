@@ -1,0 +1,189 @@
+// VeZ HashSet - Hash set implementation
+// Set of unique values with O(1) average-case operations
+
+pub struct HashSet<T>:
+    map: HashMap<T, ()>
+
+trait Hash:
+    fn hash(&self) -> u64
+
+trait Eq:
+    fn eq(&self, other: &Self) -> bool
+
+impl<T: Hash + Eq> HashSet<T>:
+    
+    pub fn new() -> Self:
+        HashSet:
+            map: HashMap::new()
+    
+    pub fn with_capacity(capacity: usize) -> Self:
+        HashSet:
+            map: HashMap::with_capacity(capacity)
+    
+    pub fn insert(&mut self, value: T) -> bool:
+        self.map.insert(value, ()).is_none()
+    
+    pub fn remove(&mut self, value: &T) -> bool:
+        self.map.remove(value).is_some()
+    
+    pub fn contains(&self, value: &T) -> bool:
+        self.map.contains_key(value)
+    
+    pub fn len(&self) -> usize:
+        self.map.len()
+    
+    pub fn is_empty(&self) -> bool:
+        self.map.is_empty()
+    
+    pub fn clear(&mut self):
+        self.map.clear()
+    
+    pub fn iter(&self) -> Iter<T>:
+        Iter:
+            keys: self.map.keys()
+            index: 0
+    
+    pub fn union(&self, other: &HashSet<T>) -> HashSet<T>:
+        let mut result = self.clone()
+        for item in other.iter():
+            result.insert(item.clone())
+        result
+    
+    pub fn intersection(&self, other: &HashSet<T>) -> HashSet<T>:
+        let mut result = HashSet::new()
+        for item in self.iter():
+            if other.contains(item):
+                result.insert(item.clone())
+        result
+    
+    pub fn difference(&self, other: &HashSet<T>) -> HashSet<T>:
+        let mut result = HashSet::new()
+        for item in self.iter():
+            if not other.contains(item):
+                result.insert(item.clone())
+        result
+    
+    pub fn symmetric_difference(&self, other: &HashSet<T>) -> HashSet<T>:
+        let mut result = HashSet::new()
+        for item in self.iter():
+            if not other.contains(item):
+                result.insert(item.clone())
+        for item in other.iter():
+            if not self.contains(item):
+                result.insert(item.clone())
+        result
+    
+    pub fn is_subset(&self, other: &HashSet<T>) -> bool:
+        for item in self.iter():
+            if not other.contains(item):
+                return false
+        true
+    
+    pub fn is_superset(&self, other: &HashSet<T>) -> bool:
+        other.is_subset(self)
+    
+    pub fn is_disjoint(&self, other: &HashSet<T>) -> bool:
+        for item in self.iter():
+            if other.contains(item):
+                return false
+        true
+    
+    pub fn retain<F: Fn(&T) -> bool>(&mut self, f: F):
+        let mut to_remove = Vec::new()
+        for item in self.iter():
+            if not f(item):
+                to_remove.push(item.clone())
+        for item in to_remove:
+            self.remove(&item)
+    
+    pub fn take(&mut self, value: &T) -> Option<T>:
+        if self.contains(value):
+            let v = value.clone()
+            self.remove(value)
+            Some(v)
+        else:
+            None
+
+struct Iter<T>:
+    keys: Vec<&T>
+    index: usize
+
+impl<T> Iterator for Iter<T>:
+    type Item = &T
+    
+    fn next(&mut self) -> Option<&T>:
+        if self.index < self.keys.len():
+            let item = self.keys[self.index]
+            self.index += 1
+            Some(item)
+        else:
+            None
+
+impl<T: Hash + Eq> Clone for HashSet<T> where T: Clone:
+    fn clone(&self) -> Self:
+        let mut new_set = HashSet::with_capacity(self.len())
+        for item in self.iter():
+            new_set.insert(item.clone())
+        new_set
+
+impl<T: Hash + Eq> Default for HashSet<T>:
+    fn default() -> Self:
+        HashSet::new()
+
+impl<T: Hash + Eq + Debug> Debug for HashSet<T>:
+    fn fmt(&self, f: &mut Formatter) -> Result:
+        f.write_str("{")
+        for (i, item) in self.iter().enumerate():
+            if i > 0:
+                f.write_str(", ")
+            f.write_fmt(format_args!("{:?}", item))
+        f.write_str("}")
+
+impl<T: Hash + Eq> FromIterator<T> for HashSet<T>:
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self:
+        let mut set = HashSet::new()
+        for item in iter:
+            set.insert(item)
+        set
+
+impl<T: Hash + Eq> Extend<T> for HashSet<T>:
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I):
+        for item in iter:
+            self.insert(item)
+
+impl<T: Hash + Eq> IntoIterator for HashSet<T>:
+    type Item = T
+    type IntoIter = IntoIter<T>
+    
+    fn into_iter(self) -> IntoIter<T>:
+        IntoIter:
+            items: self.map.into_iter().map(|(k, _)| k).collect()
+
+struct IntoIter<T>:
+    items: Vec<T>
+    index: usize
+
+impl<T> Iterator for IntoIter<T>:
+    type Item = T
+    
+    fn next(&mut self) -> Option<T>:
+        if self.index < self.items.len():
+            let item = self.items[self.index].clone()
+            self.index += 1
+            Some(item)
+        else:
+            None
+
+impl<T: Hash + Eq> IntoIterator for &HashSet<T>:
+    type Item = &T
+    type IntoIter = Iter<T>
+    
+    fn into_iter(self) -> Iter<T>:
+        self.iter()
+
+impl<T: Hash + Eq, const N: usize> From<[T; N]> for HashSet<T>:
+    fn from(arr: [T; N]) -> Self:
+        let mut set = HashSet::with_capacity(N)
+        for item in arr:
+            set.insert(item)
+        set

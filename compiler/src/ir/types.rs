@@ -22,6 +22,8 @@ pub enum IrType {
     U64,
     U128,
     /// Floating point types
+    F16,
+    BF16,
     F32,
     F64,
     /// Pointer type
@@ -32,6 +34,13 @@ pub enum IrType {
     Struct(Vec<IrType>),
     /// Function type
     Function(Vec<IrType>, Box<IrType>),
+    /// SIMD vector types
+    Vec2(Box<IrType>),
+    Vec4(Box<IrType>),
+    Vec8(Box<IrType>),
+    Vec16(Box<IrType>),
+    /// Generic vector type with arbitrary element count
+    Vector(Box<IrType>, usize),
 }
 
 impl IrType {
@@ -41,15 +50,25 @@ impl IrType {
             IrType::Void => 0,
             IrType::Bool => 1,
             IrType::I8 | IrType::U8 => 1,
-            IrType::I16 | IrType::U16 => 2,
+            IrType::I16 | IrType::U16 | IrType::F16 | IrType::BF16 => 2,
             IrType::I32 | IrType::U32 | IrType::F32 => 4,
             IrType::I64 | IrType::U64 | IrType::F64 => 8,
             IrType::I128 | IrType::U128 => 16,
-            IrType::Pointer(_) => 8, // 64-bit pointers
+            IrType::Pointer(_) => 8,
             IrType::Array(elem_ty, count) => elem_ty.size() * count,
             IrType::Struct(fields) => fields.iter().map(|f| f.size()).sum(),
-            IrType::Function(_, _) => 8, // Function pointers
+            IrType::Function(_, _) => 8,
+            IrType::Vec2(inner) => inner.size() * 2,
+            IrType::Vec4(inner) => inner.size() * 4,
+            IrType::Vec8(inner) => inner.size() * 8,
+            IrType::Vec16(inner) => inner.size() * 16,
+            IrType::Vector(inner, count) => inner.size() * count,
         }
+    }
+    
+    /// Get the size of a type in bits
+    pub fn size_in_bits(&self) -> usize {
+        self.size() * 8
     }
     
     /// Get the alignment of a type in bytes
@@ -58,7 +77,7 @@ impl IrType {
             IrType::Void => 1,
             IrType::Bool => 1,
             IrType::I8 | IrType::U8 => 1,
-            IrType::I16 | IrType::U16 => 2,
+            IrType::I16 | IrType::U16 | IrType::F16 | IrType::BF16 => 2,
             IrType::I32 | IrType::U32 | IrType::F32 => 4,
             IrType::I64 | IrType::U64 | IrType::F64 => 8,
             IrType::I128 | IrType::U128 => 16,
@@ -68,6 +87,17 @@ impl IrType {
                 fields.iter().map(|f| f.alignment()).max().unwrap_or(1)
             }
             IrType::Function(_, _) => 8,
+            IrType::Vec2(inner) => inner.alignment().max(4),
+            IrType::Vec4(inner) => inner.alignment().max(8),
+            IrType::Vec8(inner) => inner.alignment().max(16),
+            IrType::Vec16(inner) => inner.alignment().max(32),
+            IrType::Vector(inner, count) => {
+                let vec_bytes = inner.size() * count;
+                if vec_bytes <= 16 { 16 }
+                else if vec_bytes <= 32 { 32 }
+                else if vec_bytes <= 64 { 64 }
+                else { 64 }
+            }
         }
     }
     
@@ -114,6 +144,8 @@ impl fmt::Display for IrType {
             IrType::U32 => write!(f, "u32"),
             IrType::U64 => write!(f, "u64"),
             IrType::U128 => write!(f, "u128"),
+            IrType::F16 => write!(f, "f16"),
+            IrType::BF16 => write!(f, "bf16"),
             IrType::F32 => write!(f, "f32"),
             IrType::F64 => write!(f, "f64"),
             IrType::Pointer(inner) => write!(f, "*{}", inner),
@@ -138,6 +170,11 @@ impl fmt::Display for IrType {
                 }
                 write!(f, ") -> {}", ret)
             }
+            IrType::Vec2(inner) => write!(f, "vec2<{}>", inner),
+            IrType::Vec4(inner) => write!(f, "vec4<{}>", inner),
+            IrType::Vec8(inner) => write!(f, "vec8<{}>", inner),
+            IrType::Vec16(inner) => write!(f, "vec16<{}>", inner),
+            IrType::Vector(inner, count) => write!(f, "vec{}<{}>", count, inner),
         }
     }
 }

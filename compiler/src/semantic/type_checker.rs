@@ -3,7 +3,7 @@
 use crate::parser::*;
 use crate::error::{Error, ErrorKind, Result};
 use super::symbol_table::SymbolTable;
-use super::type_env::{TypeEnv, InferredType, Substitution, Unifier, TypeVar};
+use super::type_env::{TypeEnv, InferredType, Substitution, Unifier};
 use std::collections::HashMap;
 
 /// Type checker with inference

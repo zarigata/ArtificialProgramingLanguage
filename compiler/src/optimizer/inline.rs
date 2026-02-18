@@ -1,6 +1,6 @@
 //! Function inlining optimization pass
 
-use crate::ir::ssa::{Module, Function as IrFunction, ValueId};
+use crate::ir::ssa::{Module, Function as IrFunction};
 use crate::ir::instructions::Instruction;
 use crate::error::Result;
 use super::pass_manager::OptimizationPass;

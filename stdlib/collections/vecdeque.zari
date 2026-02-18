@@ -1,0 +1,400 @@
+// VeZ VecDeque - Double-ended queue implementation
+// Provides O(1) insertion/removal at both ends with efficient indexing
+
+pub struct VecDeque<T>:
+    buffer: Vec<Option<T>>
+    head: usize
+    tail: usize
+    len: usize
+    capacity: usize
+
+impl<T> VecDeque<T>:
+    
+    pub fn new() -> Self:
+        VecDeque:
+            buffer: Vec::new()
+            head: 0
+            tail: 0
+            len: 0
+            capacity: 0
+    
+    pub fn with_capacity(capacity: usize) -> Self:
+        let cap = capacity.max(1)
+        VecDeque:
+            buffer: (0..cap).map(|_| None).collect()
+            head: 0
+            tail: 0
+            len: 0
+            capacity: cap
+    
+    pub fn push_back(&mut self, value: T):
+        if self.len == self.capacity:
+            self.grow()
+        
+        if self.len > 0:
+            self.tail = self.wrap_add(self.tail, 1)
+        }
+        
+        self.buffer[self.tail] = Some(value)
+        self.len += 1
+    
+    pub fn push_front(&mut self, value: T):
+        if self.len == self.capacity:
+            self.grow()
+        
+        if self.len > 0 {
+            self.head = self.wrap_sub(self.head, 1)
+        }
+        
+        self.buffer[self.head] = Some(value)
+        self.len += 1
+    
+    pub fn pop_back(&mut self) -> Option<T>:
+        if self.len == 0:
+            return None
+        
+        let value = self.buffer[self.tail].take()
+        self.len -= 1
+        
+        if self.len > 0:
+            self.tail = self.wrap_sub(self.tail, 1)
+        }
+        
+        value
+    }
+    
+    pub fn pop_front(&mut self) -> Option<T>:
+        if self.len == 0:
+            return None
+        
+        let value = self.buffer[self.head].take()
+        self.len -= 1
+        
+        if self.len > 0:
+            self.head = self.wrap_add(self.head, 1)
+        }
+        
+        value
+    }
+    
+    pub fn front(&self) -> Option<&T>:
+        if self.len == 0:
+            None
+        else:
+            self.buffer[self.head].as_ref()
+        }
+    
+    pub fn front_mut(&mut self) -> Option<&mut T>:
+        if self.len == 0:
+            None
+        else:
+            self.buffer[self.head].as_mut()
+        }
+    
+    pub fn back(&self) -> Option<&T>:
+        if self.len == 0:
+            None
+        else:
+            self.buffer[self.tail].as_ref()
+        }
+    
+    pub fn back_mut(&mut self) -> Option<&mut T>:
+        if self.len == 0:
+            None
+        else:
+            self.buffer[self.tail].as_mut()
+        }
+    
+    pub fn get(&self, index: usize) -> Option<&T>:
+        if index >= self.len {
+            return None
+        }
+        let idx = self.wrap_add(self.head, index)
+        self.buffer[idx].as_ref()
+    }
+    
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T>:
+        if index >= self.len {
+            return None
+        }
+        let idx = self.wrap_add(self.head, index)
+        self.buffer[idx].as_mut()
+    }
+    
+    pub fn len(&self) -> usize:
+        self.len
+    
+    pub fn is_empty(&self) -> bool:
+        self.len == 0
+    
+    pub fn capacity(&self) -> usize:
+        self.capacity
+    
+    pub fn clear(&mut self):
+        while self.pop_front().is_some() {}
+        self.head = 0
+        self.tail = 0
+    }
+    
+    pub fn truncate(&mut self, len: usize):
+        while self.len > len {
+            self.pop_back()
+        }
+    }
+    
+    pub fn swap(&mut self, i: usize, j: usize):
+        let len = self.len
+        assert!(i < len and j < len, "index out of bounds")
+        
+        let a = self.wrap_add(self.head, i)
+        let b = self.wrap_add(self.head, j)
+        self.buffer.swap(a, b)
+    }
+    
+    pub fn rotate_left(&mut self, mid: usize):
+        assert!(mid <= self.len, "mid out of bounds")
+        
+        if mid == 0 or mid == self.len:
+            return
+        }
+        
+        // Rotate by adjusting head
+        self.head = self.wrap_add(self.head, mid)
+    }
+    
+    pub fn rotate_right(&mut self, k: usize):
+        assert!(k <= self.len, "k out of bounds")
+        
+        if k == 0 or k == self.len:
+            return
+        }
+        
+        self.head = self.wrap_sub(self.head, k)
+    }
+    
+    pub fn make_contiguous(&mut self) -> &mut [T] {
+        if self.head <= self.tail or self.len == 0 {
+            // Already contiguous
+        } else {
+            // Need to reorder buffer
+            let split = self.capacity - self.head
+            self.buffer.rotate_left(split)
+            self.head = 0
+            self.tail = self.len - 1
+        }
+        
+        // Return slice (simplified)
+        &mut []
+    }
+    
+    pub fn as_slices(&self) -> (&[T], &[T]) {
+        // Simplified - would need unsafe to create proper slices
+        (&[], &[])
+    }
+    
+    pub fn iter(&self) -> Iter<T>:
+        Iter:
+            deque: self
+            front: 0
+            back: self.len
+    
+    pub fn iter_mut(&mut self) -> IterMut<T>:
+        IterMut:
+            deque: self
+            front: 0
+            back: self.len
+    
+    pub fn drain<R: RangeBounds<usize>>(&mut self, range: R) -> Drain<T>:
+        let start = match range.start_bound() {
+            Bound::Included(&s) => s,
+            Bound::Excluded(&s) => s + 1,
+            Bound::Unbounded => 0,
+        }
+        let end = match range.end_bound() {
+            Bound::Included(&e) => e + 1,
+            Bound::Excluded(&e) => e,
+            Bound::Unbounded => self.len,
+        }
+        
+        Drain:
+            deque: self
+            start: start
+            end: end
+            current: start
+    
+    fn wrap_add(&self, index: usize, add: usize) -> usize:
+        (index + add) % self.capacity
+    }
+    
+    fn wrap_sub(&self, index: usize, sub: usize) -> usize:
+        if index >= sub {
+            index - sub
+        } else {
+            self.capacity - (sub - index)
+        }
+    }
+    
+    fn grow(&mut self):
+        let new_capacity = if self.capacity == 0 { 4 } else { self.capacity * 2 }
+        
+        let mut new_buffer: Vec<Option<T>> = (0..new_capacity).map(|_| None).collect()
+        
+        for i in 0..self.len:
+            let old_idx = self.wrap_add(self.head, i)
+            new_buffer[i] = self.buffer[old_idx].take()
+        }
+        
+        self.buffer = new_buffer
+        self.head = 0
+        self.tail = if self.len > 0 { self.len - 1 } else { 0 }
+        self.capacity = new_capacity
+    }
+
+struct Iter<'a, T>:
+    deque: &'a VecDeque<T>
+    front: usize
+    back: usize
+
+impl<'a, T> Iterator for Iter<'a, T>:
+    type Item = &'a T
+    
+    fn next(&mut self) -> Option<&'a T>:
+        if self.front >= self.back:
+            None
+        } else:
+            let idx = self.deque.wrap_add(self.deque.head, self.front)
+            self.front += 1
+            self.deque.buffer[idx].as_ref()
+        }
+    }
+    
+    fn size_hint(&self) -> (usize, Option<usize>):
+        let len = self.back - self.front
+        (len, Some(len))
+    }
+}
+
+impl<'a, T> DoubleEndedIterator for Iter<'a, T>:
+    fn next_back(&mut self) -> Option<&'a T>:
+        if self.front >= self.back:
+            None
+        } else:
+            self.back -= 1
+            let idx = self.deque.wrap_add(self.deque.head, self.back)
+            self.deque.buffer[idx].as_ref()
+        }
+    }
+}
+
+struct IterMut<'a, T>:
+    deque: &'a mut VecDeque<T>
+    front: usize
+    back: usize
+
+impl<'a, T> Iterator for IterMut<'a, T>:
+    type Item = &'a mut T
+    
+    fn next(&mut self) -> Option<&'a mut T>:
+        if self.front >= self.back:
+            None
+        } else:
+            let idx = self.deque.wrap_add(self.deque.head, self.front)
+            self.front += 1
+            self.deque.buffer[idx].as_mut()
+        }
+    }
+}
+
+struct Drain<'a, T>:
+    deque: &'a mut VecDeque<T>
+    start: usize
+    end: usize
+    current: usize
+
+impl<'a, T> Iterator for Drain<'a, T>:
+    type Item = T
+    
+    fn next(&mut self) -> Option<T> {
+        if self.current >= self.end {
+            None
+        } else {
+            let idx = self.deque.wrap_add(self.deque.head, self.current)
+            self.current += 1
+            self.deque.buffer[idx].take()
+        }
+    }
+}
+
+impl<T: Clone> Clone for VecDeque<T>:
+    fn clone(&self) -> Self:
+        let mut deque = VecDeque::with_capacity(self.capacity)
+        for item in self.iter():
+            deque.push_back(item.clone())
+        deque
+
+impl<T> Default for VecDeque<T>:
+    fn default() -> Self:
+        VecDeque::new()
+
+impl<T: Debug> Debug for VecDeque<T>:
+    fn fmt(&self, f: &mut Formatter) -> Result:
+        f.write_str("[")
+        for (i, item) in self.iter().enumerate():
+            if i > 0:
+                f.write_str(", ")
+            f.write_fmt(format_args!("{:?}", item))
+        f.write_str("]")
+
+impl<T> Index<usize> for VecDeque<T>:
+    type Output = T
+    
+    fn index(&self, index: usize) -> &T:
+        self.get(index).expect("index out of bounds")
+
+impl<T> IndexMut<usize> for VecDeque<T>:
+    fn index_mut(&mut self, index: usize) -> &mut T:
+        self.get_mut(index).expect("index out of bounds")
+
+impl<T> IntoIterator for VecDeque<T>:
+    type Item = T
+    type IntoIter = IntoIter<T>
+    
+    fn into_iter(self) -> IntoIter<T>:
+        IntoIter:
+            deque: self
+
+struct IntoIter<T>:
+    deque: VecDeque<T>
+
+impl<T> Iterator for IntoIter<T>:
+    type Item = T
+    
+    fn next(&mut self) -> Option<T> {
+        self.deque.pop_front()
+    }
+    
+    fn size_hint(&self) -> (usize, Option<usize>):
+        (self.deque.len, Some(self.deque.len))
+    }
+}
+
+impl<T> DoubleEndedIterator for IntoIter<T>:
+    fn next_back(&mut self) -> Option<T> {
+        self.deque.pop_back()
+    }
+}
+
+impl<T> FromIterator<T> for VecDeque<T>:
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self:
+        let iter = iter.into_iter()
+        let (lower, _) = iter.size_hint()
+        let mut deque = VecDeque::with_capacity(lower)
+        for item in iter {
+            deque.push_back(item)
+        }
+        deque
+
+impl<T> Extend<T> for VecDeque<T>:
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I):
+        for item in iter:
+            self.push_back(item)

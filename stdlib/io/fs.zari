@@ -1,0 +1,701 @@
+// VeZ Standard Library - Filesystem Operations
+// Provides file system manipulation functions
+
+use std::io
+
+/// File metadata structure
+pub struct Metadata:
+    size: u64
+    modified: u64
+    accessed: u64
+    created: u64
+    is_file: bool
+    is_dir: bool
+    is_symlink: bool
+    permissions: u32
+
+impl Metadata:
+    /// Get file size in bytes
+    pub fn len(&self) -> u64:
+        return self.size
+    
+    /// Check if file is empty
+    pub fn is_empty(&self) -> bool:
+        return self.size == 0
+    
+    /// Check if this is a regular file
+    pub fn is_file(&self) -> bool:
+        return self.is_file
+    
+    /// Check if this is a directory
+    pub fn is_dir(&self) -> bool:
+        return self.is_dir
+    
+    /// Check if this is a symbolic link
+    pub fn is_symlink(&self) -> bool:
+        return self.is_symlink
+    
+    /// Get permissions
+    pub fn permissions(&self) -> Permissions:
+        return Permissions { mode: self.permissions }
+
+
+/// File permissions wrapper
+pub struct Permissions:
+    mode: u32
+
+impl Permissions:
+    /// Check if readable by owner
+    pub fn owner_read(&self) -> bool:
+        return (self.mode & 0o400) != 0
+    
+    /// Check if writable by owner
+    pub fn owner_write(&self) -> bool:
+        return (self.mode & 0o200) != 0
+    
+    /// Check if executable by owner
+    pub fn owner_exec(&self) -> bool:
+        return (self.mode & 0o100) != 0
+    
+    /// Check if readable by group
+    pub fn group_read(&self) -> bool:
+        return (self.mode & 0o040) != 0
+    
+    /// Check if writable by group
+    pub fn group_write(&self) -> bool:
+        return (self.mode & 0o020) != 0
+    
+    /// Check if executable by group
+    pub fn group_exec(&self) -> bool:
+        return (self.mode & 0o010) != 0
+    
+    /// Check if readable by others
+    pub fn other_read(&self) -> bool:
+        return (self.mode & 0o004) != 0
+    
+    /// Check if writable by others
+    pub fn other_write(&self) -> bool:
+        return (self.mode & 0o002) != 0
+    
+    /// Check if executable by others
+    pub fn other_exec(&self) -> bool:
+        return (self.mode & 0o001) != 0
+    
+    /// Set permissions (chmod style)
+    pub fn set_mode(&mut self, mode: u32):
+        self.mode = mode
+    
+    /// Get raw mode
+    pub fn mode(&self) -> u32:
+        return self.mode
+
+
+/// Directory entry
+pub struct DirEntry:
+    name: String
+    path: String
+    metadata: Option[Metadata]
+
+impl DirEntry:
+    /// Get the file name
+    pub fn name(&self) -> &str:
+        return &self.name
+    
+    /// Get the full path
+    pub fn path(&self) -> &str:
+        return &self.path
+    
+    /// Get metadata (lazy loaded)
+    pub fn metadata(&mut self) -> Result[Metadata, io::Error]:
+        if self.metadata.is_none():
+            self.metadata = Some(metadata(&self.path)?)
+        end
+        return Ok(self.metadata.unwrap())
+    
+    /// Check if this is a directory
+    pub fn is_dir(&mut self) -> bool:
+        return self.metadata().map_or(false, |m| m.is_dir)
+    
+    /// Check if this is a file
+    pub fn is_file(&mut self) -> bool:
+        return self.metadata().map_or(false, |m| m.is_file)
+
+
+/// File type enumeration
+pub enum FileType:
+    File
+    Directory
+    Symlink
+    BlockDevice
+    CharDevice
+    Fifo
+    Socket
+    Unknown
+
+
+/// File options for opening
+pub struct OpenOptions:
+    read: bool
+    write: bool
+    append: bool
+    truncate: bool
+    create: bool
+    create_new: bool
+    mode: u32
+
+impl OpenOptions:
+    /// Create new OpenOptions with all flags disabled
+    pub fn new() -> Self:
+        return Self {
+            read: false,
+            write: false,
+            append: false,
+            truncate: false,
+            create: false,
+            create_new: false,
+            mode: 0o666
+        }
+    
+    /// Open for reading
+    pub fn read(&mut self, yes: bool) -> &mut Self:
+        self.read = yes
+        return self
+    
+    /// Open for writing
+    pub fn write(&mut self, yes: bool) -> &mut Self:
+        self.write = yes
+        return self
+    
+    /// Open for appending
+    pub fn append(&mut self, yes: bool) -> &mut Self:
+        self.append = yes
+        return self
+    
+    /// Truncate the file on open
+    pub fn truncate(&mut self, yes: bool) -> &mut Self:
+        self.truncate = yes
+        return self
+    
+    /// Create the file if it doesn't exist
+    pub fn create(&mut self, yes: bool) -> &mut Self:
+        self.create = yes
+        return self
+    
+    /// Create new file, fail if exists
+    pub fn create_new(&mut self, yes: bool) -> &mut Self:
+        self.create_new = yes
+        return self
+    
+    /// Set the mode for created files
+    pub fn mode(&mut self, mode: u32) -> &mut Self:
+        self.mode = mode
+        return self
+    
+    /// Open a file with these options
+    pub fn open(&self, path: &str) -> Result[File, io::Error]:
+        return File.open_with_options(path, self)
+
+
+/// File handle
+pub struct File:
+    fd: i32
+    path: String
+
+impl File:
+    /// Open a file for reading
+    pub fn open(path: &str) -> Result[Self, io::Error]:
+        let opts = OpenOptions.new().read(true)
+        return opts.open(path)
+    
+    /// Create a new file for writing
+    pub fn create(path: &str) -> Result[Self, io::Error]:
+        let opts = OpenOptions.new().write(true).create(true).truncate(true)
+        return opts.open(path)
+    
+    /// Open with specific options
+    pub fn open_with_options(path: &str, opts: &OpenOptions) -> Result[Self, io::Error]:
+        let mut flags = 0
+        
+        if opts.read and opts.write:
+            flags |= O_RDWR
+        elif opts.write:
+            flags |= O_WRONLY
+        else:
+            flags |= O_RDONLY
+        
+        if opts.append:
+            flags |= O_APPEND
+        
+        if opts.truncate:
+            flags |= O_TRUNC
+        
+        if opts.create:
+            flags |= O_CREAT
+        
+        if opts.create_new:
+            flags |= O_CREAT | O_EXCL
+        
+        let fd = @syscall(open, path, flags, opts.mode)
+        if fd < 0:
+            return Err(io::Error.not_found("Failed to open file"))
+        end
+        
+        return Ok(Self {
+            fd: fd,
+            path: String.from(path)
+        })
+    
+    /// Read from the file
+    pub fn read(&mut self, buf: &mut [u8]) -> Result[usize, io::Error]:
+        let n = @syscall(read, self.fd, buf.as_mut_ptr(), buf.len())
+        if n < 0:
+            return Err(io::Error.read_failed("Read failed"))
+        end
+        return Ok(n as usize)
+    
+    /// Write to the file
+    pub fn write(&mut self, buf: &[u8]) -> Result[usize, io::Error]:
+        let n = @syscall(write, self.fd, buf.as_ptr(), buf.len())
+        if n < 0:
+            return Err(io::Error.write_failed("Write failed"))
+        end
+        return Ok(n as usize)
+    
+    /// Seek to a position in the file
+    pub fn seek(&mut self, pos: SeekFrom) -> Result[u64, io::Error]:
+        let (whence, offset) = match pos:
+            SeekFrom.Start(n) => (SEEK_SET, n as i64)
+            SeekFrom.Current(n) => (SEEK_CUR, n)
+            SeekFrom.End(n) => (SEEK_END, n)
+        
+        let result = @syscall(lseek, self.fd, offset, whence)
+        if result < 0:
+            return Err(io::Error.unknown("Seek failed"))
+        end
+        return Ok(result as u64)
+    
+    /// Get metadata for this file
+    pub fn metadata(&self) -> Result[Metadata, io::Error]:
+        return metadata(&self.path)
+    
+    /// Sync all data to disk
+    pub fn sync_all(&self) -> Result[(), io::Error]:
+        let result = @syscall(fsync, self.fd)
+        if result < 0:
+            return Err(io::Error.unknown("Sync failed"))
+        end
+        return Ok(())
+    
+    /// Sync only data (not metadata) to disk
+    pub fn sync_data(&self) -> Result[(), io::Error]:
+        let result = @syscall(fdatasync, self.fd)
+        if result < 0:
+            return Err(io::Error.unknown("Sync data failed"))
+        end
+        return Ok(())
+    
+    /// Set file length
+    pub fn set_len(&self, len: u64) -> Result[(), io::Error]:
+        let result = @syscall(ftruncate, self.fd, len)
+        if result < 0:
+            return Err(io::Error.unknown("Truncate failed"))
+        end
+        return Ok(())
+    
+    /// Close the file
+    pub fn close(self):
+        @syscall(close, self.fd)
+    
+    /// Get the file descriptor
+    pub fn as_fd(&self) -> i32:
+        return self.fd
+
+
+/// Seek origin
+pub enum SeekFrom:
+    Start(u64)
+    Current(i64)
+    End(i64)
+
+
+// =====================
+// Standalone Functions
+// =====================
+
+/// Read entire file into a string
+pub fn read_to_string(path: &str) -> Result[String, io::Error]:
+    let mut file = File.open(path)?
+    let mut result = String.new()
+    let mut buf: [u8; 4096] = [0; 4096]
+    
+    loop:
+        let n = file.read(&mut buf)?
+        if n == 0:
+            break
+        end
+        
+        # Convert bytes to string
+        for i in range(n):
+            result.push(buf[i] as char)
+    end
+    
+    return Ok(result)
+
+
+/// Read entire file into bytes
+pub fn read(path: &str) -> Result[Vec[u8], io::Error]:
+    let mut file = File.open(path)?
+    let meta = file.metadata()?
+    let mut result = Vec[u8].with_capacity(meta.size as usize)
+    let mut buf: [u8; 4096] = [0; 4096]
+    
+    loop:
+        let n = file.read(&mut buf)?
+        if n == 0:
+            break
+        end
+        
+        for i in range(n):
+            result.push(buf[i])
+    end
+    
+    return Ok(result)
+
+
+/// Write a string to a file
+pub fn write_string(path: &str, contents: &str) -> Result[(), io::Error]:
+    let mut file = File.create(path)?
+    file.write(contents.as_bytes())?
+    return Ok(())
+
+
+/// Write bytes to a file
+pub fn write(path: &str, contents: &[u8]) -> Result[(), io::Error]:
+    let mut file = File.create(path)?
+    file.write(contents)?
+    return Ok(())
+
+
+/// Append to a file
+pub fn append(path: &str, contents: &[u8]) -> Result[(), io::Error]:
+    let opts = OpenOptions.new().write(true).append(true).create(true)
+    let mut file = opts.open(path)?
+    file.write(contents)?
+    return Ok(())
+
+
+/// Read directory entries
+pub fn read_dir(path: &str) -> Result[Vec[DirEntry], io::Error]:
+    let dir = @syscall(opendir, path)
+    if dir == 0:
+        return Err(io::Error.not_found("Failed to open directory"))
+    end
+    
+    let mut entries = Vec[DirEntry].new()
+    
+    loop:
+        let dirent = @syscall(readdir, dir)
+        if dirent == 0:
+            break
+        end
+        
+        let name = @syscall(dirent_name, dirent)
+        if name == "." or name == "..":
+            continue
+        end
+        
+        let full_path = if path.ends_with("/"):
+            format("{}{}", path, name)
+        else:
+            format("{}/{}", path, name)
+        
+        entries.push(DirEntry {
+            name: String.from(name),
+            path: full_path,
+            metadata: None
+        })
+    end
+    
+    @syscall(closedir, dir)
+    return Ok(entries)
+
+
+/// Create a directory
+pub fn create_dir(path: &str) -> Result[(), io::Error]:
+    let result = @syscall(mkdir, path, 0o755)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to create directory"))
+    end
+    return Ok(())
+
+
+/// Create a directory and all parent directories
+pub fn create_dir_all(path: &str) -> Result[(), io::Error]:
+    # Try creating directly first
+    if create_dir(path).is_ok():
+        return Ok(())
+    
+    # Split path and create each component
+    let mut current = String.new()
+    let parts = path.split('/')
+    
+    for part in parts:
+        if part.is_empty():
+            continue
+        end
+        
+        if not current.is_empty():
+            current.push('/')
+        end
+        current.push_str(part)
+        
+        let _ = create_dir(&current)  # Ignore errors (may already exist)
+    
+    # Verify it exists now
+    if exists(&current):
+        return Ok(())
+    else:
+        return Err(io::Error.unknown("Failed to create directory"))
+    end
+
+
+/// Remove a file
+pub fn remove_file(path: &str) -> Result[(), io::Error]:
+    let result = @syscall(unlink, path)
+    if result < 0:
+        return Err(io::Error.not_found("Failed to remove file"))
+    end
+    return Ok(())
+
+
+/// Remove an empty directory
+pub fn remove_dir(path: &str) -> Result[(), io::Error]:
+    let result = @syscall(rmdir, path)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to remove directory"))
+    end
+    return Ok(())
+
+
+/// Remove a directory and all its contents
+pub fn remove_dir_all(path: &str) -> Result[(), io::Error]:
+    let entries = read_dir(path)?
+    
+    for mut entry in entries:
+        if entry.is_dir():
+            remove_dir_all(entry.path())?
+        else:
+            remove_file(entry.path())?
+        end
+    end
+    
+    return remove_dir(path)
+
+
+/// Rename a file or directory
+pub fn rename(from: &str, to: &str) -> Result[(), io::Error]:
+    let result = @syscall(rename, from, to)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to rename"))
+    end
+    return Ok(())
+
+
+/// Copy a file
+pub fn copy(from: &str, to: &str) -> Result[u64, io::Error]:
+    let mut src = File.open(from)?
+    let mut dst = File.create(to)?
+    
+    let mut copied: u64 = 0
+    let mut buf: [u8; 8192] = [0; 8192]
+    
+    loop:
+        let n = src.read(&mut buf)?
+        if n == 0:
+            break
+        end
+        
+        dst.write(&buf[0..n])?
+        copied += n as u64
+    end
+    
+    return Ok(copied)
+
+
+/// Check if a path exists
+pub fn exists(path: &str) -> bool:
+    let result = @syscall(access, path, F_OK)
+    return result == 0
+
+
+/// Check if a path is a file
+pub fn is_file(path: &str) -> bool:
+    return metadata(path).map_or(false, |m| m.is_file)
+
+
+/// Check if a path is a directory
+pub fn is_dir(path: &str) -> bool:
+    return metadata(path).map_or(false, |m| m.is_dir)
+
+
+/// Get file metadata
+pub fn metadata(path: &str) -> Result[Metadata, io::Error]:
+    let mut stat: Stat = Stat {
+        st_dev: 0,
+        st_ino: 0,
+        st_mode: 0,
+        st_nlink: 0,
+        st_uid: 0,
+        st_gid: 0,
+        st_rdev: 0,
+        st_size: 0,
+        st_atime: 0,
+        st_mtime: 0,
+        st_ctime: 0,
+        st_blksize: 0,
+        st_blocks: 0
+    }
+    
+    let result = @syscall(stat, path, &mut stat)
+    if result < 0:
+        return Err(io::Error.not_found("Failed to get metadata"))
+    end
+    
+    return Ok(Metadata {
+        size: stat.st_size,
+        modified: stat.st_mtime,
+        accessed: stat.st_atime,
+        created: stat.st_ctime,
+        is_file: (stat.st_mode & S_IFREG) != 0,
+        is_dir: (stat.st_mode & S_IFDIR) != 0,
+        is_symlink: (stat.st_mode & S_IFLNK) != 0,
+        permissions: stat.st_mode & 0o7777
+    })
+
+
+/// Set file permissions
+pub fn set_permissions(path: &str, mode: u32) -> Result[(), io::Error]:
+    let result = @syscall(chmod, path, mode)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to set permissions"))
+    end
+    return Ok(())
+
+
+/// Create a symbolic link
+pub fn soft_link(original: &str, link: &str) -> Result[(), io::Error]:
+    let result = @syscall(symlink, original, link)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to create symlink"))
+    end
+    return Ok(())
+
+
+/// Create a hard link
+pub fn hard_link(original: &str, link: &str) -> Result[(), io::Error]:
+    let result = @syscall(link, original, link)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to create hard link"))
+    end
+    return Ok(())
+
+
+/// Read symbolic link target
+pub fn read_link(path: &str) -> Result[String, io::Error]:
+    let mut buf: [u8; 1024] = [0; 1024]
+    let n = @syscall(readlink, path, &mut buf, buf.len())
+    if n < 0:
+        return Err(io::Error.unknown("Failed to read symlink"))
+    end
+    
+    let mut result = String.new()
+    for i in range(n as usize):
+        result.push(buf[i] as char)
+    end
+    
+    return Ok(result)
+
+
+/// Get current working directory
+pub fn current_dir() -> Result[String, io::Error]:
+    let mut buf: [u8; 1024] = [0; 1024]
+    let result = @syscall(getcwd, &mut buf, buf.len())
+    if result == 0:
+        return Err(io::Error.unknown("Failed to get current directory"))
+    end
+    
+    let mut dir = String.new()
+    let mut i = 0
+    while buf[i] != 0:
+        dir.push(buf[i] as char)
+        i += 1
+    end
+    
+    return Ok(dir)
+
+
+/// Set current working directory
+pub fn set_current_dir(path: &str) -> Result[(), io::Error]:
+    let result = @syscall(chdir, path)
+    if result < 0:
+        return Err(io::Error.unknown("Failed to change directory"))
+    end
+    return Ok(())
+
+
+/// Get canonical (absolute) path
+pub fn canonicalize(path: &str) -> Result[String, io::Error]:
+    let mut buf: [u8; 4096] = [0; 4096]
+    let result = @syscall(realpath, path, &mut buf)
+    if result == 0:
+        return Err(io::Error.unknown("Failed to canonicalize path"))
+    end
+    
+    let mut canonical = String.new()
+    let mut i = 0
+    while buf[i] != 0:
+        canonical.push(buf[i] as char)
+        i += 1
+    end
+    
+    return Ok(canonical)
+
+
+/// Stat structure for syscall
+struct Stat:
+    st_dev: u64
+    st_ino: u64
+    st_mode: u32
+    st_nlink: u32
+    st_uid: u32
+    st_gid: u32
+    st_rdev: u64
+    st_size: u64
+    st_atime: u64
+    st_mtime: u64
+    st_ctime: u64
+    st_blksize: u64
+    st_blocks: u64
+
+
+/// File constants
+const O_RDONLY: i32 = 0
+const O_WRONLY: i32 = 1
+const O_RDWR: i32 = 2
+const O_CREAT: i32 = 64
+const O_TRUNC: i32 = 512
+const O_APPEND: i32 = 1024
+const O_EXCL: i32 = 128
+
+const SEEK_SET: i32 = 0
+const SEEK_CUR: i32 = 1
+const SEEK_END: i32 = 2
+
+const F_OK: i32 = 0
+const R_OK: i32 = 4
+const W_OK: i32 = 2
+const X_OK: i32 = 1
+
+const S_IFREG: u32 = 0o100000
+const S_IFDIR: u32 = 0o040000
+const S_IFLNK: u32 = 0o120000

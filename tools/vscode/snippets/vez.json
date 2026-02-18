@@ -1,0 +1,127 @@
+{
+  "Function": {
+    "prefix": "fn",
+    "body": ["fn ${1:name}(${2:params}) -> ${3:ReturnType} {", "\t${4:// body}", "}"],
+    "description": "Define a function"
+  },
+  "Public Function": {
+    "prefix": "pub fn",
+    "body": ["pub fn ${1:name}(${2:params}) -> ${3:ReturnType} {", "\t${4:// body}", "}"],
+    "description": "Define a public function"
+  },
+  "Async Function": {
+    "prefix": "async fn",
+    "body": ["async fn ${1:name}(${2:params}) -> ${3:Future<T>} {", "\t${4:// body}", "}"],
+    "description": "Define an async function"
+  },
+  "GPU Kernel": {
+    "prefix": "@gpu",
+    "body": ["@gpu(threads=${1:1024})", "fn ${2:kernel_name}(${3:params}) -> ${4:ReturnType} {", "\t${5:// GPU kernel body}", "}"],
+    "description": "Define a GPU kernel"
+  },
+  "Struct": {
+    "prefix": "struct",
+    "body": ["struct ${1:Name} {", "\t${2:field}: ${3:Type},", "}"],
+    "description": "Define a struct"
+  },
+  "Enum": {
+    "prefix": "enum",
+    "body": ["enum ${1:Name} {", "\t${2:Variant1},", "\t${3:Variant2},", "}"],
+    "description": "Define an enum"
+  },
+  "Trait": {
+    "prefix": "trait",
+    "body": ["trait ${1:Name} {", "\tfn ${2:method}(&self) -> ${3:ReturnType};", "}"],
+    "description": "Define a trait"
+  },
+  "Impl": {
+    "prefix": "impl",
+    "body": ["impl ${1:Trait} for ${2:Type} {", "\tfn ${3:method}(&self) -> ${4:ReturnType} {", "\t\t${5:// body}", "\t}", "}"],
+    "description": "Implement a trait"
+  },
+  "Match": {
+    "prefix": "match",
+    "body": ["match ${1:value} {", "\t${2:Pattern1} => ${3:action1},", "\t${4:Pattern2} => ${5:action2},", "\t_ => ${6:default},", "}"],
+    "description": "Match expression"
+  },
+  "If Let": {
+    "prefix": "if let",
+    "body": ["if let ${1:Pattern} = ${2:value} {", "\t${3:// body}", "}"],
+    "description": "If let pattern matching"
+  },
+  "For Loop": {
+    "prefix": "for",
+    "body": ["for ${1:item} in ${2:iterable} {", "\t${3:// body}", "}"],
+    "description": "For loop"
+  },
+  "While Loop": {
+    "prefix": "while",
+    "body": ["while ${1:condition} {", "\t${2:// body}", "}"],
+    "description": "While loop"
+  },
+  "Loop": {
+    "prefix": "loop",
+    "body": ["loop {", "\t${1:// body}", "\tif ${2:condition} {", "\t\tbreak;", "\t}", "}"],
+    "description": "Infinite loop"
+  },
+  "Result": {
+    "prefix": "result",
+    "body": ["Result<${1:Ok}, ${2:Err}>"],
+    "description": "Result type"
+  },
+  "Option": {
+    "prefix": "option",
+    "body": ["Option<${1:T}>"],
+    "description": "Option type"
+  },
+  "Vec": {
+    "prefix": "vec",
+    "body": ["Vec<${1:T}>"],
+    "description": "Vec type"
+  },
+  "HashMap": {
+    "prefix": "hashmap",
+    "body": ["HashMap<${1:K}, ${2:V}>"],
+    "description": "HashMap type"
+  },
+  "Test Function": {
+    "prefix": "test",
+    "body": ["@test", "fn test_${1:name}() {", "\t${2:// test body}", "}"],
+    "description": "Define a test function"
+  },
+  "Benchmark": {
+    "prefix": "bench",
+    "body": ["@bench", "fn bench_${1:name}() {", "\t${2:// benchmark body}", "}"],
+    "description": "Define a benchmark"
+  },
+  "Contract": {
+    "prefix": "@contract",
+    "body": ["@contract(", "\tpre: ${1:condition}", "\tpost: ${2:condition}", ")", "fn ${3:name}(${4:params}) -> ${5:ReturnType} {", "\t${6:// body}", "}"],
+    "description": "Define a function with contract"
+  },
+  "Entry Point": {
+    "prefix": "main",
+    "body": ["@entry", "fn main() {", "\t${1:// body}", "}"],
+    "description": "Define main entry point"
+  },
+  "Module": {
+    "prefix": "mod",
+    "body": ["mod ${1:module_name} {", "\t${2:// module contents}", "}"],
+    "description": "Define a module"
+  },
+  "Import": {
+    "prefix": "use",
+    "body": ["use ${1:module}::${2:item};"],
+    "description": "Import from module"
+  },
+  "Error": {
+    "prefix": "error",
+    "body": ["#[derive(Debug, thiserror::Error)]", "pub enum ${1:ErrorName} {", "\t#[error(\"${2:description}\")]", "\t${3:Variant},", "}"],
+    "description": "Define an error enum"
+  },
+  "Struct Derive": {
+    "prefix": "derive",
+    "body": ["#[derive(${1:Debug, Clone})]", "struct ${2:Name} {", "\t${3:field}: ${4:Type},", "}"],
+    "description": "Define a struct with derives"
+  }
+}

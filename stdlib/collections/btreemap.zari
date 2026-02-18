@@ -1,0 +1,442 @@
+// VeZ BTreeMap - Sorted map implementation using B-tree
+// Provides O(log n) lookup, insert, and delete with ordered iteration
+
+pub struct BTreeMap<K, V>:
+    root: Option<Box<Node<K, V>>>
+    len: usize
+    order: usize
+
+struct Node<K, V>:
+    keys: Vec<K>
+    values: Vec<V>
+    children: Vec<Box<Node<K, V>>>
+    leaf: bool
+
+trait Ord:
+    fn cmp(&self, other: &Self) -> Ordering
+
+enum Ordering:
+    Less
+    Equal
+    Greater
+
+impl<K: Ord, V> BTreeMap<K, V>:
+    
+    pub fn new() -> Self:
+        BTreeMap:
+            root: None
+            len: 0
+            order: 6
+    
+    pub fn with_order(order: usize) -> Self:
+        BTreeMap:
+            root: None
+            len: 0
+            order: order.max(3)
+    
+    pub fn insert(&mut self, key: K, value: V) -> Option<V>:
+        match &mut self.root:
+            None:
+                self.root = Some(Box::new(Node:
+                    keys: vec![key]
+                    values: vec![value]
+                    children: Vec::new()
+                    leaf: true
+                ))
+                self.len += 1
+                None
+            Some(root):
+                if root.keys.len() == 2 * self.order - 1:
+                    let mut new_root = Box::new(Node:
+                        keys: Vec::new()
+                        values: Vec::new()
+                        children: vec![self.root.take().unwrap()]
+                        leaf: false
+                    )
+                    self.split_child(&mut new_root, 0)
+                    self.insert_non_full(&mut new_root, key, value)
+                    self.root = Some(new_root)
+                    self.len += 1
+                    None
+                else:
+                    let result = self.insert_non_full(root, key, value)
+                    if result.is_none():
+                        self.len += 1
+                    result
+    
+    pub fn get(&self, key: &K) -> Option<&V>:
+        match &self.root:
+            None => None
+            Some(root) => self.search(root, key)
+        }
+    
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut V>:
+        match &mut self.root:
+            None => None
+            Some(root) => self.search_mut(root, key)
+        }
+    
+    pub fn remove(&mut self, key: &K) -> Option<V>:
+        match &mut self.root:
+            None => None
+            Some(root):
+                let result = self.delete(root, key)
+                if result.is_some():
+                    self.len -= 1
+                    if root.keys.is_empty() and not root.children.is_empty():
+                        self.root = Some(root.children.remove(0))
+                result
+        }
+    
+    pub fn contains_key(&self, key: &K) -> bool:
+        self.get(key).is_some()
+    
+    pub fn len(&self) -> usize:
+        self.len
+    
+    pub fn is_empty(&self) -> bool:
+        self.len == 0
+    
+    pub fn clear(&mut self):
+        self.root = None
+        self.len = 0
+    
+    pub fn first_key_value(&self) -> Option<(&K, &V)>:
+        match &self.root:
+            None => None
+            Some(root) => Some(self.first_in_subtree(root))
+        }
+    
+    pub fn last_key_value(&self) -> Option<(&K, &V)>:
+        match &self.root:
+            None => None
+            Some(root) => Some(self.last_in_subtree(root))
+        }
+    
+    pub fn first_entry(&mut self) -> Option<OccupiedEntry<K, V>>:
+        self.root.as_mut().map(|root| self.first_entry_in_subtree(root))
+    
+    pub fn last_entry(&mut self) -> Option<OccupiedEntry<K, V>>:
+        self.root.as_mut().map(|root| self.last_entry_in_subtree(root))
+    
+    pub fn range<T: Ord, R: RangeBounds<T>>(&self, range: R) -> Range<K, V>:
+        Range:
+            map: self
+            range: range
+            stack: Vec::new()
+    
+    pub fn iter(&self) -> Iter<K, V>:
+        Iter:
+            map: self
+            stack: Vec::new()
+            current: None
+    
+    pub fn keys(&self) -> Keys<K, V>:
+        Keys:
+            iter: self.iter()
+    
+    pub fn values(&self) -> Values<K, V>:
+        Values:
+            iter: self.iter()
+    
+    pub fn entry(&mut self, key: K) -> Entry<K, V>:
+        match self.get_mut(&key):
+            Some(value) => Entry::Occupied(OccupiedEntry:
+                map: self
+                key: key
+            )
+            None => Entry::Vacant(VacantEntry:
+                map: self
+                key: key
+            )
+    
+    fn search(&self, node: &Node<K, V>, key: &K) -> Option<&V>:
+        let mut i = 0
+        while i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Greater:
+            i += 1
+        
+        if i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Equal:
+            Some(&node.values[i])
+        else if node.leaf:
+            None
+        else:
+            self.search(&node.children[i], key)
+    
+    fn search_mut(&mut self, node: &mut Node<K, V>, key: &K) -> Option<&mut V>:
+        let mut i = 0
+        while i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Greater:
+            i += 1
+        
+        if i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Equal:
+            Some(&mut node.values[i])
+        else if node.leaf:
+            None
+        else:
+            self.search_mut(&mut node.children[i], key)
+    
+    fn split_child(&mut self, parent: &mut Node<K, V>, index: usize):
+        let order = self.order
+        let child = &mut parent.children[index]
+        let mid = order - 1
+        
+        let mut new_node = Box::new(Node:
+            keys: child.keys.split_off(mid + 1)
+            values: child.values.split_off(mid + 1)
+            children: if child.leaf { Vec::new() } else { child.children.split_off(mid + 1) }
+            leaf: child.leaf
+        )
+        
+        parent.keys.insert(index, child.keys.pop().unwrap())
+        parent.values.insert(index, child.values.pop().unwrap())
+        parent.children.insert(index + 1, new_node)
+    
+    fn insert_non_full(&mut self, node: &mut Node<K, V>, key: K, value: V) -> Option<V>:
+        let mut i = node.keys.len()
+        
+        while i > 0 and key.cmp(&node.keys[i - 1]) == Ordering::Less:
+            i -= 1
+        
+        if i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Equal:
+            let old = std::mem::replace(&mut node.values[i], value)
+            Some(old)
+        else if node.leaf:
+            node.keys.insert(i, key)
+            node.values.insert(i, value)
+            None
+        else:
+            if node.children[i].keys.len() == 2 * self.order - 1:
+                self.split_child(node, i)
+                if key.cmp(&node.keys[i]) == Ordering::Greater:
+                    i += 1
+            self.insert_non_full(&mut node.children[i], key, value)
+    
+    fn delete(&mut self, node: &mut Node<K, V>, key: &K) -> Option<V>:
+        let order = self.order
+        let mut i = 0
+        
+        while i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Greater:
+            i += 1
+        
+        if i < node.keys.len() and key.cmp(&node.keys[i]) == Ordering::Equal:
+            if node.leaf:
+                node.keys.remove(i)
+                Some(node.values.remove(i))
+            else:
+                if node.children[i].keys.len() >= order:
+                    let pred_key = self.predecessor(&node.children[i])
+                    let pred_val = self.delete(&mut node.children[i], &pred_key).unwrap()
+                    let old = std::mem::replace(&mut node.keys[i], pred_key)
+                    std::mem::replace(&mut node.values[i], pred_val)
+                    Some(old)
+                else if node.children[i + 1].keys.len() >= order:
+                    let succ_key = self.successor(&node.children[i + 1])
+                    let succ_val = self.delete(&mut node.children[i + 1], &succ_key).unwrap()
+                    let old = std::mem::replace(&mut node.keys[i], succ_key)
+                    std::mem::replace(&mut node.values[i], succ_val)
+                    Some(old)
+                else:
+                    self.merge(node, i)
+                    self.delete(&mut node.children[i], key)
+            }
+        } else if not node.leaf:
+            if node.children[i].keys.len() < order:
+                self.fill(node, i)
+            self.delete(&mut node.children[i], key)
+        } else {
+            None
+        }
+    
+    fn predecessor(&self, node: &Node<K, V>) -> K:
+        if node.leaf:
+            node.keys.last().unwrap().clone()
+        else:
+            self.predecessor(node.children.last().unwrap())
+    
+    fn successor(&self, node: &Node<K, V>) -> K:
+        if node.leaf:
+            node.keys.first().unwrap().clone()
+        else:
+            self.successor(node.children.first().unwrap())
+    
+    fn merge(&mut self, parent: &mut Node<K, V>, index: usize):
+        let mid_key = parent.keys.remove(index)
+        let mid_val = parent.values.remove(index)
+        let mut right = parent.children.remove(index + 1)
+        let left = &mut parent.children[index]
+        
+        left.keys.push(mid_key)
+        left.values.push(mid_val)
+        left.keys.append(&mut right.keys)
+        left.values.append(&mut right.values)
+        if not left.leaf:
+            left.children.append(&mut right.children)
+    
+    fn fill(&mut self, parent: &mut Node<K, V>, index: usize):
+        let order = self.order
+        
+        if index > 0 and parent.children[index - 1].keys.len() >= order:
+            self.borrow_from_prev(parent, index)
+        else if index < parent.children.len() - 1 and parent.children[index + 1].keys.len() >= order:
+            self.borrow_from_next(parent, index)
+        else:
+            if index < parent.children.len() - 1:
+                self.merge(parent, index)
+            else:
+                self.merge(parent, index - 1)
+    
+    fn borrow_from_prev(&mut self, parent: &mut Node<K, V>, index: usize):
+        let child = &mut parent.children[index]
+        let sibling = &mut parent.children[index - 1]
+        
+        child.keys.insert(0, parent.keys[index - 1].clone())
+        child.values.insert(0, parent.values[index - 1].clone())
+        parent.keys[index - 1] = sibling.keys.pop().unwrap()
+        parent.values[index - 1] = sibling.values.pop().unwrap()
+        
+        if not child.leaf:
+            child.children.insert(0, sibling.children.pop().unwrap())
+    
+    fn borrow_from_next(&mut self, parent: &mut Node<K, V>, index: usize):
+        let child = &mut parent.children[index]
+        let sibling = &mut parent.children[index + 1]
+        
+        child.keys.push(parent.keys[index].clone())
+        child.values.push(parent.values[index].clone())
+        parent.keys[index] = sibling.keys.remove(0)
+        parent.values[index] = sibling.values.remove(0)
+        
+        if not child.leaf:
+            child.children.push(sibling.children.remove(0))
+    
+    fn first_in_subtree(&self, node: &Node<K, V>) -> (&K, &V) {
+        if node.leaf:
+            (&node.keys[0], &node.values[0])
+        else:
+            self.first_in_subtree(&node.children[0])
+        }
+    }
+    
+    fn last_in_subtree(&self, node: &Node<K, V>) -> (&K, &V) {
+        if node.leaf {
+            (&node.keys[node.keys.len() - 1], &node.values[node.values.len() - 1])
+        } else {
+            self.last_in_subtree(&node.children[node.children.len() - 1])
+        }
+    }
+
+enum Entry<K, V>:
+    Occupied(OccupiedEntry<K, V>)
+    Vacant(VacantEntry<K, V>)
+
+struct OccupiedEntry<K, V>:
+    map: &mut BTreeMap<K, V>
+    key: K
+
+struct VacantEntry<K, V>:
+    map: &mut BTreeMap<K, V>
+    key: K
+
+impl<K: Ord, V> OccupiedEntry<K, V>:
+    pub fn get(&self) -> &V:
+        self.map.get(&self.key).unwrap()
+    
+    pub fn get_mut(&mut self) -> &mut V:
+        self.map.get_mut(&self.key).unwrap()
+    
+    pub fn insert(&mut self, value: V) -> V:
+        let old = self.map.get_mut(&self.key).unwrap()
+        std::mem::replace(old, value)
+    
+    pub fn remove(self) -> V:
+        self.map.remove(&self.key).unwrap()
+
+impl<K: Ord, V> VacantEntry<K, V>:
+    pub fn insert(self, value: V) -> &mut V:
+        self.map.insert(self.key.clone(), value)
+        self.map.get_mut(&self.key).unwrap()
+
+impl<K: Ord, V> Clone for BTreeMap<K, V> where K: Clone, V: Clone:
+    fn clone(&self) -> Self:
+        let mut new_map = BTreeMap::with_order(self.order)
+        for (k, v) in self.iter():
+            new_map.insert(k.clone(), v.clone())
+        new_map
+
+impl<K: Ord, V> Default for BTreeMap<K, V>:
+    fn default() -> Self:
+        BTreeMap::new()
+
+impl<K: Ord + Debug, V: Debug> Debug for BTreeMap<K, V>:
+    fn fmt(&self, f: &mut Formatter) -> Result:
+        f.write_str("BTreeMap { ")
+        for (i, (k, v)) in self.iter().enumerate():
+            if i > 0:
+                f.write_str(", ")
+            f.write_fmt(format_args!("{:?}: {:?}", k, v))
+        f.write_str(" }")
+
+struct Iter<K, V>:
+    map: &BTreeMap<K, V>
+    stack: Vec<(&Node<K, V>, usize)>
+    current: Option<(&K, &V)>
+
+impl<K, V> Iterator for Iter<K, V>:
+    type Item = (&K, &V)
+    
+    fn next(&mut self) -> Option<(&K, &V)>:
+        // In-order traversal implementation
+        if self.stack.is_empty():
+            if let Some(root) = &self.map.root:
+                self.stack.push((root, 0))
+            else:
+                return None
+        
+        while not self.stack.is_empty():
+            let (node, idx) = self.stack.last().unwrap()
+            
+            if *idx < node.keys.len():
+                if not node.leaf and *idx == 0:
+                    // Push left child first
+                }
+                let result = (&node.keys[*idx], &node.values[*idx])
+                self.stack.last_mut().unwrap().1 += 1
+                return Some(result)
+            else:
+                self.stack.pop()
+        }
+        
+        None
+    }
+}
+
+struct Keys<K, V>:
+    iter: Iter<K, V>
+
+impl<K, V> Iterator for Keys<K, V>:
+    type Item = &K
+    
+    fn next(&mut self) -> Option<&K>:
+        self.iter.next().map(|(k, _)| k)
+
+struct Values<K, V>:
+    iter: Iter<K, V>
+
+impl<K, V> Iterator for Values<K, V>:
+    type Item = &V
+    
+    fn next(&mut self) -> Option<&V>:
+        self.iter.next().map(|(_, v)| v)
+
+trait RangeBounds<T>:
+    fn start_bound(&self) -> Bound<&T>
+    fn end_bound(&self) -> Bound<&T>
+
+enum Bound<T>:
+    Included(T)
+    Excluded(T)
+    Unbounded
+
+struct Range<K, V, R>:
+    map: &BTreeMap<K, V>
+    range: R
+    stack: Vec<(&Node<K, V>, usize)>

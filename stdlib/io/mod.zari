@@ -1,0 +1,16 @@
+// VeZ Standard Library - I/O Module
+// Provides input/output primitives
+
+pub use buffered::{BufferedReader, BufferedWriter, BufReader, BufWriter}
+pub use buffered::{LineIterator, buf_reader, buf_writer}
+pub use buffered::{read_to_string, copy}
+
+pub use net::{SocketAddr, TcpStream, TcpListener, UdpSocket}
+pub use net::{Shutdown, tcp_connect, tcp_listen, udp_bind}
+
+pub use fs::{File, Metadata, Permissions, DirEntry, FileType, OpenOptions, SeekFrom}
+pub use fs::{read_to_string as file_read_to_string, read, write_string, write, append}
+pub use fs::{read_dir, create_dir, create_dir_all, remove_file, remove_dir, remove_dir_all}
+pub use fs::{rename, copy, exists, is_file, is_dir, metadata as file_metadata}
+pub use fs::{set_permissions, soft_link, hard_link, read_link}
+pub use fs::{current_dir, set_current_dir, canonicalize}
